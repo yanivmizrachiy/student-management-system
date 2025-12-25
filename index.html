@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>מערכת ניהול תלמידים</title>
+  <script src="data.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      color: white;
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 80%, rgba(120, 119, 198, 0.1) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .header {
+      text-align: center;
+      padding: 50px 20px;
+      margin-bottom: 60px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 25px;
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .main-title {
+      font-size: 3.8rem;
+      font-weight: 800;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 50%, #c7d2fe 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 0 40px rgba(255,255,255,0.5);
+      letter-spacing: -1px;
+    }
+
+    .subtitle {
+      font-size: 1.3rem;
+      color: rgba(255, 255, 255, 0.85);
+      margin-bottom: 30px;
+      font-weight: 400;
+      letter-spacing: 0.5px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .layers-container {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      flex-wrap: wrap;
+      margin-bottom: 60px;
+    }
+
+    .layer-btn {
+      border: none;
+      border-radius: 25px;
+      padding: 45px 65px;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.5),
+                  0 5px 15px rgba(0,0,0,0.3),
+                  inset 0 1px 0 rgba(255,255,255,0.1);
+      min-width: 300px;
+      text-decoration: none;
+      display: block;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .layer-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .layer-btn:hover::before {
+      left: 100%;
+    }
+
+    .layer-btn:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6),
+                  0 10px 25px rgba(0,0,0,0.4),
+                  inset 0 1px 0 rgba(255,255,255,0.2);
+    }
+
+    .layer-title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 20px;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+
+    .layer-count {
+      font-size: 4rem;
+      font-weight: 900;
+      color: white;
+      margin: 15px 0;
+      text-shadow: 0 0 30px rgba(255,255,255,0.6);
+    }
+
+    .layer-label {
+      font-size: 1.15rem;
+      color: rgba(255,255,255,0.95);
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+
+    .total-counter {
+      background: linear-gradient(145deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      border-radius: 30px;
+      padding: 50px 70px;
+      display: inline-block;
+      box-shadow: 0 20px 60px rgba(102, 126, 234, 0.5),
+                  0 10px 30px rgba(118, 75, 162, 0.4),
+                  inset 0 1px 0 rgba(255,255,255,0.2);
+      animation: pulse 4s infinite;
+      margin: 50px auto;
+      text-align: center;
+      border: 2px solid rgba(255,255,255,0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .total-counter::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      animation: rotate 20s linear infinite;
+    }
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.02);
+      }
+    }
+
+    .total-label {
+      font-size: 2rem;
+      color: white;
+      margin-bottom: 20px;
+      font-weight: 700;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+
+    .total-count {
+      font-size: 5.5rem;
+      font-weight: 900;
+      color: white;
+      text-shadow: 0 0 40px rgba(255,255,255,0.8),
+                   0 4px 20px rgba(0,0,0,0.4);
+      position: relative;
+      z-index: 2;
+    }
+
+    .total-sublabel {
+      font-size: 1.2rem;
+      color: rgba(255,255,255,0.95);
+      font-weight: 500;
+      margin-top: 15px;
+      letter-spacing: 0.5px;
+    }
+
+    .admin-controls {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1000;
+    }
+
+    .admin-toggle {
+      background: rgba(255,255,255,0.1);
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 25px;
+      padding: 12px 24px;
+      color: white;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .admin-toggle:hover {
+      background: rgba(255,255,255,0.15);
+      border-color: rgba(255,255,255,0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+
+    .admin-toggle.active {
+      background: linear-gradient(135deg, rgba(34,193,195,0.3) 0%, rgba(45,253,47,0.3) 100%);
+      border-color: rgba(34,193,195,0.6);
+      box-shadow: 0 4px 20px rgba(34,193,195,0.4);
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+
+      .admin-controls {
+        top: 10px;
+        left: 10px;
+      }
+
+      .admin-toggle {
+        padding: 8px 15px;
+        font-size: 0.8rem;
+      }
+
+      .header {
+        padding: 20px 10px;
+        margin-bottom: 30px;
+      }
+
+      .main-title {
+        font-size: 2rem;
+        margin-bottom: 10px;
+      }
+
+      .subtitle {
+        font-size: 1rem;
+        margin-bottom: 20px;
+      }
+      
+      .layers-container {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 30px;
+      }
+      
+      .layer-btn {
+        min-width: 200px;
+        width: 100%;
+        max-width: 100%;
+        padding: 30px 40px;
+      }
+
+      .layer-title {
+        font-size: 1.5rem;
+      }
+
+      .layer-count {
+        font-size: 2.5rem;
+      }
+
+      .total-counter {
+        padding: 30px 40px;
+        width: 100%;
+        max-width: 100%;
+      }
+
+      .total-label {
+        font-size: 1.4rem;
+      }
+
+      .total-count {
+        font-size: 3.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-controls">
+    <button class="admin-toggle" id="adminToggle" onclick="toggleAdmin()">
+      <span id="adminStatus">🔓 מצב צפייה</span>
+    </button>
+  </div>
+
+  <div class="container">
+    <div class="header">
+      <h1 class="main-title">מערכת חכמה לניהול תלמידים</h1>
+      <p class="subtitle">האתר מנוהל ע"י יניב רז</p>
+    </div>
+    
+    <div class="layers-container">
+      <a href="layer.html?layer=7" class="layer-btn" id="layer7Btn" style="background: linear-gradient(145deg, #2962ff, #1e4ed8);">
+        <div class="layer-title">שכבת ז'</div>
+        <div class="layer-count" id="count7">0</div>
+        <div class="layer-label">תלמידים</div>
+      </a>
+      
+      <a href="layer.html?layer=8" class="layer-btn" id="layer8Btn" style="background: linear-gradient(145deg, #00c853, #00a043);">
+        <div class="layer-title">שכבת ח'</div>
+        <div class="layer-count" id="count8">0</div>
+        <div class="layer-label">תלמידים</div>
+      </a>
+      
+      <a href="layer.html?layer=9" class="layer-btn" id="layer9Btn" style="background: linear-gradient(145deg, #ff9800, #e68900);">
+        <div class="layer-title">שכבת ט'</div>
+        <div class="layer-count" id="count9">0</div>
+        <div class="layer-label">תלמידים</div>
+      </a>
+    </div>
+    
+    <div style="text-align: center;">
+      <div class="total-counter">
+        <div class="total-label">סה"כ תלמידי בית הספר</div>
+        <div class="total-count" id="totalCount">0</div>
+        <div class="total-sublabel">תלמידים</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleAdmin() {
+      DataStore.isAdmin = !DataStore.isAdmin;
+      updateAdminUI();
+    }
+
+    function updateAdminUI() {
+      const toggle = document.getElementById('adminToggle');
+      const status = document.getElementById('adminStatus');
+      if (DataStore.isAdmin) {
+        toggle.classList.add('active');
+        status.textContent = '🔒 מצב בעל מערכת';
+      } else {
+        toggle.classList.remove('active');
+        status.textContent = '🔓 מצב צפייה';
+      }
+    }
+
+    function updateCounts() {
+      document.getElementById('count7').textContent = DataStore.getLayerCount('7');
+      document.getElementById('count8').textContent = DataStore.getLayerCount('8');
+      document.getElementById('count9').textContent = DataStore.getLayerCount('9');
+      document.getElementById('totalCount').textContent = DataStore.getTotalCount();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      DataStore.load();
+      updateAdminUI();
+      updateCounts();
+      
+      // עדכון כל 2 שניות
+      setInterval(() => {
+        DataStore.load();
+        updateCounts();
+      }, 2000);
+    });
+  </script>
+</body>
+</html>

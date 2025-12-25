@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>מורה - מערכת ניהול תלמידים</title>
+  <script src="data.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      color: white;
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 80%, rgba(120, 119, 198, 0.1) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .header {
+      background: rgba(255,255,255,0.08);
+      border-radius: 25px;
+      padding: 35px;
+      margin-bottom: 40px;
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.15);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
+                  inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+
+    .nav-breadcrumbs {
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.7);
+    }
+
+    .nav-breadcrumbs a {
+      color: #00bcd4;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .nav-breadcrumbs a:hover {
+      color: #ffffff;
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .title-section h1 {
+      font-size: 2.6rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #fff9c4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.5px;
+      text-shadow: 0 0 30px rgba(255,215,0,0.5);
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .nav-btn {
+      background: rgba(255,255,255,0.2);
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 12px;
+      padding: 12px 25px;
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: all 0.3s ease;
+    }
+
+    .nav-btn:hover {
+      background: rgba(255,255,255,0.3);
+      transform: translateY(-2px);
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .groups-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 25px;
+      margin-bottom: 40px;
+    }
+
+    .group-card {
+      background: rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 28px;
+      border: 2px solid rgba(255,255,255,0.15);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      text-decoration: none;
+      display: block;
+      color: white;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2),
+                  inset 0 1px 0 rgba(255,255,255,0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .group-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,215,0,0.1), transparent);
+      transition: left 0.6s;
+    }
+
+    .group-card:hover::before {
+      left: 100%;
+    }
+
+    .group-card:hover {
+      border-color: rgba(255,215,0,0.6);
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 15px 40px rgba(255,215,0,0.3),
+                  0 5px 20px rgba(0,0,0,0.3),
+                  inset 0 1px 0 rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.12);
+    }
+
+    .group-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .group-name {
+      font-size: 1.9rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.5px;
+    }
+
+    .group-count {
+      background: linear-gradient(135deg, rgba(255,215,0,0.3) 0%, rgba(255,237,78,0.3) 100%);
+      padding: 10px 20px;
+      border-radius: 25px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      border: 1px solid rgba(255,255,255,0.2);
+      box-shadow: 0 4px 15px rgba(255,215,0,0.2);
+    }
+
+    .group-layer {
+      margin-top: 15px;
+      font-size: 1rem;
+      color: rgba(255,255,255,0.8);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: rgba(255,255,255,0.5);
+      font-size: 1.2rem;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+
+      .header {
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+
+      .nav-breadcrumbs {
+        font-size: 0.85rem;
+        margin-bottom: 15px;
+      }
+
+      .title-section h1 {
+        font-size: 1.8rem;
+      }
+
+      .nav-buttons {
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .nav-btn {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+      }
+
+      .groups-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+      }
+
+      .group-card {
+        padding: 20px;
+      }
+
+      .group-name {
+        font-size: 1.5rem;
+      }
+
+      .group-count {
+        font-size: 1rem;
+        padding: 6px 15px;
+      }
+      
+      .header-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="nav-breadcrumbs">
+        <a href="index.html">בית</a> / <span>מורה</span>
+      </div>
+      <div class="header-content">
+        <div class="title-section">
+          <h1 id="teacherName">מורה</h1>
+        </div>
+        <div class="nav-buttons">
+          <a href="index.html" class="nav-btn">🏠 בית</a>
+          <a href="index.html" class="nav-btn">← חזרה</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="groups-grid" id="groupsGrid"></div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const teacherId = urlParams.get('teacherId');
+
+    function renderTeacher() {
+      if (!teacherId) {
+        window.location.href = 'index.html';
+        return;
+      }
+
+      const teacher = DataStore.getTeacher(teacherId);
+      if (!teacher) {
+        window.location.href = 'index.html';
+        return;
+      }
+
+      document.getElementById('teacherName').textContent = teacher.name;
+
+      const groups = DataStore.getGroupsByTeacher(teacherId);
+      const grid = document.getElementById('groupsGrid');
+
+      if (groups.length === 0) {
+        grid.innerHTML = '<div class="empty-state">אין הקבצות משויכות למורה זה</div>';
+        return;
+      }
+
+      grid.innerHTML = groups.map(group => {
+        const layerName = DataStore.getLayerName(group.layer);
+        const count = DataStore.getGroupCount(group.id);
+
+        return `
+          <a href="group.html?groupId=${group.id}" class="group-card">
+            <div class="group-header">
+              <div class="group-name">${group.name}</div>
+              <div class="group-count">${count} תלמידים</div>
+            </div>
+            <div class="group-layer">שכבה: ${layerName}</div>
+          </a>
+        `;
+      }).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      DataStore.load();
+      renderTeacher();
+      
+      // עדכון כל 2 שניות
+      setInterval(() => {
+        DataStore.load();
+        renderTeacher();
+      }, 2000);
+    });
+  </script>
+</body>
+</html>
+

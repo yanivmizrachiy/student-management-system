@@ -1,0 +1,25 @@
+# קבצים מיותרים - לא לשמור ב-Git
+*.log
+*.tmp
+*.temp
+
+# קבצי מערכת
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# קבצי IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# קבצי ניפוי שגיאות
+node_modules/
+*.min.js.map
+
+# קבצים אישיים/זמניים
+*_backup.*
+*_old.*
+

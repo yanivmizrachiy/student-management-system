@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>תלמיד - מערכת ניהול תלמידים</title>
+  <script src="data.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      color: white;
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 80%, rgba(120, 119, 198, 0.1) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .header {
+      background: rgba(255,255,255,0.08);
+      border-radius: 25px;
+      padding: 35px;
+      margin-bottom: 40px;
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.15);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
+                  inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+
+    .nav-breadcrumbs {
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.7);
+    }
+
+    .nav-breadcrumbs a {
+      color: #667eea;
+      text-decoration: none;
+      transition: color 0.3s ease;
+      font-weight: 500;
+    }
+
+    .nav-breadcrumbs a:hover {
+      color: #ffffff;
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .title-section h1 {
+      font-size: 2.6rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.5px;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .nav-btn {
+      background: rgba(255,255,255,0.2);
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 12px;
+      padding: 12px 25px;
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: all 0.3s ease;
+    }
+
+    .nav-btn:hover {
+      background: rgba(255,255,255,0.3);
+      transform: translateY(-2px);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .student-card {
+      background: rgba(255,255,255,0.08);
+      border-radius: 25px;
+      padding: 45px;
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.15);
+      margin-bottom: 30px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
+                  inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+
+    .student-info {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 25px;
+      margin-bottom: 30px;
+    }
+
+    .info-item {
+      background: rgba(255,255,255,0.06);
+      padding: 22px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2),
+                  inset 0 1px 0 rgba(255,255,255,0.05);
+      transition: all 0.3s ease;
+    }
+
+    .info-item:hover {
+      background: rgba(255,255,255,0.1);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+
+    .info-label {
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 8px;
+    }
+
+    .info-value {
+      font-size: 1.4rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .info-value a {
+      color: #00bcd4;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .info-value a:hover {
+      color: #ffffff;
+      text-decoration: underline;
+    }
+
+    .student-image {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .student-image img {
+      max-width: 200px;
+      max-height: 200px;
+      border-radius: 15px;
+      border: 3px solid rgba(255,255,255,0.3);
+    }
+
+    .grades-section {
+      margin-top: 30px;
+    }
+
+    .grades-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .grades-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 15px;
+    }
+
+    .grade-item {
+      background: rgba(255,255,255,0.05);
+      padding: 15px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .grade-label {
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 8px;
+    }
+
+    .grade-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: white;
+    }
+
+    .grade-input {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 8px;
+      background: rgba(255,255,255,0.1);
+      color: white;
+      font-size: 1.2rem;
+      text-align: center;
+    }
+
+    .grade-input:focus {
+      outline: none;
+      border-color: #00bcd4;
+      box-shadow: 0 0 10px rgba(0,188,212,0.3);
+    }
+
+    .files-section {
+      margin-top: 30px;
+    }
+
+    .files-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .files-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+    }
+
+    .file-item {
+      background: rgba(255,255,255,0.05);
+      padding: 15px;
+      border-radius: 12px;
+      text-align: center;
+      position: relative;
+    }
+
+    .file-item a {
+      color: #00bcd4;
+      text-decoration: none;
+      font-weight: 500;
+      display: block;
+    }
+
+    .file-item a:hover {
+      color: #ffffff;
+      text-decoration: underline;
+    }
+
+    .file-delete-btn {
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      background: rgba(255,0,0,0.7);
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+      display: none;
+    }
+
+    .file-item:hover .file-delete-btn {
+      display: block;
+    }
+
+    .file-delete-btn:hover {
+      background: rgba(255,0,0,0.9);
+    }
+
+    .notes-section {
+      margin-top: 30px;
+    }
+
+    .notes-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .notes-textarea {
+      width: 100%;
+      min-height: 150px;
+      padding: 15px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 8px;
+      background: rgba(255,255,255,0.1);
+      color: white;
+      font-size: 1rem;
+      font-family: inherit;
+      resize: vertical;
+    }
+
+    .notes-textarea:focus {
+      outline: none;
+      border-color: #00bcd4;
+      box-shadow: 0 0 10px rgba(0,188,212,0.3);
+    }
+
+    .notes-textarea:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .info-edit-input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 8px;
+      background: rgba(255,255,255,0.1);
+      color: white;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .info-edit-input:focus {
+      outline: none;
+      border-color: #00bcd4;
+      box-shadow: 0 0 10px rgba(0,188,212,0.3);
+    }
+
+    .info-edit-input:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .admin-controls {
+      margin-bottom: 20px;
+    }
+
+    .control-btn {
+      background: linear-gradient(135deg, rgba(34,193,195,0.3) 0%, rgba(45,253,47,0.3) 100%);
+      border: 2px solid rgba(34,193,195,0.5);
+      border-radius: 15px;
+      padding: 12px 28px;
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      margin-left: 15px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 15px rgba(34,193,195,0.2);
+    }
+
+    .control-btn:hover {
+      background: linear-gradient(135deg, rgba(34,193,195,0.5) 0%, rgba(45,253,47,0.5) 100%);
+      border-color: rgba(34,193,195,0.8);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 25px rgba(34,193,195,0.4);
+    }
+
+    .control-btn.hidden {
+      display: none;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+
+      .header {
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+
+      .nav-breadcrumbs {
+        font-size: 0.85rem;
+        margin-bottom: 15px;
+      }
+
+      .title-section h1 {
+        font-size: 1.8rem;
+      }
+
+      .nav-buttons {
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .nav-btn {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+      }
+
+      .admin-controls {
+        margin-bottom: 15px;
+      }
+
+      .control-btn {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+        margin-left: 0;
+        margin-bottom: 10px;
+        display: block;
+        width: 100%;
+        max-width: 200px;
+      }
+
+      .student-card {
+        padding: 20px;
+      }
+
+      .student-info {
+        grid-template-columns: 1fr;
+        gap: 15px;
+      }
+
+      .info-value {
+        font-size: 1.1rem;
+      }
+
+      .student-image img {
+        max-width: 150px;
+        max-height: 150px;
+      }
+
+      .grades-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 10px;
+      }
+
+      .files-list {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="nav-breadcrumbs" id="breadcrumbs">
+        <a href="index.html">בית</a> / <span id="breadcrumbPath">תלמיד</span>
+      </div>
+      <div class="header-content">
+        <div class="title-section">
+          <h1 id="studentTitle">תלמיד</h1>
+        </div>
+        <div class="nav-buttons">
+          <a href="index.html" class="nav-btn">🏠 בית</a>
+          <a href="#" class="nav-btn" id="backBtn">← חזרה</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-controls" id="adminControls">
+      <input type="file" id="imageUpload" accept="image/*" onchange="uploadImage(event)">
+      <input type="file" id="fileUpload" multiple onchange="uploadFiles(event)">
+      <button class="control-btn" onclick="document.getElementById('imageUpload').click()">📷 העלה תמונה</button>
+      <button class="control-btn" onclick="document.getElementById('fileUpload').click()">📎 העלה קבצים</button>
+    </div>
+
+    <div class="student-card">
+      <div class="student-image" id="studentImage"></div>
+      
+      <div class="student-info" id="studentInfo"></div>
+
+      <div class="grades-section">
+        <div class="grades-title">ציונים</div>
+        <div class="grades-grid" id="gradesGrid"></div>
+      </div>
+
+      <div class="files-section">
+        <div class="files-title">קבצים</div>
+        <div class="files-list" id="filesList"></div>
+      </div>
+
+      <div class="notes-section" id="notesSection"></div>
+    </div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const studentId = urlParams.get('studentId');
+
+    function renderStudent() {
+      if (!studentId) {
+        window.location.href = 'index.html';
+        return;
+      }
+
+      const student = DataStore.getStudent(studentId);
+      if (!student) {
+        window.location.href = 'index.html';
+        return;
+      }
+
+      document.getElementById('studentTitle').textContent = `${student.firstName || ''} ${student.lastName || ''}`.trim() || 'תלמיד';
+
+      // בניית breadcrumbs
+      const group = student.groupId ? DataStore.getGroup(student.groupId) : null;
+      const layerName = student.layer ? DataStore.getLayerName(student.layer) : '';
+      let breadcrumbPath = '';
+      if (group && student.layer) {
+        breadcrumbPath = `<a href="layer.html?layer=${student.layer}">שכבת ${layerName}</a> / <a href="group.html?groupId=${group.id}">${group.name}</a> / תלמיד`;
+        document.getElementById('backBtn').href = `group.html?groupId=${group.id}`;
+      } else {
+        breadcrumbPath = 'תלמיד';
+        document.getElementById('backBtn').href = 'index.html';
+      }
+      document.getElementById('breadcrumbPath').innerHTML = breadcrumbPath;
+
+      // תמונה
+      const imageContainer = document.getElementById('studentImage');
+      if (student.image) {
+        imageContainer.innerHTML = `<img src="${student.image}" alt="תמונת תלמיד">`;
+      } else {
+        imageContainer.innerHTML = '';
+      }
+
+      // פרטי תלמיד
+      const studentClass = student.classId ? DataStore.getClass(student.classId) : null;
+      const classTeacher = studentClass && studentClass.teacherId ? DataStore.getTeacher(studentClass.teacherId) : null;
+      const groupName = group ? group.name : '';
+
+      const isAdmin = DataStore.isAdmin;
+      const infoHTML = `
+        <div class="info-item">
+          <div class="info-label">שם פרטי</div>
+          ${isAdmin 
+            ? `<input type="text" class="info-edit-input" value="${student.firstName || ''}" onchange="updateStudentField('firstName', this.value)" placeholder="שם פרטי">`
+            : `<div class="info-value">${student.firstName || ''}</div>`
+          }
+        </div>
+        <div class="info-item">
+          <div class="info-label">שם משפחה</div>
+          ${isAdmin 
+            ? `<input type="text" class="info-edit-input" value="${student.lastName || ''}" onchange="updateStudentField('lastName', this.value)" placeholder="שם משפחה">`
+            : `<div class="info-value">${student.lastName || ''}</div>`
+          }
+        </div>
+        <div class="info-item">
+          <div class="info-label">שכבה</div>
+          <div class="info-value">${layerName || ''}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">הקבצה</div>
+          <div class="info-value">${groupName || ''}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">כיתה</div>
+          <div class="info-value">${studentClass ? `<a href="class.html?classId=${studentClass.id}">${studentClass.name}</a>` : ''}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">מחנכת</div>
+          <div class="info-value">${classTeacher ? `<a href="teacher.html?teacherId=${classTeacher.id}" style="color: #ffd700; text-decoration: none;">${classTeacher.name}</a>` : ''}</div>
+        </div>
+      `;
+      document.getElementById('studentInfo').innerHTML = infoHTML;
+
+      // ציונים
+      const gradesGrid = document.getElementById('gradesGrid');
+      if (DataStore.gradeColumns.length === 0) {
+        gradesGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: rgba(255,255,255,0.5);">אין עמודות ציונים</div>';
+      } else {
+        gradesGrid.innerHTML = DataStore.gradeColumns.map(col => {
+          const grade = student.grades && student.grades[col.id] ? student.grades[col.id] : '';
+          if (DataStore.isAdmin) {
+            return `
+              <div class="grade-item">
+                <div class="grade-label">${col.name}</div>
+                <input type="text" class="grade-input" value="${grade}" onchange="saveGrade('${col.id}', this.value)">
+              </div>
+            `;
+          } else {
+            return `
+              <div class="grade-item">
+                <div class="grade-label">${col.name}</div>
+                <div class="grade-value">${grade || ''}</div>
+              </div>
+            `;
+          }
+        }).join('');
+      }
+
+      // קבצים
+      const filesList = document.getElementById('filesList');
+      if (!student.files || student.files.length === 0) {
+        filesList.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: rgba(255,255,255,0.5);">אין קבצים</div>';
+      } else {
+        filesList.innerHTML = student.files.map(file => `
+          <div class="file-item">
+            ${isAdmin ? `<button class="file-delete-btn" onclick="deleteFile('${file.id}')" title="מחק קובץ">×</button>` : ''}
+            <a href="${file.url}" target="_blank">${file.name}</a>
+          </div>
+        `).join('');
+      }
+
+      // הערות
+      const notesSection = document.getElementById('notesSection');
+      if (notesSection) {
+        if (isAdmin) {
+          notesSection.innerHTML = `
+            <div class="notes-title">הערות</div>
+            <textarea class="notes-textarea" id="studentNotes" placeholder="הוסף הערות על התלמיד..." onchange="updateStudentField('notes', this.value)">${student.notes || ''}</textarea>
+          `;
+        } else {
+          notesSection.innerHTML = student.notes 
+            ? `<div class="notes-title">הערות</div><div style="padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px; white-space: pre-wrap;">${student.notes}</div>`
+            : '';
+        }
+      }
+
+      // הצגת/הסתרת בקרות בעל מערכת
+      const adminControls = document.getElementById('adminControls');
+      if (!DataStore.isAdmin) {
+        adminControls.classList.add('hidden');
+      }
+    }
+
+    function saveGrade(columnId, value) {
+      if (!DataStore.isAdmin) {
+        alert('אין הרשאה לערוך');
+        return;
+      }
+      
+      const student = DataStore.getStudent(studentId);
+      if (!student) return;
+
+      if (!student.grades) {
+        student.grades = {};
+      }
+      
+      student.grades[columnId] = value;
+      DataStore.save();
+    }
+
+    function uploadImage(event) {
+      if (!DataStore.isAdmin) {
+        alert('אין הרשאה להעלאת תמונות');
+        event.target.value = '';
+        return;
+      }
+      
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const student = DataStore.getStudent(studentId);
+        if (!student) return;
+
+        student.image = e.target.result;
+        DataStore.save();
+        renderStudent();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function uploadFiles(event) {
+      if (!DataStore.isAdmin) {
+        alert('אין הרשאה להעלאת קבצים');
+        event.target.value = '';
+        return;
+      }
+      
+      const files = Array.from(event.target.files);
+      if (files.length === 0) return;
+
+      const student = DataStore.getStudent(studentId);
+      if (!student) return;
+
+      if (!student.files) {
+        student.files = [];
+      }
+
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          student.files.push({
+            id: DataStore.generateId(),
+            name: file.name,
+            url: e.target.result,
+            uploadDate: new Date().toISOString()
+          });
+          DataStore.save();
+          renderStudent();
+        };
+        reader.readAsDataURL(file);
+      });
+      
+      event.target.value = ''; // איפוס input
+    }
+
+    function deleteFile(fileId) {
+      if (!DataStore.isAdmin) {
+        alert('אין הרשאה למחוק קבצים');
+        return;
+      }
+
+      if (!confirm('האם אתה בטוח שברצונך למחוק קובץ זה?')) {
+        return;
+      }
+
+      const student = DataStore.getStudent(studentId);
+      if (!student || !student.files) return;
+
+      student.files = student.files.filter(f => f.id !== fileId);
+      DataStore.save();
+      renderStudent();
+    }
+
+    function updateStudentField(field, value) {
+      if (!DataStore.isAdmin) {
+        alert('אין הרשאה לערוך');
+        return;
+      }
+
+      const student = DataStore.getStudent(studentId);
+      if (!student) return;
+
+      student[field] = value;
+      DataStore.save();
+      
+      // עדכון כותרת אם זה שם
+      if (field === 'firstName' || field === 'lastName') {
+        const newTitle = `${student.firstName || ''} ${student.lastName || ''}`.trim() || 'תלמיד';
+        document.getElementById('studentTitle').textContent = newTitle;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      DataStore.load();
+      renderStudent();
+    });
+  </script>
+</body>
+</html>
+

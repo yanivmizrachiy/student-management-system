@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>הקבצה - מערכת ניהול תלמידים</title>
+  <script src="data.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      color: white;
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 80%, rgba(120, 119, 198, 0.1) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .header {
+      background: rgba(255,255,255,0.08);
+      border-radius: 25px;
+      padding: 35px;
+      margin-bottom: 40px;
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.15);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
+                  inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+
+    .nav-breadcrumbs {
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.7);
+    }
+
+    .nav-breadcrumbs a {
+      color: #667eea;
+      text-decoration: none;
+      transition: color 0.3s ease;
+      font-weight: 500;
+    }
+
+    .nav-breadcrumbs a:hover {
+      color: #ffffff;
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .title-section h1 {
+      font-size: 2.6rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.5px;
+    }
+
+    .header-info {
+      font-size: 1.1rem;
+      color: rgba(255,255,255,0.8);
+      margin-top: 10px;
+    }
+
+    .header-info span {
+      margin-left: 20px;
+    }
+
+    .teacher-link {
+      color: #ffd700;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s ease;
+    }
+
+    .teacher-link:hover {
+      color: #ffed4e;
+      text-decoration: underline;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .nav-btn {
+      background: rgba(255,255,255,0.2);
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 12px;
+      padding: 12px 25px;
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: all 0.3s ease;
+    }
+
+    .nav-btn:hover {
+      background: rgba(255,255,255,0.3);
+      transform: translateY(-2px);
+    }
+
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    .table-container {
+      background: #ffffff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border: 1px solid #e1e4e8;
+    }
+
+    .students-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      color: #24292e;
+      font-size: 14px;
+    }
+
+    .students-table thead {
+      background: linear-gradient(180deg, #f6f8fa 0%, #eaeef2 100%);
+      border-bottom: 2px solid #d1d5da;
+    }
+
+    .students-table th {
+      padding: 10px 12px;
+      text-align: right;
+      font-weight: 600;
+      font-size: 13px;
+      color: #586069;
+      border-right: 1px solid #d1d5da;
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .students-table th:first-child {
+      border-right: none;
+    }
+
+    .students-table th:last-child {
+      border-right: none;
+    }
+
+    .students-table tbody tr {
+      border-bottom: 1px solid #e1e4e8;
+      transition: background-color 0.1s ease;
+      background-color: #ffffff;
+    }
+
+    .students-table tbody tr:nth-child(even) {
+      background-color: #fafbfc;
+    }
+
+    .students-table tbody tr:hover {
+      background-color: #f1f8ff !important;
+      cursor: pointer;
+    }
+
+    .students-table td {
+      padding: 8px 12px;
+      font-size: 13px;
+      color: #24292e;
+      border-right: 1px solid #e1e4e8;
+      vertical-align: middle;
+    }
+
+    .students-table td:first-child {
+      border-right: none;
+      font-weight: 500;
+      color: #586069;
+      text-align: center;
+      width: 50px;
+    }
+
+    .students-table td:last-child {
+      border-right: none;
+    }
+
+    .student-link {
+      color: #0366d6;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.15s ease;
+    }
+
+    .student-link:hover {
+      color: #005cc5;
+      text-decoration: underline;
+    }
+
+    .class-link {
+      color: #28a745;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.15s ease;
+    }
+
+    .class-link:hover {
+      color: #22863a;
+      text-decoration: underline;
+    }
+
+    .teacher-name {
+      color: #586069;
+    }
+    
+    .teacher-name-link {
+      color: #ffd700;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.15s ease;
+    }
+    
+    .teacher-name-link:hover {
+      color: #ffed4e;
+      text-decoration: underline;
+    }
+
+    .grade-cell {
+      text-align: center;
+      min-width: 90px;
+      max-width: 120px;
+    }
+
+    .grade-input {
+      width: 100%;
+      max-width: 100px;
+      padding: 4px 8px;
+      border: 1px solid #d1d5da;
+      border-radius: 3px;
+      text-align: center;
+      font-size: 13px;
+      background-color: #ffffff;
+      color: #24292e;
+      transition: all 0.15s ease;
+    }
+
+    .grade-input:hover {
+      border-color: #0366d6;
+    }
+
+    .grade-input:focus {
+      outline: none;
+      border-color: #0366d6;
+      box-shadow: 0 0 0 3px rgba(3, 102, 214, 0.1);
+      background-color: #fff;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #586069;
+      font-size: 14px;
+      background-color: #fafbfc;
+    }
+
+    .admin-controls {
+      margin-bottom: 20px;
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .control-btn {
+      background: linear-gradient(135deg, rgba(34,193,195,0.3) 0%, rgba(45,253,47,0.3) 100%);
+      border: 2px solid rgba(34,193,195,0.5);
+      border-radius: 15px;
+      padding: 12px 28px;
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 15px rgba(34,193,195,0.2);
+    }
+
+    .control-btn:hover {
+      background: linear-gradient(135deg, rgba(34,193,195,0.5) 0%, rgba(45,253,47,0.5) 100%);
+      border-color: rgba(34,193,195,0.8);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 25px rgba(34,193,195,0.4);
+    }
+
+    .control-btn.hidden {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+
+      .header {
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+
+      .nav-breadcrumbs {
+        font-size: 0.85rem;
+        margin-bottom: 15px;
+      }
+
+      .title-section h1 {
+        font-size: 1.8rem;
+      }
+
+      .header-info {
+        font-size: 0.95rem;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+
+      .header-info span {
+        margin-left: 0;
+      }
+
+      .nav-buttons {
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .nav-btn {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+      }
+
+      .admin-controls {
+        margin-bottom: 15px;
+      }
+
+      .control-btn {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+        margin-left: 0;
+        margin-bottom: 10px;
+      }
+      
+      .header-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+      }
+      
+      .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 5px;
+      }
+
+      .students-table {
+        min-width: 600px;
+        font-size: 12px;
+      }
+
+      .students-table th {
+        padding: 8px 10px;
+        font-size: 12px;
+      }
+
+      .students-table td {
+        padding: 6px 10px;
+        font-size: 12px;
+      }
+
+      .grade-input {
+        width: 60px;
+        padding: 3px 6px;
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header" id="header">
+      <div class="nav-breadcrumbs" id="breadcrumbs">
+        <a href="index.html">בית</a> / <a href="layer.html?layer=" id="layerLink">שכבה</a> / <span id="groupName">הקבצה</span>
+      </div>
+      <div class="header-content">
+        <div class="title-section">
+          <h1 id="groupTitle">הקבצה</h1>
+          <div class="header-info">
+            <span id="groupInfo"></span>
+            <span id="teacherInfo"></span>
+            <span id="countInfo"></span>
+          </div>
+        </div>
+        <div class="nav-buttons">
+          <a href="index.html" class="nav-btn">🏠 בית</a>
+          <a href="#" class="nav-btn" id="backBtn">← חזרה</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-controls" id="adminControls">
+      <button class="control-btn" onclick="addGradeColumn()">+ הוסף עמודת ציון</button>
+    </div>
+
+    <div class="table-container">
+      <table class="students-table">
+        <thead id="tableHead">
+          <tr>
+            <th>#</th>
+            <th>שם משפחה</th>
+            <th>שם פרטי</th>
+            <th>כיתה</th>
+            <th>מחנכת</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <tr>
+            <td colspan="5" class="empty-state">טוען...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const groupId = urlParams.get('groupId');
+
+    function renderGroup() {
+      if (!groupId) {
+        window.location.href = 'index.html';
+        return;
+      }
+
+      const group = DataStore.getGroup(groupId);
+      if (!group) {
+        window.location.href = 'index.html';
+        return;
+      }
+
+      const layerName = DataStore.getLayerName(group.layer);
+      document.getElementById('groupTitle').textContent = group.name;
+      document.getElementById('groupName').textContent = group.name;
+      document.getElementById('layerLink').textContent = `שכבת ${layerName}`;
+      document.getElementById('layerLink').href = `layer.html?layer=${group.layer}`;
+      document.getElementById('backBtn').href = `layer.html?layer=${group.layer}`;
+
+      const teacher = group.teacherId ? DataStore.getTeacher(group.teacherId) : null;
+      const count = DataStore.getGroupCount(groupId);
+      
+      document.getElementById('groupInfo').textContent = `שכבה: ${layerName}`;
+      document.getElementById('teacherInfo').innerHTML = teacher 
+        ? `מורה: <a href="teacher.html?teacherId=${teacher.id}" class="teacher-link">${teacher.name}</a>`
+        : '';
+      document.getElementById('countInfo').textContent = `${count} תלמידים`;
+
+      // הגדרת רקע לפי שכבה
+      const layerColor = DataStore.getLayerColor(group.layer);
+      document.querySelector('.header').style.background = layerColor.replace('linear-gradient(145deg, ', 'linear-gradient(135deg, ').replace(')', ', rgba(0,0,0,0.3))');
+
+      // הצגת/הסתרת בקרות בעל מערכת
+      const adminControls = document.getElementById('adminControls');
+      if (!DataStore.isAdmin) {
+        adminControls.classList.add('hidden');
+      }
+
+      // טעינת תלמידים
+      const students = DataStore.getStudentsByGroup(groupId);
+
+      // בניית כותרות טבלה
+      const tableHead = document.getElementById('tableHead');
+      let headerHTML = '<tr><th>#</th><th>שם משפחה</th><th>שם פרטי</th><th>כיתה</th><th>מחנכת</th>';
+      
+      DataStore.gradeColumns.forEach(col => {
+        headerHTML += `<th>${col.name}</th>`;
+      });
+      
+      headerHTML += '</tr>';
+      tableHead.innerHTML = headerHTML;
+
+      // בניית גוף טבלה
+      const tableBody = document.getElementById('tableBody');
+      if (students.length === 0) {
+        const cols = 5 + DataStore.gradeColumns.length;
+        tableBody.innerHTML = `<tr><td colspan="${cols}" class="empty-state">אין תלמידים בהקבצה זו</td></tr>`;
+        return;
+      }
+
+      tableBody.innerHTML = students.map((student, index) => {
+        const studentClass = student.classId ? DataStore.getClass(student.classId) : null;
+        const classTeacher = studentClass && studentClass.teacherId ? DataStore.getTeacher(studentClass.teacherId) : null;
+
+        let rowHTML = `
+          <tr>
+            <td>${index + 1}</td>
+            <td><a href="student.html?studentId=${student.id}" class="student-link">${student.lastName || ''}</a></td>
+            <td><a href="student.html?studentId=${student.id}" class="student-link">${student.firstName || ''}</a></td>
+            <td>${studentClass ? `<a href="class.html?classId=${studentClass.id}" class="class-link">${studentClass.name}</a>` : ''}</td>
+            <td class="teacher-name">${classTeacher ? `<a href="teacher.html?teacherId=${classTeacher.id}" class="teacher-name-link">${classTeacher.name}</a>` : ''}</td>
+        `;
+
+        // עמודות ציונים
+        DataStore.gradeColumns.forEach(col => {
+          const grade = student.grades && student.grades[col.id] ? student.grades[col.id] : '';
+          if (DataStore.isAdmin) {
+            rowHTML += `<td class="grade-cell"><input type="text" class="grade-input" value="${grade}" onchange="saveGrade('${student.id}', '${col.id}', this.value)"></td>`;
+          } else {
+            rowHTML += `<td class="grade-cell">${grade || ''}</td>`;
+          }
+        });
+
+        rowHTML += '</tr>';
+        return rowHTML;
+      }).join('');
+    }
+
+    function saveGrade(studentId, columnId, value) {
+      if (!DataStore.isAdmin) {
+        alert('אין הרשאה לערוך');
+        return;
+      }
+      
+      const student = DataStore.getStudent(studentId);
+      if (!student) return;
+
+      if (!student.grades) {
+        student.grades = {};
+      }
+      
+      student.grades[columnId] = value;
+      DataStore.save();
+    }
+
+    function addGradeColumn() {
+      if (!DataStore.isAdmin) {
+        alert('אין הרשאה להוספת עמודות');
+        return;
+      }
+      
+      const name = prompt('שם העמודה:');
+      if (!name || name.trim() === '') return;
+
+      const column = {
+        id: DataStore.generateId(),
+        name: name.trim()
+      };
+
+      DataStore.gradeColumns.push(column);
+      DataStore.save();
+      renderGroup();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      DataStore.load();
+      renderGroup();
+      
+      // עדכון כל 2 שניות
+      setInterval(() => {
+        DataStore.load();
+        renderGroup();
+      }, 2000);
+    });
+  </script>
+</body>
+</html>
+

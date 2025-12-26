@@ -380,7 +380,8 @@ const DataStore = {
       }
     });
 
-    this.save();
+    this._invalidateCache(); // ביטול cache אחרי שינוי
+    this.save(); // שמירה עם debounce (לא מיידית כי זה יכול להיות קבוצה גדולה)
     const primaryClass = config.className ? this.classes.find(c => c.name === config.className && c.layer === config.layer) : Array.from(classesUsed)[0];
     return { added, total: students.length, teacher, classItem: primaryClass, classesUsed: Array.from(classesUsed), group };
   },
@@ -392,7 +393,8 @@ const DataStore = {
     this.groups = [];
     this.teachers = [];
     this.gradeColumns = [];
-    this.save();
+    this._invalidateCache(); // ביטול cache
+    this.save(true); // שמירה מיידית
   }
 };
 

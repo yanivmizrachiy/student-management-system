@@ -361,8 +361,22 @@
 
   <script>
     function toggleAdmin() {
-      DataStore.isAdmin = !DataStore.isAdmin;
-      updateAdminUI();
+      // אם כבר במצב עריכה, יציאה ממצב עריכה
+      if (DataStore.isAdmin) {
+        DataStore.isAdmin = false;
+        updateAdminUI();
+        return;
+      }
+      
+      // אם לא במצב עריכה, בקשת סיסמה
+      const password = prompt('הכנס סיסמה לכניסה למצב עריכה:');
+      if (password === '1167') {
+        DataStore.isAdmin = true;
+        updateAdminUI();
+        alert('✅ נכנסת למצב עריכה');
+      } else if (password !== null) {
+        alert('❌ סיסמה שגויה');
+      }
     }
 
     function updateAdminUI() {
@@ -370,7 +384,7 @@
       const status = document.getElementById('adminStatus');
       if (DataStore.isAdmin) {
         toggle.classList.add('active');
-        status.textContent = '🔒 מצב בעל מערכת';
+        status.textContent = '🔒 מצב עריכה';
       } else {
         toggle.classList.remove('active');
         status.textContent = '🔓 מצב צפייה';

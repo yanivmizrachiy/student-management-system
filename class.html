@@ -459,7 +459,7 @@
       }
 
       // שימוש ב-formatClassName להצגת שם הכיתה ללא "כיתה "
-      const formattedClassName = formatClassName(classItem.name);
+      const formattedClassName = window.SharedUtils ? window.SharedUtils.formatClassName(classItem.name) : (classItem.name || '').replace(/^כיתה\s+/, '');
       document.getElementById('classTitle').textContent = formattedClassName;
       document.getElementById('className').textContent = formattedClassName;
 

@@ -188,78 +188,60 @@ const DataStore = {
     this._cacheTimestamp = null;
   },
   
+  // Helper function for cache checking
+  _getCachedCount(key, useCache) {
+    if (useCache && this._countCache[key] && 
+        this._cacheTimestamp && (Date.now() - this._cacheTimestamp < this._cacheTTL)) {
+      return this._countCache[key];
+    }
+    return null;
+  },
+
+  _setCachedCount(key, count) {
+    this._countCache[key] = count;
+    this._cacheTimestamp = Date.now();
+  },
+
   // פונקציות עזר - מונים (עם cache לשיפור performance)
   getLayerCount(layer, useCache = true) {
-    // בדיקת cache
-    if (useCache && this._countCache[`layer_${layer}`] && 
-        this._cacheTimestamp && (Date.now() - this._cacheTimestamp < this._cacheTTL)) {
-      return this._countCache[`layer_${layer}`];
-    }
+    const cacheKey = `layer_${layer}`;
+    const cached = this._getCachedCount(cacheKey, useCache);
+    if (cached !== null) return cached;
     
-    // חישוב חדש
     if (!layer) return 0;
-    const layerStr = String(layer);
-    const count = this.students.filter(s => s && s.layer && String(s.layer) === layerStr).length;
-    
-    // שמירה ב-cache
-    this._countCache[`layer_${layer}`] = count;
-    this._cacheTimestamp = Date.now();
-    
+    const count = this.students.filter(s => s?.layer && String(s.layer) === String(layer)).length;
+    this._setCachedCount(cacheKey, count);
     return count;
   },
-  
+
   getGroupCount(groupId, useCache = true) {
-    // בדיקת cache
-    if (useCache && this._countCache[`group_${groupId}`] && 
-        this._cacheTimestamp && (Date.now() - this._cacheTimestamp < this._cacheTTL)) {
-      return this._countCache[`group_${groupId}`];
-    }
+    const cacheKey = `group_${groupId}`;
+    const cached = this._getCachedCount(cacheKey, useCache);
+    if (cached !== null) return cached;
     
-    // חישוב חדש
     if (!groupId) return 0;
-    const groupIdStr = String(groupId);
-    const count = this.students.filter(s => s && s.groupId && String(s.groupId) === groupIdStr).length;
-    
-    // שמירה ב-cache
-    this._countCache[`group_${groupId}`] = count;
-    this._cacheTimestamp = Date.now();
-    
+    const count = this.students.filter(s => s?.groupId && String(s.groupId) === String(groupId)).length;
+    this._setCachedCount(cacheKey, count);
     return count;
   },
-  
+
   getClassCount(classId, useCache = true) {
-    // בדיקת cache
-    if (useCache && this._countCache[`class_${classId}`] && 
-        this._cacheTimestamp && (Date.now() - this._cacheTimestamp < this._cacheTTL)) {
-      return this._countCache[`class_${classId}`];
-    }
+    const cacheKey = `class_${classId}`;
+    const cached = this._getCachedCount(cacheKey, useCache);
+    if (cached !== null) return cached;
     
-    // חישוב חדש
     if (!classId) return 0;
-    const classIdStr = String(classId);
-    const count = this.students.filter(s => s && s.classId && String(s.classId) === classIdStr).length;
-    
-    // שמירה ב-cache
-    this._countCache[`class_${classId}`] = count;
-    this._cacheTimestamp = Date.now();
-    
+    const count = this.students.filter(s => s?.classId && String(s.classId) === String(classId)).length;
+    this._setCachedCount(cacheKey, count);
     return count;
   },
-  
+
   getTotalCount(useCache = true) {
-    // בדיקת cache
-    if (useCache && this._countCache['total'] && 
-        this._cacheTimestamp && (Date.now() - this._cacheTimestamp < this._cacheTTL)) {
-      return this._countCache['total'];
-    }
+    const cached = this._getCachedCount('total', useCache);
+    if (cached !== null) return cached;
     
-    // חישוב חדש
-    const count = this.students ? this.students.length : 0;
-    
-    // שמירה ב-cache
-    this._countCache['total'] = count;
-    this._cacheTimestamp = Date.now();
-    
+    const count = this.students?.length || 0;
+    this._setCachedCount('total', count);
     return count;
   },
   

@@ -4,7 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>כיתה - מערכת ניהול תלמידים</title>
-  <script src="data.js"></script>`n  <script src="auto-load-data.js"></script>
+  <script src="data.js"></script>
+  <script src="auto-load-data.js"></script>
+  <script src="shared-utils.js"></script>
   <style>
     * {
       margin: 0;
@@ -386,6 +388,8 @@
             <th>#</th>
             <th>שם משפחה</th>
             <th>שם פרטי</th>
+            <th>הקבצה</th>
+            <th>מורה למתמטיקה</th>
           </tr>
         </thead>
         <tbody id="tableBody">
@@ -413,8 +417,10 @@
         return;
       }
 
-      document.getElementById('classTitle').textContent = classItem.name;
-      document.getElementById('className').textContent = classItem.name;
+      // שימוש ב-formatClassName להצגת שם הכיתה ללא "כיתה "
+      const formattedClassName = formatClassName(classItem.name);
+      document.getElementById('classTitle').textContent = formattedClassName;
+      document.getElementById('className').textContent = formattedClassName;
 
       const teacher = classItem.teacherId ? DataStore.getTeacher(classItem.teacherId) : null;
       const layerName = classItem.layer ? DataStore.getLayerName(classItem.layer) : '';
@@ -442,18 +448,42 @@
       const tableBody = document.getElementById('tableBody');
 
       if (students.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="3" class="empty-state">אין תלמידים בכיתה זו</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="5" class="empty-state">אין תלמידים בכיתה זו</td></tr>';
         return;
       }
 
+      // בניית כותרות טבלה עם עמודות ציונים
+      const tableHead = document.querySelector('.students-table thead tr');
+      let headerHTML = '<th>#</th><th>שם משפחה</th><th>שם פרטי</th><th>הקבצה</th><th>מורה למתמטיקה</th>';
+      
+      // הוסף עמודות ציונים
+      DataStore.gradeColumns.forEach(col => {
+        headerHTML += `<th>${col.name}</th>`;
+      });
+      
+      tableHead.innerHTML = headerHTML;
+
       tableBody.innerHTML = students.map((student, index) => {
-        return `
+        const group = student.groupId ? DataStore.getGroup(student.groupId) : null;
+        const mathTeacher = group && group.teacherId ? DataStore.getTeacher(group.teacherId) : null;
+        
+        let rowHTML = `
           <tr>
             <td>${index + 1}</td>
             <td><a href="student.html?studentId=${student.id}" class="student-link">${student.lastName || ''}</a></td>
             <td><a href="student.html?studentId=${student.id}" class="student-link">${student.firstName || ''}</a></td>
-          </tr>
+            <td>${group ? `<a href="group.html?groupId=${group.id}" class="group-link">${group.name}</a>` : ''}</td>
+            <td>${mathTeacher ? `<a href="teacher.html?teacherId=${mathTeacher.id}" class="math-teacher-link">${mathTeacher.name}</a>` : ''}</td>
         `;
+        
+        // עמודות ציונים
+        DataStore.gradeColumns.forEach(col => {
+          const grade = student.grades && student.grades[col.id] ? student.grades[col.id] : '';
+          rowHTML += `<td class="grade-cell">${grade || ''}</td>`;
+        });
+        
+        rowHTML += '</tr>';
+        return rowHTML;
       }).join('');
     }
 

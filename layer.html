@@ -480,19 +480,20 @@
       grid.innerHTML = groups.map(group => {
         const teacher = group.teacherId ? DataStore.getTeacher(group.teacherId) : null;
         const count = DataStore.getGroupCount(group.id);
-        const teacherLink = teacher 
-          ? `<a href="teacher.html?teacherId=${teacher.id}" class="teacher-link">${teacher.name}</a>`
-          : '<span class="no-teacher">ללא מורה</span>';
+        
+        // בניית כותרת הכפתור: "הקבצה [שם] [מורה]"
+        const groupTitle = teacher 
+          ? `הקבצה ${group.name} ${teacher.name}`
+          : `הקבצה ${group.name}`;
 
         return `
           <div class="group-card-wrapper">
             <a href="group.html?groupId=${group.id}" class="group-card">
               <div class="group-header">
-                <div class="group-name">${group.name}</div>
+                <div class="group-name">${groupTitle}</div>
               </div>
             </a>
             <div class="group-info">
-              <div class="group-teacher">${teacherLink}</div>
               <div class="group-count-badge">${count} תלמידים</div>
             </div>
           </div>

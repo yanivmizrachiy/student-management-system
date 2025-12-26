@@ -88,21 +88,10 @@ const DataStore = {
   },
   
   // Debounced save function - שמירה עם debounce לשיפור performance
-  _saveDebounced: null,
+  _saveTimeout: null,
   
   // שמירת נתונים (עם debounce לשיפור performance)
   save(immediate = false) {
-    // אם זה שמירה מיידית או אין debounced function
-    if (immediate || !this._saveDebounced) {
-      this._saveDebounced = this._debounceSave();
-      return this._saveDebounced(immediate);
-    }
-    
-    return this._saveDebounced();
-  },
-  
-  _debounceSave() {
-    let timeout;
     const saveNow = () => {
       const data = {
         students: this.students,
@@ -130,16 +119,26 @@ const DataStore = {
       }
     };
     
-    return (immediate = false) => {
-      if (immediate) {
-        clearTimeout(timeout);
-        return saveNow();
+    // שמירה מיידית
+    if (immediate) {
+      if (this._saveTimeout) {
+        clearTimeout(this._saveTimeout);
+        this._saveTimeout = null;
       }
-      
-      clearTimeout(timeout);
-      timeout = setTimeout(saveNow, 300); // Debounce של 300ms
-      return true; // מחזיר true כי השמירה תתבצע
-    };
+      return saveNow();
+    }
+    
+    // Debounce - דחיית שמירה ל-300ms
+    if (this._saveTimeout) {
+      clearTimeout(this._saveTimeout);
+    }
+    
+    this._saveTimeout = setTimeout(() => {
+      saveNow();
+      this._saveTimeout = null;
+    }, 300);
+    
+    return true; // מחזיר true כי השמירה תתבצע
   },
   
   // פונקציה להפעלת סנכרון אוטומטי ל-GitHub

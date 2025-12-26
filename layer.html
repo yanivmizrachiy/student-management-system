@@ -465,6 +465,9 @@
         headerEl.style.background = layerColor.replace('linear-gradient(145deg, ', 'linear-gradient(135deg, ').replace(')', ', rgba(0,0,0,0.3))');
       }
 
+      // טעינת נתונים טריים
+      DataStore.load(true);
+      
       const groups = DataStore.getGroupsByLayer(layer);
       const grid = document.getElementById('groupsGrid');
 
@@ -475,23 +478,51 @@
         return;
       }
 
-      grid.innerHTML = groups.map((group) => {
+      // סינון קבוצות ריקות - רק קבוצות עם תלמידים או עם מורה
+      const validGroups = groups.filter(group => {
+        const count = DataStore.getGroupCount(group.id) || 0;
+        const hasTeacher = group.teacherId && DataStore.getTeacher(group.teacherId);
+        return count > 0 || hasTeacher;
+      });
+
+      if (validGroups.length === 0) {
+        grid.innerHTML = '<div class="empty-state">אין הקבצות עם תלמידים בשכבה זו</div>';
+        return;
+      }
+
+      const escapeHtml = window.SharedUtils ? window.SharedUtils.escapeHtml : (text) => {
+        if (!text && text !== 0) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      };
+
+      grid.innerHTML = validGroups.map((group) => {
+        // טעינת נתונים טריים לכל קבוצה
+        DataStore.load(true);
+        
         const teacher = group.teacherId ? DataStore.getTeacher(group.teacherId) : null;
         const count = DataStore.getGroupCount(group.id) || 0;
         
-        const escapeHtml = window.SharedUtils ? window.SharedUtils.escapeHtml : (text) => {
-          if (!text && text !== 0) return '';
-          const div = document.createElement('div');
-          div.textContent = text;
-          return div.innerHTML;
-        };
+        // תיקון שם מורה שגוי - אם המורה הוא "איתי רז", נציג "יניב רז"
+        let teacherName = teacher ? teacher.name : '';
+        let teacherId = teacher ? teacher.id : '';
+        
+        // אם המורה הוא "איתי רז", נחפש את "יניב רז" במקום
+        if (teacherName === 'איתי רז') {
+          const yanivRaz = DataStore.teachers.find(t => t.name === 'יניב רז');
+          if (yanivRaz) {
+            teacherName = 'יניב רז';
+            teacherId = yanivRaz.id;
+          }
+        }
         
         const groupNameEscaped = escapeHtml(group.name);
-        const teacherNameEscaped = teacher ? escapeHtml(teacher.name) : '';
-        const teacherIdEscaped = teacher ? escapeHtml(teacher.id) : '';
+        const teacherNameEscaped = teacherName ? escapeHtml(teacherName) : '';
+        const teacherIdEscaped = teacherId ? escapeHtml(teacherId) : '';
         const groupIdEscaped = escapeHtml(group.id);
         
-        const groupTitle = teacher 
+        const groupTitle = teacherNameEscaped
           ? `הקבצה ${groupNameEscaped} - המורה <a href="teacher.html?teacherId=${teacherIdEscaped}" class="teacher-name-in-title" onclick="event.stopPropagation(); return false;">${teacherNameEscaped}</a>`
           : `הקבצה ${groupNameEscaped}`;
 

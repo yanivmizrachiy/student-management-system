@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>יצירת אייקון כחול בולט</title>
+</head>
+<body>
+  <h1>יצירת אייקון כחול בולט</h1>
+  <canvas id="iconCanvas" width="256" height="256" style="border: 1px solid #ccc; display: block; margin: 20px auto;"></canvas>
+  <div style="text-align: center; margin: 20px;">
+    <button onclick="createIcon()" style="padding: 15px 30px; font-size: 16px; background: #2196F3; color: white; border: none; border-radius: 8px; cursor: pointer;">צור אייקון כחול בולט</button>
+    <button onclick="downloadIcon()" style="padding: 15px 30px; font-size: 16px; background: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; margin-right: 10px;">הורד כפורמט ICO</button>
+  </div>
+
+  <script>
+    function createIcon() {
+      const canvas = document.getElementById('iconCanvas');
+      const ctx = canvas.getContext('2d');
+      const size = 256;
+      
+      // רקע כחול בולט עם גרדיאנט
+      const gradient = ctx.createLinearGradient(0, 0, size, size);
+      gradient.addColorStop(0, '#1976D2'); // כחול כהה
+      gradient.addColorStop(0.5, '#2196F3'); // כחול בינוני
+      gradient.addColorStop(1, '#42A5F5'); // כחול בהיר
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, size, size);
+      
+      // הוסף צל לכחול
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+      ctx.shadowBlur = 20;
+      ctx.shadowOffsetX = 5;
+      ctx.shadowOffsetY = 5;
+      
+      // ציור עיגול כחול בולט במרכז
+      const centerX = size / 2;
+      const centerY = size / 2;
+      const radius = size * 0.35;
+      
+      // עיגול חיצוני עם גרדיאנט
+      const circleGradient = ctx.createRadialGradient(centerX - 30, centerY - 30, 0, centerX, centerY, radius);
+      circleGradient.addColorStop(0, '#64B5F6'); // כחול בהיר מאוד
+      circleGradient.addColorStop(0.7, '#2196F3'); // כחול בינוני
+      circleGradient.addColorStop(1, '#1565C0'); // כחול כהה
+      
+      ctx.fillStyle = circleGradient;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // הוסף הברקה
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+      
+      const highlightGradient = ctx.createRadialGradient(centerX - 40, centerY - 40, 0, centerX - 40, centerY - 40, radius * 0.6);
+      highlightGradient.addColorStop(0, 'rgba(255, 255, 255, 0.6)');
+      highlightGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      
+      ctx.fillStyle = highlightGradient;
+      ctx.beginPath();
+      ctx.arc(centerX - 40, centerY - 40, radius * 0.6, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // סמל תלמיד/ספר במרכז (אותיות עבריות)
+      ctx.fillStyle = 'white';
+      ctx.font = 'bold 120px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+      ctx.shadowBlur = 10;
+      ctx.shadowOffsetX = 3;
+      ctx.shadowOffsetY = 3;
+      ctx.fillText('ת', centerX, centerY);
+      
+      // הוסף מסגרת כחולה כהה
+      ctx.strokeStyle = '#0D47A1';
+      ctx.lineWidth = 8;
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+      ctx.strokeRect(4, 4, size - 8, size - 8);
+      
+      console.log('✅ אייקון כחול בולט נוצר!');
+    }
+
+    function downloadIcon() {
+      const canvas = document.getElementById('iconCanvas');
+      const dataURL = canvas.toDataURL('image/png');
+      
+      // הורדה כקובץ PNG
+      const link = document.createElement('a');
+      link.download = 'favicon-blue.png';
+      link.href = dataURL;
+      link.click();
+      
+      // הודעה למשתמש
+      alert('✅ האייקון הורד! עכשיו נמיר אותו ל-ICO...\n\nאם יש לך כלי להמרה, השתמש בו.\nאחרת, נשתמש בכלי מקוון או PowerShell.');
+    }
+
+    // צור אייקון אוטומטית בטעינה
+    window.addEventListener('load', () => {
+      createIcon();
+    });
+  </script>
+</body>
+</html>
+

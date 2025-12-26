@@ -79,7 +79,39 @@ const DataStore = {
       gradeColumns: this.gradeColumns
     };
     localStorage.setItem('schoolData', JSON.stringify(data));
+    
+    // סנכרון אוטומטי ל-GitHub
+    this.triggerGitSync();
+    
     return true;
+  },
+  
+  // פונקציה להפעלת סנכרון אוטומטי ל-GitHub
+  triggerGitSync() {
+    try {
+      // יוצר marker file שמסמן שיש שינוי שצריך לסנכרן
+      const syncData = {
+        timestamp: new Date().toISOString(),
+        action: 'save',
+        version: Date.now()
+      };
+      
+      // נסה לשמור קובץ marker (אם זה Node.js environment)
+      if (typeof require !== 'undefined') {
+        const fs = require('fs');
+        const path = require('path');
+        const markerPath = path.join(__dirname, '.sync-marker.json');
+        fs.writeFileSync(markerPath, JSON.stringify(syncData, null, 2));
+      }
+      
+      // נסה לשלוח event ל-background script (אם יש)
+      if (typeof window !== 'undefined' && window.dispatchEvent) {
+        window.dispatchEvent(new CustomEvent('dataSaved', { detail: syncData }));
+      }
+    } catch (e) {
+      // שקט - זה לא קריטי אם הסנכרון לא עובד
+      console.log('Git sync marker:', e.message);
+    }
   },
   
   // פונקציות עזר - מונים (עם טעינה אוטומטית ובדיקות)

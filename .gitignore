@@ -23,3 +23,7 @@ node_modules/
 *_backup.*
 *_old.*
 
+# קבצי סנכרון אוטומטי
+.sync-marker.json
+.last-sync.txt
+

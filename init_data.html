@@ -52,7 +52,7 @@
     <button onclick="importGroup5()" style="background: #00c853;">קבוצה 5: ח'2 - מקדמת (טל נחמיה)</button>
     <button onclick="importGroup6()" style="background: #00c853;">קבוצה 6: ח'1 - מדעית (יניב רז)</button>
     <button onclick="importGroup7()" style="background: #00c853;">קבוצה 7: ח' - א' (טל נחמיה)</button>
-    <button onclick="importGroup8()" style="background: #00c853;">קבוצה 8: ח'3/ח'4 - א'1 (איתי רז)</button>
+    <button onclick="importGroup8()" style="background: #00c853;">קבוצה 8: ח'3/ח'4 - א'1 (יניב רז)</button>
     <button onclick="importGroup9()" style="background: #00c853;">קבוצה 9: ח' - א'1 (רונית פואל)</button>
     <button onclick="importGroup10()" style="background: #00c853;">קבוצה 10: ח'2 - מקדמת (רונית פואל)</button>
     
@@ -288,7 +288,7 @@
       showResult(result, 'קבוצה 7 הוזנה בהצלחה!', classesInfo);
     }
 
-    // קבוצה 8: ח'3/ח'4 - א'1 (איתי רז)
+    // קבוצה 8: ח'3/ח'4 - א'1 (יניב רז)
     function importGroup8() {
       const students = [
         ['אודשורן', 'אלרום', '3'],
@@ -314,7 +314,7 @@
       const result = DataStore.importGroup({
         layer: '8',
         groupName: 'א\'1',
-        teacherName: 'איתי רז',
+        teacherName: 'יניב רז',
         className: 'כיתה ח\'3' // default
       }, students);
 

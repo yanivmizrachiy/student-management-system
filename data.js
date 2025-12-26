@@ -83,8 +83,8 @@ const DataStore = {
       { id: this.generateId(), name: 'ציון 5' }
     ];
     this.gradeColumns = defaultColumns;
-    // שמירה תמידית (גם אם אין נתונים אחרים, כדי לשמור את העמודות)
-    this.save();
+    // שמירה תמידית מיידית (גם אם אין נתונים אחרים, כדי לשמור את העמודות)
+    this.save(true);
   },
   
   // Debounced save function - שמירה עם debounce לשיפור performance

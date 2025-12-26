@@ -525,10 +525,8 @@
         return div.innerHTML;
       };
 
-      // רינדור קבוצות
-      grid.innerHTML = groups.map((group) => {
-        if (!group || !group.id) return '';
-
+      // רינדור קבוצות - משתמש בקבוצות מסוננות
+      grid.innerHTML = groupsWithStudents.map((group) => {
         // קבלת מורה
         const teacher = group.teacherId && DataStore.getTeacher 
           ? DataStore.getTeacher(group.teacherId) 
@@ -546,7 +544,7 @@
         const teacherIdEscaped = teacher ? escapeHtml(teacher.id) : '';
         const groupIdEscaped = escapeHtml(group.id);
 
-        // בניית כותרת
+        // בניית כותרת - רק אם יש מורה
         const groupTitle = teacherNameEscaped
           ? `הקבצה ${groupNameEscaped} - המורה <a href="teacher.html?teacherId=${teacherIdEscaped}" class="teacher-name-in-title" onclick="event.stopPropagation(); return false;">${teacherNameEscaped}</a>`
           : `הקבצה ${groupNameEscaped}`;
@@ -561,7 +559,7 @@
             </div>
           </a>
         `;
-      }).filter(html => html !== '').join('');
+      }).join('');
 
       // אם אין קבוצות אחרי הסינון
       if (!grid.innerHTML.trim()) {

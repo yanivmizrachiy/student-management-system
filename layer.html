@@ -502,13 +502,13 @@
         return;
       }
 
-      grid.innerHTML = groups.map(group => {
+      grid.innerHTML = groups.map((group, index) => {
         const teacher = group.teacherId ? DataStore.getTeacher(group.teacherId) : null;
         const count = DataStore.getGroupCount(group.id);
         
         // בניית כותרת הכפתור: "הקבצה [שם] - המורה [שם מורה]"
         const groupTitle = teacher 
-          ? `הקבצה ${group.name} - המורה <a href="teacher.html?teacherId=${teacher.id}" class="teacher-name-in-title">${teacher.name}</a>`
+          ? `הקבצה ${group.name} - המורה <a href="teacher.html?teacherId=${teacher.id}" class="teacher-name-in-title" onclick="event.stopPropagation();">${teacher.name}</a>`
           : `הקבצה ${group.name}`;
 
         return `

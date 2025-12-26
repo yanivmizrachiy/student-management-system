@@ -637,7 +637,7 @@
         DataStore.gradeColumns.forEach(col => {
           const grade = student.grades && student.grades[col.id] ? student.grades[col.id] : '';
           if (DataStore.isAdmin) {
-            rowHTML += `<td class="grade-cell"><input type="text" class="grade-input" value="${grade}" onchange="saveGrade('${student.id}', '${col.id}', this.value)"></td>`;
+            rowHTML += `<td class="grade-cell"><input type="text" class="grade-input" value="${grade}" onchange="saveGrade('${student.id}', '${col.id}', this.value)" ${!DataStore.isAdmin ? 'disabled' : ''}></td>`;
           } else {
             rowHTML += `<td class="grade-cell">${grade || ''}</td>`;
           }

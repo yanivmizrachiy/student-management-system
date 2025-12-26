@@ -691,14 +691,14 @@
         <div class="info-item">
           <div class="info-label">שם פרטי</div>
           ${isAdmin 
-            ? `<input type="text" class="info-edit-input" value="${student.firstName || ''}" onchange="updateStudentField('firstName', this.value)" placeholder="שם פרטי">`
+            ? `<input type="text" class="info-edit-input" value="${student.firstName || ''}" onchange="updateStudentField('firstName', this.value)" placeholder="שם פרטי" ${!isAdmin ? 'disabled' : ''}>`
             : `<div class="info-value">${student.firstName || ''}</div>`
           }
         </div>
         <div class="info-item">
           <div class="info-label">שם משפחה</div>
           ${isAdmin 
-            ? `<input type="text" class="info-edit-input" value="${student.lastName || ''}" onchange="updateStudentField('lastName', this.value)" placeholder="שם משפחה">`
+            ? `<input type="text" class="info-edit-input" value="${student.lastName || ''}" onchange="updateStudentField('lastName', this.value)" placeholder="שם משפחה" ${!isAdmin ? 'disabled' : ''}>`
             : `<div class="info-value">${student.lastName || ''}</div>`
           }
         </div>
@@ -732,7 +732,7 @@
             return `
               <div class="grade-item">
                 <div class="grade-label">${col.name}</div>
-                <input type="text" class="grade-input" value="${grade}" onchange="saveGrade('${col.id}', this.value)">
+                <input type="text" class="grade-input" value="${grade}" onchange="saveGrade('${col.id}', this.value)" ${!DataStore.isAdmin ? 'disabled' : ''}>
               </div>
             `;
           } else {
@@ -765,7 +765,7 @@
         if (isAdmin) {
           notesSection.innerHTML = `
             <div class="notes-title">הערות</div>
-            <textarea class="notes-textarea" id="studentNotes" placeholder="הוסף הערות על התלמיד..." onchange="updateStudentField('notes', this.value)">${student.notes || ''}</textarea>
+            <textarea class="notes-textarea" id="studentNotes" placeholder="הוסף הערות על התלמיד..." onchange="updateStudentField('notes', this.value)" ${!isAdmin ? 'disabled' : ''}>${student.notes || ''}</textarea>
           `;
         } else {
           notesSection.innerHTML = student.notes 

@@ -92,7 +92,19 @@ const DataStore = {
   
   // שמירת נתונים (עם debounce לשיפור performance)
   save(immediate = false) {
+    // בדיקה נוספת: רק במצב עריכה ניתן לשמור
+    if (!this.isAdmin) {
+      console.warn('⚠️ ניסיון שמירה ללא הרשאה - נחסם');
+      return false;
+    }
+    
     const saveNow = () => {
+      // בדיקה נוספת לפני שמירה
+      if (!this.isAdmin) {
+        console.warn('⚠️ ניסיון שמירה ללא הרשאה - נחסם');
+        return false;
+      }
+      
       const data = {
         students: this.students,
         classes: this.classes,

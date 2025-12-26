@@ -89,20 +89,16 @@ const DataStore = {
   // פונקציה להפעלת סנכרון אוטומטי ל-GitHub
   triggerGitSync() {
     try {
-      // יוצר marker file שמסמן שיש שינוי שצריך לסנכרן
+      // יוצר marker ב-localStorage שהקובץ Node.js יקרא
       const syncData = {
         timestamp: new Date().toISOString(),
         action: 'save',
-        version: Date.now()
+        version: Date.now(),
+        needsSync: true
       };
       
-      // נסה לשמור קובץ marker (אם זה Node.js environment)
-      if (typeof require !== 'undefined') {
-        const fs = require('fs');
-        const path = require('path');
-        const markerPath = path.join(__dirname, '.sync-marker.json');
-        fs.writeFileSync(markerPath, JSON.stringify(syncData, null, 2));
-      }
+      // שמור marker ב-localStorage (ה-Node.js script יקרא את זה דרך localStorage dump)
+      localStorage.setItem('gitSyncMarker', JSON.stringify(syncData));
       
       // נסה לשלוח event ל-background script (אם יש)
       if (typeof window !== 'undefined' && window.dispatchEvent) {

@@ -17,6 +17,38 @@ const GIT_BATCH_DELAY = 5000; // 5 שניות - ממתין לאיסוף שינו
 
 let syncTimeout = null;
 let lastSyncVersion = null;
+let lastFileCheckTime = Date.now();
+
+// פונקציה ליצירת marker file אם יש שינוי בקבצים
+function ensureMarkerFile() {
+  try {
+    const importantFiles = ['data.js', 'index.html', 'student.html', 'group.html', 'class.html'];
+    let hasChanges = false;
+    
+    importantFiles.forEach(file => {
+      const filePath = path.join(PROJECT_PATH, file);
+      if (fs.existsSync(filePath)) {
+        const stats = fs.statSync(filePath);
+        if (stats.mtimeMs > lastFileCheckTime) {
+          hasChanges = true;
+        }
+      }
+    });
+    
+    if (hasChanges && !fs.existsSync(SYNC_MARKER)) {
+      const syncData = {
+        timestamp: new Date().toISOString(),
+        action: 'auto-detect',
+        version: Date.now()
+      };
+      fs.writeFileSync(SYNC_MARKER, JSON.stringify(syncData, null, 2));
+    }
+    
+    lastFileCheckTime = Date.now();
+  } catch (e) {
+    // שקט
+  }
+}
 
 // טען את הגרסה האחרונה שסונכרנה
 function loadLastSync() {
@@ -43,19 +75,44 @@ function saveLastSync(version) {
 // בדוק אם יש שינויים חדשים
 function checkForChanges() {
   try {
-    if (!fs.existsSync(SYNC_MARKER)) {
-      return false;
+    // בדוק אם יש marker file
+    if (fs.existsSync(SYNC_MARKER)) {
+      const markerContent = fs.readFileSync(SYNC_MARKER, 'utf8');
+      const syncData = JSON.parse(markerContent);
+      
+      // בדוק אם זה שינוי חדש
+      if (lastSyncVersion && syncData.version <= lastSyncVersion) {
+        return false;
+      }
+      
+      return syncData;
     }
     
-    const markerContent = fs.readFileSync(SYNC_MARKER, 'utf8');
-    const syncData = JSON.parse(markerContent);
+    // גם בדוק שינויים בקבצים ישירות (fallback)
+    // אם יש שינוי בקובץ data.js או קבצי HTML אחרי הזמן האחרון
+    const importantFiles = ['data.js', 'index.html', 'student.html', 'group.html', 'class.html', 'layer.html', 'teacher.html'];
+    const now = Date.now();
     
-    // בדוק אם זה שינוי חדש
-    if (lastSyncVersion && syncData.version <= lastSyncVersion) {
-      return false;
+    for (const file of importantFiles) {
+      const filePath = path.join(PROJECT_PATH, file);
+      if (fs.existsSync(filePath)) {
+        const stats = fs.statSync(filePath);
+        // אם הקובץ שונה ב-30 שניות האחרונות, זה שינוי חדש
+        if (now - stats.mtimeMs < 30000) {
+          // צור marker file אוטומטית
+          const syncData = {
+            timestamp: new Date().toISOString(),
+            action: 'file-change-detected',
+            version: Date.now(),
+            changedFile: file
+          };
+          fs.writeFileSync(SYNC_MARKER, JSON.stringify(syncData, null, 2));
+          return syncData;
+        }
+      }
     }
     
-    return syncData;
+    return false;
   } catch (e) {
     return false;
   }
@@ -87,7 +144,14 @@ function syncToGitHub(syncData) {
     
     // הוסף את כל הקבצים החשובים
     console.log('📦 מוסיף קבצים...');
-    execSync('git add *.html *.js *.md .gitignore 2>&1', { stdio: 'inherit' });
+    execSync('git add *.html *.js *.md .gitignore package.json 2>&1', { stdio: 'inherit' });
+    
+    // אל תכלול את marker files ב-commit (הם זמניים)
+    try {
+      execSync('git reset HEAD .sync-marker.json .last-sync.txt 2>&1', { stdio: 'pipe' });
+    } catch (e) {
+      // זה בסדר אם הקבצים לא ב-staging
+    }
     
     // צור commit
     const timestamp = new Date().toLocaleString('he-IL');
@@ -113,6 +177,9 @@ function syncToGitHub(syncData) {
 
 // פונקציה ראשית - בודקת ומסנכרנת
 function processSync() {
+  // וודא שיש marker file אם יש שינויים בקבצים
+  ensureMarkerFile();
+  
   const syncData = checkForChanges();
   
   if (syncData) {

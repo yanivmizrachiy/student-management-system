@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>יצירת Sync Marker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        button {
+            padding: 10px 20px;
+            background: #4a90e2;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #357abd;
+        }
+        #status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success {
+            background: #2d5016;
+            color: #90ee90;
+        }
+        .error {
+            background: #5a1a1a;
+            color: #ff6b6b;
+        }
+    </style>
+</head>
+<body>
+    <h1>יצירת Sync Marker ל-GitHub</h1>
+    <p>לחץ על הכפתור כדי ליצור marker file שיגרום לסנכרון אוטומטי ל-GitHub</p>
+    <button onclick="createMarker()">צור Sync Marker</button>
+    <div id="status"></div>
+
+    <script>
+        function createMarker() {
+            const status = document.getElementById('status');
+            status.className = '';
+            status.innerHTML = 'יוצר marker file...';
+            
+            // שמור marker ב-localStorage (ה-Node.js script יוכל לקרוא את זה)
+            const syncData = {
+                timestamp: new Date().toISOString(),
+                action: 'manual',
+                version: Date.now(),
+                needsSync: true
+            };
+            
+            try {
+                localStorage.setItem('gitSyncMarker', JSON.stringify(syncData));
+                
+                // נסה להוריד קובץ JSON (שהמשתמש יכול להעתיק לתיקייה)
+                const blob = new Blob([JSON.stringify(syncData, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = '.sync-marker.json';
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                status.className = 'success';
+                status.innerHTML = '✅ Marker נוצר! העתק את הקובץ לתיקיית הפרויקט (או שהסקריפט יעשה את זה אוטומטית)';
+            } catch (e) {
+                status.className = 'error';
+                status.innerHTML = '❌ שגיאה: ' + e.message;
+            }
+        }
+        
+        // בדוק אם יש marker קיים
+        window.addEventListener('load', () => {
+            const marker = localStorage.getItem('gitSyncMarker');
+            if (marker) {
+                try {
+                    const data = JSON.parse(marker);
+                    document.getElementById('status').innerHTML = 
+                        'ℹ️ Marker קיים: ' + new Date(data.timestamp).toLocaleString('he-IL');
+                } catch (e) {}
+            }
+        });
+    </script>
+</body>
+</html>
+

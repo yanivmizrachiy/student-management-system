@@ -788,14 +788,21 @@
       }
       
       const student = DataStore.getStudent(studentId);
-      if (!student) return;
+      if (!student) {
+        console.error('שגיאה: לא נמצא התלמיד');
+        return;
+      }
 
       if (!student.grades) {
         student.grades = {};
       }
       
       student.grades[columnId] = value;
-      DataStore.save();
+      if (DataStore.save()) {
+        console.log('✅ ציון נשמר בהצלחה');
+      } else {
+        console.error('שגיאה בשמירת הציון');
+      }
     }
 
     function uploadImage(event) {
@@ -808,14 +815,32 @@
       const file = event.target.files[0];
       if (!file) return;
 
+      // בדיקת גודל קובץ (מוגבל ל-5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('התמונה גדולה מדי. אנא בחר תמונה עד 5MB');
+        event.target.value = '';
+        return;
+      }
+
       const reader = new FileReader();
       reader.onload = (e) => {
         const student = DataStore.getStudent(studentId);
-        if (!student) return;
+        if (!student) {
+          alert('שגיאה: לא נמצא התלמיד');
+          return;
+        }
 
         student.image = e.target.result;
-        DataStore.save();
-        renderStudent();
+        if (DataStore.save()) {
+          renderStudent();
+          console.log('✅ תמונה נשמרה בהצלחה');
+        } else {
+          alert('שגיאה בשמירת התמונה');
+        }
+      };
+      reader.onerror = () => {
+        alert('שגיאה בקריאת התמונה');
+        event.target.value = '';
       };
       reader.readAsDataURL(file);
     }
@@ -831,13 +856,30 @@
       if (files.length === 0) return;
 
       const student = DataStore.getStudent(studentId);
-      if (!student) return;
+      if (!student) {
+        alert('שגיאה: לא נמצא התלמיד');
+        return;
+      }
 
       if (!student.files) {
         student.files = [];
       }
 
+      let filesProcessed = 0;
+      let filesToProcess = files.length;
+
       files.forEach(file => {
+        // בדיקת גודל קובץ (מוגבל ל-10MB לקובץ)
+        if (file.size > 10 * 1024 * 1024) {
+          alert(`הקובץ "${file.name}" גדול מדי. אנא בחר קובץ עד 10MB`);
+          filesProcessed++;
+          if (filesProcessed === filesToProcess) {
+            event.target.value = '';
+            renderStudent();
+          }
+          return;
+        }
+
         const reader = new FileReader();
         reader.onload = (e) => {
           student.files.push({
@@ -846,13 +888,29 @@
             url: e.target.result,
             uploadDate: new Date().toISOString()
           });
-          DataStore.save();
-          renderStudent();
+          filesProcessed++;
+          
+          // שמור אחרי כל קובץ (למקרה של שגיאה)
+          if (DataStore.save()) {
+            console.log(`✅ קובץ "${file.name}" נשמר בהצלחה`);
+          }
+          
+          // עדכן תצוגה אחרי כל הקבצים
+          if (filesProcessed === filesToProcess) {
+            renderStudent();
+            event.target.value = '';
+          }
+        };
+        reader.onerror = () => {
+          alert(`שגיאה בקריאת הקובץ "${file.name}"`);
+          filesProcessed++;
+          if (filesProcessed === filesToProcess) {
+            event.target.value = '';
+            renderStudent();
+          }
         };
         reader.readAsDataURL(file);
       });
-      
-      event.target.value = ''; // איפוס input
     }
 
     function deleteFile(fileId) {
@@ -866,11 +924,22 @@
       }
 
       const student = DataStore.getStudent(studentId);
-      if (!student || !student.files) return;
+      if (!student || !student.files) {
+        console.error('שגיאה: לא נמצא התלמיד או הקבצים');
+        return;
+      }
 
+      const fileCountBefore = student.files.length;
       student.files = student.files.filter(f => f.id !== fileId);
-      DataStore.save();
-      renderStudent();
+      
+      if (student.files.length < fileCountBefore) {
+        if (DataStore.save()) {
+          console.log('✅ קובץ נמחק ונשמר בהצלחה');
+          renderStudent();
+        } else {
+          alert('שגיאה בשמירת השינויים');
+        }
+      }
     }
 
     function updateStudentField(field, value) {
@@ -880,15 +949,22 @@
       }
 
       const student = DataStore.getStudent(studentId);
-      if (!student) return;
+      if (!student) {
+        console.error('שגיאה: לא נמצא התלמיד');
+        return;
+      }
 
       student[field] = value;
-      DataStore.save();
-      
-      // עדכון כותרת אם זה שם
-      if (field === 'firstName' || field === 'lastName') {
-        const newTitle = `${student.firstName || ''} ${student.lastName || ''}`.trim() || 'תלמיד';
-        document.getElementById('studentTitle').textContent = newTitle;
+      if (DataStore.save()) {
+        console.log(`✅ שדה ${field} נשמר בהצלחה`);
+        
+        // עדכון כותרת אם זה שם
+        if (field === 'firstName' || field === 'lastName') {
+          const newTitle = `${student.firstName || ''} ${student.lastName || ''}`.trim() || 'תלמיד';
+          document.getElementById('studentTitle').textContent = newTitle;
+        }
+      } else {
+        console.error(`שגיאה בשמירת שדה ${field}`);
       }
     }
 

@@ -9,40 +9,25 @@ $repoName = "student-management-system"
 $username = "yanivmizrachiy"
 $websiteUrl = "https://$username.github.io/$repoName/"
 
-# שלב 1: הגדרת GitHub Pages
-Write-Host "📝 מגדיר GitHub Pages..." -ForegroundColor Yellow
+# שלב 1: בדיקת סטטוס GitHub Pages
+Write-Host "📝 בודק סטטוס GitHub Pages..." -ForegroundColor Yellow
 try {
-    # בדוק אם GitHub Pages כבר מוגדר
     $pagesInfo = gh api repos/$username/$repoName/pages --jq '{status: .status, url: .html_url}' 2>&1
     
     if ($LASTEXITCODE -eq 0) {
         Write-Host "✅ GitHub Pages כבר מוגדר!" -ForegroundColor Green
-        $pagesInfo | ConvertFrom-Json | Format-List
+        $pagesInfo
     } else {
-        Write-Host "⚙️  מגדיר GitHub Pages..." -ForegroundColor Yellow
-        # הגדר GitHub Pages עם main branch ו-root path
-        $body = @{
-            source = @{
-                branch = "main"
-                path = "/"
-            }
-        } | ConvertTo-Json
-        
-        gh api repos/$username/$repoName/pages -X POST --input - <<< $body 2>&1 | Out-Null
-        
-        if ($LASTEXITCODE -eq 0) {
-            Write-Host "✅ GitHub Pages הוגדר בהצלחה!" -ForegroundColor Green
-        } else {
-            Write-Host "⚠️  ייתכן ש-GitHub Pages כבר מוגדר או צריך להמתין" -ForegroundColor Yellow
-        }
+        Write-Host "⚙️  GitHub Pages לא מוגדר עדיין" -ForegroundColor Yellow
+        Write-Host "💡 הגדר דרך GitHub: Settings > Pages > Source: main, Path: /" -ForegroundColor Cyan
     }
 } catch {
-    Write-Host "⚠️  שגיאה בהגדרת GitHub Pages: $_" -ForegroundColor Red
+    Write-Host "⚠️  שגיאה בבדיקה: $_" -ForegroundColor Red
 }
 
 Write-Host ""
 Write-Host "⏳ ממתין כמה שניות לפעילות GitHub Pages..." -ForegroundColor Yellow
-Start-Sleep -Seconds 5
+Start-Sleep -Seconds 3
 
 # שלב 2: בדיקת URL
 Write-Host ""
@@ -85,4 +70,3 @@ Write-Host "   $shortcutPath" -ForegroundColor White
 Write-Host ""
 Write-Host "💡 הערה: GitHub Pages יכול לקחת 1-2 דקות להיכנס לפעילות" -ForegroundColor Gray
 Write-Host "════════════════════════════════════════" -ForegroundColor Cyan
-

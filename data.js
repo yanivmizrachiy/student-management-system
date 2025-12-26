@@ -22,8 +22,16 @@ const DataStore = {
     '9': ['מדעית', 'א\'(1)', 'א\'(2)', 'א\'1', 'מקדמת']
   },
   
-  // טעינת נתונים
-  load() {
+  // טעינת נתונים (עם cache כדי למנוע טעינות מיותרות)
+  _loadedData: null,
+  _lastLoadTime: null,
+  
+  load(force = false) {
+    // אם כבר נטען לאחרונה (בטווח של 100ms), לא נטען שוב
+    if (!force && this._lastLoadTime && (Date.now() - this._lastLoadTime < 100)) {
+      return;
+    }
+    
     const saved = localStorage.getItem('schoolData');
     if (saved) {
       try {
@@ -33,6 +41,12 @@ const DataStore = {
         this.groups = data.groups || [];
         this.teachers = data.teachers || [];
         this.gradeColumns = data.gradeColumns || [];
+        
+        this._loadedData = data;
+        this._lastLoadTime = Date.now();
+        
+        // ביטול cache אחרי טעינה
+        this._invalidateCache();
       } catch (e) {
         console.error('שגיאה בטעינת נתונים:', e);
         this.students = [];
@@ -40,6 +54,8 @@ const DataStore = {
         this.groups = [];
         this.teachers = [];
         this.gradeColumns = [];
+        this._loadedData = null;
+        this._lastLoadTime = Date.now();
       }
     } else {
       this.students = [];
@@ -47,6 +63,8 @@ const DataStore = {
       this.groups = [];
       this.teachers = [];
       this.gradeColumns = [];
+      this._loadedData = null;
+      this._lastLoadTime = Date.now();
     }
     
     // אם אין עמודות ציונים, הוסף 5 עמודות ברירת מחדל
@@ -69,21 +87,59 @@ const DataStore = {
     this.save();
   },
   
-  // שמירת נתונים
-  save() {
-    const data = {
-      students: this.students,
-      classes: this.classes,
-      groups: this.groups,
-      teachers: this.teachers,
-      gradeColumns: this.gradeColumns
+  // Debounced save function - שמירה עם debounce לשיפור performance
+  _saveDebounced: null,
+  
+  // שמירת נתונים (עם debounce לשיפור performance)
+  save(immediate = false) {
+    // אם זה שמירה מיידית או אין debounced function
+    if (immediate || !this._saveDebounced) {
+      this._saveDebounced = this._debounceSave();
+      return this._saveDebounced(immediate);
+    }
+    
+    return this._saveDebounced();
+  },
+  
+  _debounceSave() {
+    let timeout;
+    const saveNow = () => {
+      const data = {
+        students: this.students,
+        classes: this.classes,
+        groups: this.groups,
+        teachers: this.teachers,
+        gradeColumns: this.gradeColumns
+      };
+      
+      try {
+        localStorage.setItem('schoolData', JSON.stringify(data));
+        // ביטול cache אחרי שמירה
+        this._invalidateCache();
+        // סנכרון אוטומטי ל-GitHub
+        this.triggerGitSync();
+        return true;
+      } catch (e) {
+        console.error('שגיאה בשמירת נתונים:', e);
+        // אם localStorage מלא, נסה לנקות נתונים ישנים
+        if (e.name === 'QuotaExceededError') {
+          console.warn('localStorage מלא, מנסה לנקות...');
+          // כאן אפשר להוסיף לוגיקה לניקוי נתונים ישנים
+        }
+        return false;
+      }
     };
-    localStorage.setItem('schoolData', JSON.stringify(data));
     
-    // סנכרון אוטומטי ל-GitHub
-    this.triggerGitSync();
-    
-    return true;
+    return (immediate = false) => {
+      if (immediate) {
+        clearTimeout(timeout);
+        return saveNow();
+      }
+      
+      clearTimeout(timeout);
+      timeout = setTimeout(saveNow, 300); // Debounce של 300ms
+      return true; // מחזיר true כי השמירה תתבצע
+    };
   },
   
   // פונקציה להפעלת סנכרון אוטומטי ל-GitHub
@@ -110,34 +166,90 @@ const DataStore = {
     }
   },
   
-  // פונקציות עזר - מונים (עם טעינה אוטומטית ובדיקות)
-  getLayerCount(layer) {
-    this.load(); // וידוא שנתונים עדכניים
+  // Cache for counts - משפר performance משמעותית
+  _countCache: {},
+  _cacheTimestamp: null,
+  _cacheTTL: 5000, // 5 שניות
+  
+  // Invalidate cache when data changes
+  _invalidateCache() {
+    this._countCache = {};
+    this._cacheTimestamp = null;
+  },
+  
+  // פונקציות עזר - מונים (עם cache לשיפור performance)
+  getLayerCount(layer, useCache = true) {
+    // בדיקת cache
+    if (useCache && this._countCache[`layer_${layer}`] && 
+        this._cacheTimestamp && (Date.now() - this._cacheTimestamp < this._cacheTTL)) {
+      return this._countCache[`layer_${layer}`];
+    }
+    
+    // חישוב חדש
     if (!layer) return 0;
-    // המרה למחרוזת כדי להבטיח התאמה
     const layerStr = String(layer);
-    return this.students.filter(s => s && s.layer && String(s.layer) === layerStr).length;
+    const count = this.students.filter(s => s && s.layer && String(s.layer) === layerStr).length;
+    
+    // שמירה ב-cache
+    this._countCache[`layer_${layer}`] = count;
+    this._cacheTimestamp = Date.now();
+    
+    return count;
   },
   
-  getGroupCount(groupId) {
-    this.load(); // וידוא שנתונים עדכניים
+  getGroupCount(groupId, useCache = true) {
+    // בדיקת cache
+    if (useCache && this._countCache[`group_${groupId}`] && 
+        this._cacheTimestamp && (Date.now() - this._cacheTimestamp < this._cacheTTL)) {
+      return this._countCache[`group_${groupId}`];
+    }
+    
+    // חישוב חדש
     if (!groupId) return 0;
-    // המרה למחרוזת כדי להבטיח התאמה
     const groupIdStr = String(groupId);
-    return this.students.filter(s => s && s.groupId && String(s.groupId) === groupIdStr).length;
+    const count = this.students.filter(s => s && s.groupId && String(s.groupId) === groupIdStr).length;
+    
+    // שמירה ב-cache
+    this._countCache[`group_${groupId}`] = count;
+    this._cacheTimestamp = Date.now();
+    
+    return count;
   },
   
-  getClassCount(classId) {
-    this.load(); // וידוא שנתונים עדכניים
+  getClassCount(classId, useCache = true) {
+    // בדיקת cache
+    if (useCache && this._countCache[`class_${classId}`] && 
+        this._cacheTimestamp && (Date.now() - this._cacheTimestamp < this._cacheTTL)) {
+      return this._countCache[`class_${classId}`];
+    }
+    
+    // חישוב חדש
     if (!classId) return 0;
-    // המרה למחרוזת כדי להבטיח התאמה
     const classIdStr = String(classId);
-    return this.students.filter(s => s && s.classId && String(s.classId) === classIdStr).length;
+    const count = this.students.filter(s => s && s.classId && String(s.classId) === classIdStr).length;
+    
+    // שמירה ב-cache
+    this._countCache[`class_${classId}`] = count;
+    this._cacheTimestamp = Date.now();
+    
+    return count;
   },
   
-  getTotalCount() {
-    this.load(); // וידוא שנתונים עדכניים
-    return this.students ? this.students.length : 0;
+  getTotalCount(useCache = true) {
+    // בדיקת cache
+    if (useCache && this._countCache['total'] && 
+        this._cacheTimestamp && (Date.now() - this._cacheTimestamp < this._cacheTTL)) {
+      return this._countCache['total'];
+    }
+    
+    // חישוב חדש
+    const count = this.students ? this.students.length : 0;
+    
+    // שמירה ב-cache
+    this._countCache['total'] = count;
+    this._cacheTimestamp = Date.now();
+    
+    return count;
   },
   
   // פונקציות עזר - נתונים

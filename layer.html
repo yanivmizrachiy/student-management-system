@@ -482,26 +482,47 @@
     const layer = window.SharedUtils ? window.SharedUtils.getURLParameter('layer') : new URLSearchParams(window.location.search).get('layer');
 
     function renderGroups() {
+      if (!layer) {
+        if (window.SharedUtils && window.SharedUtils.navigateToPage) {
+          window.SharedUtils.navigateToPage('index.html');
+        } else {
+          window.location.href = 'index.html';
+        }
+        return;
+      }
+      
       if (!window.SharedUtils || !window.SharedUtils.requireData(layer, 'index.html')) {
         return;
       }
+      
+      if (!DataStore) {
+        console.error('DataStore לא נטען');
+        return;
+      }
 
-      const layerName = DataStore.getLayerName(layer);
-      document.getElementById('layerTitle').textContent = `שכבת ${layerName}`;
-      document.getElementById('layerName').textContent = `שכבת ${layerName}`;
+      const layerName = DataStore.getLayerName(layer) || layer;
+      const layerTitleEl = document.getElementById('layerTitle');
+      const layerNameEl = document.getElementById('layerName');
+      const countNumberEl = document.getElementById('countNumber');
+      
+      if (layerTitleEl) layerTitleEl.textContent = `שכבת ${layerName}`;
+      if (layerNameEl) layerNameEl.textContent = `שכבת ${layerName}`;
 
       // עדכון מונה כללי של השכבה
-      const totalCount = DataStore.getLayerCount(layer);
-      document.getElementById('countNumber').textContent = totalCount;
+      const totalCount = DataStore.getLayerCount(layer) || 0;
+      if (countNumberEl) countNumberEl.textContent = totalCount;
 
       // הגדרת רקע לפי שכבה
       const layerColor = DataStore.getLayerColor(layer);
-      document.querySelector('.header').style.background = layerColor.replace('linear-gradient(145deg, ', 'linear-gradient(135deg, ').replace(')', ', rgba(0,0,0,0.3))');
+      const headerEl = document.querySelector('.header');
+      if (headerEl && layerColor) {
+        headerEl.style.background = layerColor.replace('linear-gradient(145deg, ', 'linear-gradient(135deg, ').replace(')', ', rgba(0,0,0,0.3))');
+      }
 
       const groups = DataStore.getGroupsByLayer(layer);
       const grid = document.getElementById('groupsGrid');
 
-      if (groups.length === 0) {
+      if (!groups || groups.length === 0) {
         grid.innerHTML = '<div class="empty-state">אין הקבצות בשכבה זו</div>';
         return;
       }
@@ -510,13 +531,26 @@
         const teacher = group.teacherId ? DataStore.getTeacher(group.teacherId) : null;
         const count = DataStore.getGroupCount(group.id);
         
+        // Escape HTML למניעת XSS
+        const escapeHtml = (text) => {
+          if (!text) return '';
+          const div = document.createElement('div');
+          div.textContent = text;
+          return div.innerHTML;
+        };
+        
+        const groupNameEscaped = escapeHtml(group.name);
+        const teacherNameEscaped = teacher ? escapeHtml(teacher.name) : '';
+        const teacherIdEscaped = teacher ? escapeHtml(teacher.id) : '';
+        const groupIdEscaped = escapeHtml(group.id);
+        
         // בניית כותרת הכפתור: "הקבצה [שם] - המורה [שם מורה]"
         const groupTitle = teacher 
-          ? `הקבצה ${group.name} - המורה <a href="teacher.html?teacherId=${teacher.id}" class="teacher-name-in-title" onclick="event.stopPropagation(); return false;">${teacher.name}</a>`
-          : `הקבצה ${group.name}`;
+          ? `הקבצה ${groupNameEscaped} - המורה <a href="teacher.html?teacherId=${teacherIdEscaped}" class="teacher-name-in-title" onclick="event.stopPropagation(); return false;">${teacherNameEscaped}</a>`
+          : `הקבצה ${groupNameEscaped}`;
 
         return `
-          <a href="group.html?groupId=${group.id}" class="group-card">
+          <a href="group.html?groupId=${groupIdEscaped}" class="group-card">
             <div class="group-header">
               <div class="group-name">${groupTitle}</div>
             </div>
@@ -529,14 +563,26 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      DataStore.load();
-      renderGroups();
-      
-      // עדכון כל 3 שניות (פחות תכוף כדי למנוע עומס)
-      setInterval(() => {
+      try {
         DataStore.load();
         renderGroups();
-      }, 3000);
+        
+        // עדכון כל 3 שניות (פחות תכוף כדי למנוע עומס)
+        setInterval(() => {
+          try {
+            DataStore.load();
+            renderGroups();
+          } catch (e) {
+            console.error('שגיאה בעדכון:', e);
+          }
+        }, 3000);
+      } catch (e) {
+        console.error('שגיאה בטעינת עמוד שכבה:', e);
+        const grid = document.getElementById('groupsGrid');
+        if (grid) {
+          grid.innerHTML = '<div class="empty-state">שגיאה בטעינת הנתונים. אנא רענן את הדף.</div>';
+        }
+      }
     });
   </script>
 </body>

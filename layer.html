@@ -42,6 +42,11 @@
       z-index: 1;
     }
 
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
     .header {
       background: rgba(255,255,255,0.08);
       border-radius: 25px;
@@ -78,6 +83,10 @@
       gap: 20px;
     }
 
+    .title-section {
+      flex: 1;
+    }
+
     .title-section h1 {
       font-size: 2.6rem;
       font-weight: 800;
@@ -102,7 +111,6 @@
       color: #ffd700;
       text-shadow: 0 0 20px rgba(255, 215, 0, 0.5),
                    0 2px 10px rgba(0, 0, 0, 0.3);
-      transition: all 0.3s ease;
     }
 
     .count-label {
@@ -140,35 +148,28 @@
       box-shadow: 0 5px 18px rgba(0,0,0,0.25);
     }
 
-    .container {
-      max-width: 1400px;
-      margin: 0 auto;
-    }
-
     .groups-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
       margin-bottom: 40px;
     }
 
     .group-card {
       background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-      border-radius: 14px;
-      padding: 18px 22px;
+      border-radius: 16px;
+      padding: 24px;
       border: 1px solid rgba(102, 126, 234, 0.2);
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       text-decoration: none;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+      display: block;
       color: white;
       backdrop-filter: blur(8px);
       box-shadow: 0 2px 12px rgba(0,0,0,0.12),
                   inset 0 1px 0 rgba(255,255,255,0.06);
       position: relative;
       overflow: hidden;
-      min-height: 120px;
+      min-height: 140px;
     }
 
     .group-card::before {
@@ -178,7 +179,7 @@
       left: -100%;
       width: 100%;
       height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.15), transparent);
+      background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.12), transparent);
       transition: left 0.5s ease;
     }
 
@@ -195,76 +196,36 @@
       background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
     }
 
-    .group-header {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-bottom: 0;
-      flex: 1;
-    }
-
-    .group-name {
-      font-size: 1.25rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      letter-spacing: -0.2px;
-      text-align: center;
-      line-height: 1.6;
-      word-wrap: break-word;
-      margin-bottom: 0;
-      width: 100%;
-    }
-    
-    .group-name a {
-      display: inline-block;
-      margin: 0 4px;
-      vertical-align: middle;
-    }
-
-    .group-info {
+    .group-content {
       display: flex;
       flex-direction: column;
-      align-items: center;
-      gap: 0;
-      margin-top: 15px;
-      padding-top: 15px;
-      border-top: 1px solid rgba(255,255,255,0.1);
+      height: 100%;
+      position: relative;
+      z-index: 1;
     }
 
-    .teacher-link {
-      color: #008080;
-      text-decoration: none;
+    .group-title {
+      font-size: 1.3rem;
       font-weight: 700;
-      transition: all 0.3s ease;
-      display: inline-block;
-      padding: 4px 12px;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.95);
-      border: 1px solid rgba(0, 128, 128, 0.3);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    .teacher-link:hover {
-      color: #006666;
-      background: rgba(255, 255, 255, 1);
-      transform: scale(1.05);
-      box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+      color: #ffffff;
+      text-align: center;
+      line-height: 1.6;
+      margin-bottom: 16px;
+      word-wrap: break-word;
     }
 
     .teacher-name-in-title {
       color: #ffffff;
       font-weight: 700;
-      background: rgba(0, 128, 128, 0.8);
-      padding: 2px 8px;
-      border-radius: 6px;
+      background: rgba(0, 128, 128, 0.85);
+      padding: 3px 10px;
+      border-radius: 8px;
       display: inline-block;
       text-shadow: 0 1px 3px rgba(0,0,0,0.5);
       box-shadow: 0 2px 6px rgba(0, 128, 128, 0.4);
       text-decoration: none;
       transition: all 0.3s ease;
+      margin: 0 4px;
     }
     
     .teacher-name-in-title:hover {
@@ -273,21 +234,23 @@
       box-shadow: 0 3px 8px rgba(0, 128, 128, 0.6);
     }
 
-    .no-teacher {
-      color: rgba(255,255,255,0.5);
-      font-style: italic;
+    .group-count-section {
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255,255,255,0.12);
+      text-align: center;
     }
 
     .group-count-badge {
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
-      padding: 5px 12px;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.25) 0%, rgba(118, 75, 162, 0.25) 100%);
+      padding: 6px 14px;
       border-radius: 10px;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       font-weight: 600;
-      border: 1px solid rgba(255,255,255,0.12);
-      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
       color: rgba(255,255,255,0.95);
-      text-align: center;
+      display: inline-block;
     }
 
     .empty-state {
@@ -295,6 +258,7 @@
       padding: 60px 20px;
       color: rgba(255,255,255,0.5);
       font-size: 1.2rem;
+      grid-column: 1 / -1;
     }
 
     @media (max-width: 480px) {
@@ -303,8 +267,8 @@
       }
 
       .header {
-        padding: 15px;
-        margin-bottom: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
       }
 
       .nav-breadcrumbs {
@@ -313,7 +277,7 @@
       }
 
       .title-section h1 {
-        font-size: 1.4rem;
+        font-size: 1.6rem;
       }
 
       .layer-total-count {
@@ -324,7 +288,7 @@
       }
 
       .count-number {
-        font-size: 1.8rem;
+        font-size: 2rem;
       }
 
       .count-label {
@@ -345,37 +309,33 @@
 
       .groups-grid {
         grid-template-columns: 1fr;
-        gap: 12px;
+        gap: 16px;
       }
 
       .group-card {
-        padding: 15px;
-        margin-bottom: 10px;
+        padding: 20px;
+        min-height: 120px;
       }
 
-      .group-name {
-        font-size: 1.2rem;
-        line-height: 1.4;
+      .group-title {
+        font-size: 1.15rem;
+        margin-bottom: 12px;
+      }
+
+      .teacher-name-in-title {
+        padding: 2px 8px;
+        font-size: 0.95rem;
       }
 
       .group-count-badge {
         font-size: 0.85rem;
-        padding: 6px 12px;
+        padding: 5px 12px;
       }
 
-      .group-teacher {
-        font-size: 0.95rem;
-      }
-
-      .teacher-link {
-        padding: 3px 8px;
-        font-size: 0.9rem;
-      }
-      
       .header-content {
         flex-direction: column;
         align-items: flex-start;
-        gap: 12px;
+        gap: 15px;
       }
     }
 
@@ -385,8 +345,8 @@
       }
 
       .header {
-        padding: 20px;
-        margin-bottom: 20px;
+        padding: 25px;
+        margin-bottom: 25px;
       }
 
       .nav-breadcrumbs {
@@ -395,7 +355,7 @@
       }
 
       .title-section h1 {
-        font-size: 1.8rem;
+        font-size: 2rem;
       }
 
       .layer-total-count {
@@ -406,7 +366,7 @@
       }
 
       .count-number {
-        font-size: 2rem;
+        font-size: 2.2rem;
       }
 
       .count-label {
@@ -425,27 +385,17 @@
 
       .groups-grid {
         grid-template-columns: 1fr;
-        gap: 15px;
+        gap: 20px;
       }
 
       .group-card {
-        padding: 20px;
+        padding: 22px;
       }
 
-      .group-name {
-        font-size: 1.4rem;
-        line-height: 1.4;
+      .group-title {
+        font-size: 1.25rem;
       }
 
-      .group-count-badge {
-        font-size: 0.9rem;
-        padding: 6px 15px;
-      }
-
-      .group-teacher {
-        font-size: 1rem;
-      }
-      
       .header-content {
         flex-direction: column;
         align-items: flex-start;
@@ -475,11 +425,20 @@
       </div>
     </div>
 
-    <div class="groups-grid" id="groupsGrid"></div>
+    <div class="groups-grid" id="groupsGrid">
+      <div class="empty-state">טוען...</div>
+    </div>
   </div>
 
   <script>
     const layer = window.SharedUtils ? window.SharedUtils.getURLParameter('layer') : new URLSearchParams(window.location.search).get('layer');
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
 
     function renderGroups() {
       if (!layer) {
@@ -488,10 +447,6 @@
         } else {
           window.location.href = 'index.html';
         }
-        return;
-      }
-      
-      if (!window.SharedUtils || !window.SharedUtils.requireData(layer, 'index.html')) {
         return;
       }
       
@@ -508,11 +463,9 @@
       if (layerTitleEl) layerTitleEl.textContent = `שכבת ${layerName}`;
       if (layerNameEl) layerNameEl.textContent = `שכבת ${layerName}`;
 
-      // עדכון מונה כללי של השכבה
       const totalCount = DataStore.getLayerCount(layer) || 0;
       if (countNumberEl) countNumberEl.textContent = totalCount;
 
-      // הגדרת רקע לפי שכבה
       const layerColor = DataStore.getLayerColor(layer);
       const headerEl = document.querySelector('.header');
       if (headerEl && layerColor) {
@@ -522,6 +475,8 @@
       const groups = DataStore.getGroupsByLayer(layer);
       const grid = document.getElementById('groupsGrid');
 
+      if (!grid) return;
+
       if (!groups || groups.length === 0) {
         grid.innerHTML = '<div class="empty-state">אין הקבצות בשכבה זו</div>';
         return;
@@ -529,33 +484,24 @@
 
       grid.innerHTML = groups.map((group) => {
         const teacher = group.teacherId ? DataStore.getTeacher(group.teacherId) : null;
-        const count = DataStore.getGroupCount(group.id);
-        
-        // Escape HTML למניעת XSS
-        const escapeHtml = (text) => {
-          if (!text) return '';
-          const div = document.createElement('div');
-          div.textContent = text;
-          return div.innerHTML;
-        };
+        const count = DataStore.getGroupCount(group.id) || 0;
         
         const groupNameEscaped = escapeHtml(group.name);
         const teacherNameEscaped = teacher ? escapeHtml(teacher.name) : '';
         const teacherIdEscaped = teacher ? escapeHtml(teacher.id) : '';
         const groupIdEscaped = escapeHtml(group.id);
         
-        // בניית כותרת הכפתור: "הקבצה [שם] - המורה [שם מורה]"
         const groupTitle = teacher 
           ? `הקבצה ${groupNameEscaped} - המורה <a href="teacher.html?teacherId=${teacherIdEscaped}" class="teacher-name-in-title" onclick="event.stopPropagation(); return false;">${teacherNameEscaped}</a>`
           : `הקבצה ${groupNameEscaped}`;
 
         return `
           <a href="group.html?groupId=${groupIdEscaped}" class="group-card">
-            <div class="group-header">
-              <div class="group-name">${groupTitle}</div>
-            </div>
-            <div class="group-info">
-              <div class="group-count-badge">${count} תלמידים</div>
+            <div class="group-content">
+              <div class="group-title">${groupTitle}</div>
+              <div class="group-count-section">
+                <div class="group-count-badge">${count} תלמידים</div>
+              </div>
             </div>
           </a>
         `;
@@ -567,7 +513,6 @@
         DataStore.load();
         renderGroups();
         
-        // עדכון כל 3 שניות (פחות תכוף כדי למנוע עומס)
         setInterval(() => {
           try {
             DataStore.load();

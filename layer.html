@@ -212,9 +212,16 @@
       background-clip: text;
       letter-spacing: -0.2px;
       text-align: center;
-      line-height: 1.5;
+      line-height: 1.6;
       word-wrap: break-word;
       margin-bottom: 0;
+      width: 100%;
+    }
+    
+    .group-name a {
+      display: inline-block;
+      margin: 0 4px;
+      vertical-align: middle;
     }
 
     .group-info {
@@ -499,13 +506,13 @@
         return;
       }
 
-      grid.innerHTML = groups.map((group, index) => {
+      grid.innerHTML = groups.map((group) => {
         const teacher = group.teacherId ? DataStore.getTeacher(group.teacherId) : null;
         const count = DataStore.getGroupCount(group.id);
         
         // בניית כותרת הכפתור: "הקבצה [שם] - המורה [שם מורה]"
         const groupTitle = teacher 
-          ? `הקבצה ${group.name} - המורה <a href="teacher.html?teacherId=${teacher.id}" class="teacher-name-in-title" onclick="event.stopPropagation();">${teacher.name}</a>`
+          ? `הקבצה ${group.name} - המורה <a href="teacher.html?teacherId=${teacher.id}" class="teacher-name-in-title" onclick="event.stopPropagation(); return false;">${teacher.name}</a>`
           : `הקבצה ${group.name}`;
 
         return `

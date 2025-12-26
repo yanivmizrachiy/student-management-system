@@ -498,9 +498,6 @@
       };
 
       grid.innerHTML = validGroups.map((group) => {
-        // טעינת נתונים טריים לכל קבוצה
-        DataStore.load(true);
-        
         const teacher = group.teacherId ? DataStore.getTeacher(group.teacherId) : null;
         const count = DataStore.getGroupCount(group.id) || 0;
         

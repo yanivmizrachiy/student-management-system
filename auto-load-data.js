@@ -37,24 +37,30 @@
     loadAllGroups();
   }
   
+  // Helper function to create students array from name pairs
+  function createStudents(namePairs, className = null) {
+    return namePairs.map(([lastName, firstName, classNum]) => ({
+      lastName,
+      firstName,
+      ...(className || classNum ? { className: className || `כיתה ${classNum}` } : {})
+    }));
+  }
+
   function loadAllGroups() {
     // קבוצה 1: ז'1 - מדעית (טל נחמיה)
-    const group1 = {
+    DataStore.importGroup({
       layer: '7',
       groupName: 'מדעית',
       teacherName: 'טל נחמיה',
       className: 'כיתה ז\'1'
-    };
-    const students1 = [
+    }, createStudents([
       ['אוסקר', 'ליהי'], ['אזולאי', 'לירן'], ['ברימט', 'טליה'], ['ברקוביץ', 'דניאל'],
       ['דהן', 'בנימין'], ['זכריה', 'שיר'], ['חודורוב', 'מאיה'], ['כהן', 'אופק'],
       ['מוגס', 'דניאלה'], ['מזרחי', 'מאור'], ['מכחל', 'נועה'], ['מלניק', 'נתנאל'],
       ['סיאנוב', 'אוריה'], ['עמדי', 'מעיין'], ['פאילייב', 'אדל'], ['פינקס', 'אריאל'],
       ['ציקווש', 'יהלי'], ['רזייב', 'עדינה'], ['שוורץ', 'עילי'], ['שוורצר', 'סופיה ניצה'],
       ['שכטמן', 'ניר'], ['שמש', 'אמילי'], ['שצמן', 'יעל'], ['ששון', 'אוריה אברהם']
-    ].map(([lastName, firstName]) => ({ lastName, firstName }));
-    
-    DataStore.importGroup(group1, students1);
+    ]));
     
     // קבוצה 2: ז'3/ז'4 - א' (אילנית רז)
     const students2 = [

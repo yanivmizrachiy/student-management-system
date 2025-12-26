@@ -81,6 +81,25 @@ function getURLParameter(name) {
   return urlParams.get(name);
 }
 
+// Navigate to page with error handling
+function navigateToPage(url, fallback = 'index.html') {
+  try {
+    window.location.href = url;
+  } catch (e) {
+    console.error('Navigation error:', e);
+    window.location.href = fallback;
+  }
+}
+
+// Check if required data exists, redirect if not
+function requireData(condition, redirectUrl = 'index.html') {
+  if (!condition) {
+    navigateToPage(redirectUrl);
+    return false;
+  }
+  return true;
+}
+
 // Image compression helper
 function compressImage(file, maxWidth = 1920, maxHeight = 1080, quality = 0.8) {
   return new Promise((resolve, reject) => {
@@ -161,7 +180,9 @@ if (typeof window !== 'undefined') {
     scrollToElement,
     getURLParameter,
     compressImage,
-    showNotification
+    showNotification,
+    navigateToPage,
+    requireData
   };
 }
 

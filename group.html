@@ -554,25 +554,17 @@
   </div>
 
   <script>
-    // פונקציה להסרת המילה "כיתה " מתחילת שם הכיתה
-    function formatClassName(className) {
-      if (!className) return '';
-      // הסר "כיתה " מהתחלה אם קיים
-      return className.replace(/^כיתה\s+/, '');
-    }
+    // משתמש ב-formatClassName מ-shared-utils.js
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const groupId = urlParams.get('groupId');
+    const groupId = window.SharedUtils ? window.SharedUtils.getURLParameter('groupId') : new URLSearchParams(window.location.search).get('groupId');
 
     function renderGroup() {
-      if (!groupId) {
-        window.location.href = 'index.html';
+      if (!window.SharedUtils || !window.SharedUtils.requireData(groupId, 'index.html')) {
         return;
       }
 
       const group = DataStore.getGroup(groupId);
-      if (!group) {
-        window.location.href = 'index.html';
+      if (!window.SharedUtils.requireData(group, 'index.html')) {
         return;
       }
 
@@ -633,7 +625,7 @@
             <td>${index + 1}</td>
             <td><a href="student.html?studentId=${student.id}" class="student-link">${student.lastName || ''}</a></td>
             <td><a href="student.html?studentId=${student.id}" class="student-link">${student.firstName || ''}</a></td>
-            <td>${studentClass ? `<a href="class.html?classId=${studentClass.id}" class="class-link">${formatClassName(studentClass.name)}</a>` : ''}</td>
+            <td>${studentClass ? `<a href="class.html?classId=${studentClass.id}" class="class-link">${window.SharedUtils ? window.SharedUtils.formatClassName(studentClass.name) : (studentClass.name || '').replace(/^כיתה\s+/, '')}</a>` : ''}</td>
             <td class="teacher-name">${classTeacher ? `<a href="teacher.html?teacherId=${classTeacher.id}" class="teacher-name-link">${classTeacher.name}</a>` : ''}</td>
         `;
 

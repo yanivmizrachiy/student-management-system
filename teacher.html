@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>מורה - מערכת ניהול תלמידים</title>
-  <script src="data.js"></script>`n  <script src="auto-load-data.js"></script>
+  <script src="data.js"></script>
+  <script src="shared-utils.js"></script>`n  <script src="auto-load-data.js"></script>
   <style>
     * {
       margin: 0;
@@ -340,18 +341,15 @@
   </div>
 
   <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const teacherId = urlParams.get('teacherId');
+    const teacherId = window.SharedUtils ? window.SharedUtils.getURLParameter('teacherId') : new URLSearchParams(window.location.search).get('teacherId');
 
     function renderTeacher() {
-      if (!teacherId) {
-        window.location.href = 'index.html';
+      if (!window.SharedUtils || !window.SharedUtils.requireData(teacherId, 'index.html')) {
         return;
       }
 
       const teacher = DataStore.getTeacher(teacherId);
-      if (!teacher) {
-        window.location.href = 'index.html';
+      if (!window.SharedUtils.requireData(teacher, 'index.html')) {
         return;
       }
 

@@ -642,25 +642,17 @@
   </div>
 
   <script>
-    // פונקציה להסרת המילה "כיתה " מתחילת שם הכיתה
-    function formatClassName(className) {
-      if (!className) return '';
-      // הסר "כיתה " מהתחלה אם קיים
-      return className.replace(/^כיתה\s+/, '');
-    }
+    // משתמש ב-formatClassName מ-shared-utils.js
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const studentId = urlParams.get('studentId');
+    const studentId = window.SharedUtils ? window.SharedUtils.getURLParameter('studentId') : new URLSearchParams(window.location.search).get('studentId');
 
     function renderStudent() {
-      if (!studentId) {
-        window.location.href = 'index.html';
+      if (!window.SharedUtils || !window.SharedUtils.requireData(studentId, 'index.html')) {
         return;
       }
 
       const student = DataStore.getStudent(studentId);
-      if (!student) {
-        window.location.href = 'index.html';
+      if (!window.SharedUtils.requireData(student, 'index.html')) {
         return;
       }
 
@@ -718,7 +710,7 @@
         </div>
         <div class="info-item">
           <div class="info-label">כיתה</div>
-          <div class="info-value">${studentClass ? `<a href="class.html?classId=${studentClass.id}">${formatClassName(studentClass.name)}</a>` : ''}</div>
+          <div class="info-value">${studentClass ? `<a href="class.html?classId=${studentClass.id}">${window.SharedUtils ? window.SharedUtils.formatClassName(studentClass.name) : (studentClass.name || '').replace(/^כיתה\s+/, '')}</a>` : ''}</div>
         </div>
         <div class="info-item">
           <div class="info-label">מחנכת</div>

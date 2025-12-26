@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>שכבה - מערכת ניהול תלמידים</title>
-  <script src="data.js"></script>`n  <script src="auto-load-data.js"></script>
+  <script src="data.js"></script>
+  <script src="shared-utils.js"></script>`n  <script src="auto-load-data.js"></script>
   <style>
     * {
       margin: 0;
@@ -470,12 +471,10 @@
   </div>
 
   <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const layer = urlParams.get('layer');
+    const layer = window.SharedUtils ? window.SharedUtils.getURLParameter('layer') : new URLSearchParams(window.location.search).get('layer');
 
     function renderGroups() {
-      if (!layer) {
-        window.location.href = 'index.html';
+      if (!window.SharedUtils || !window.SharedUtils.requireData(layer, 'index.html')) {
         return;
       }
 

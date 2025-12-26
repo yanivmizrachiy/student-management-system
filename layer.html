@@ -431,24 +431,42 @@
   </div>
 
   <script>
-    const layer = window.SharedUtils ? window.SharedUtils.getURLParameter('layer') : new URLSearchParams(window.location.search).get('layer');
+    // פונקציה מרכזית לטעינת ועיבוד נתונים
+    function initLayerPage() {
+      // בדיקת DataStore
+      if (typeof DataStore === 'undefined') {
+        console.error('❌ DataStore לא נטען');
+        setTimeout(initLayerPage, 100);
+        return;
+      }
 
-    function renderGroups() {
+      // קבלת פרמטר שכבה מה-URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const layer = urlParams.get('layer');
+
       if (!layer) {
-        if (window.SharedUtils && window.SharedUtils.navigateToPage) {
-          window.SharedUtils.navigateToPage('index.html');
-        } else {
-          window.location.href = 'index.html';
-        }
-        return;
-      }
-      
-      if (!DataStore) {
-        console.error('DataStore לא נטען');
+        console.warn('⚠️ לא צוינה שכבה, מעבר לדף הבית');
+        window.location.href = 'index.html';
         return;
       }
 
-      const layerName = DataStore.getLayerName(layer) || layer;
+      // טעינת נתונים טריים - חשוב מאוד!
+      DataStore.load(true);
+
+      // המתן קצת כדי לוודא ש-auto-load-data.js רץ (אם צריך)
+      setTimeout(() => {
+        renderLayerPage(layer);
+      }, 200);
+    }
+
+    function renderLayerPage(layer) {
+      // טעינת נתונים טריים שוב לפני רינדור
+      DataStore.load(true);
+
+      // קבלת שם שכבה
+      const layerName = DataStore.getLayerName ? DataStore.getLayerName(layer) : `שכבה ${layer}`;
+      
+      // עדכון כותרות
       const layerTitleEl = document.getElementById('layerTitle');
       const layerNameEl = document.getElementById('layerName');
       const countNumberEl = document.getElementById('countNumber');
@@ -456,69 +474,63 @@
       if (layerTitleEl) layerTitleEl.textContent = `שכבת ${layerName}`;
       if (layerNameEl) layerNameEl.textContent = `שכבת ${layerName}`;
 
-      const totalCount = DataStore.getLayerCount(layer) || 0;
-      if (countNumberEl) countNumberEl.textContent = totalCount;
+      // עדכון מונה כולל
+      const totalCount = DataStore.getLayerCount ? DataStore.getLayerCount(layer) : 0;
+      if (countNumberEl) countNumberEl.textContent = totalCount || 0;
 
-      const layerColor = DataStore.getLayerColor(layer);
-      const headerEl = document.querySelector('.header');
-      if (headerEl && layerColor) {
-        headerEl.style.background = layerColor.replace('linear-gradient(145deg, ', 'linear-gradient(135deg, ').replace(')', ', rgba(0,0,0,0.3))');
+      // עדכון רקע לפי שכבה
+      if (DataStore.getLayerColor) {
+        const layerColor = DataStore.getLayerColor(layer);
+        const headerEl = document.querySelector('.header');
+        if (headerEl && layerColor) {
+          headerEl.style.background = layerColor.replace('linear-gradient(145deg, ', 'linear-gradient(135deg, ').replace(')', ', rgba(0,0,0,0.3))');
+        }
       }
 
-      // טעינת נתונים טריים
-      DataStore.load(true);
-      
-      const groups = DataStore.getGroupsByLayer(layer);
+      // קבלת קבוצות של השכבה
+      const groups = DataStore.getGroupsByLayer ? DataStore.getGroupsByLayer(layer) : [];
       const grid = document.getElementById('groupsGrid');
 
-      if (!grid) return;
+      if (!grid) {
+        console.error('❌ לא נמצא groupsGrid');
+        return;
+      }
 
       if (!groups || groups.length === 0) {
         grid.innerHTML = '<div class="empty-state">אין הקבצות בשכבה זו</div>';
         return;
       }
 
-      // סינון קבוצות ריקות - רק קבוצות עם תלמידים או עם מורה
-      const validGroups = groups.filter(group => {
-        const count = DataStore.getGroupCount(group.id) || 0;
-        const hasTeacher = group.teacherId && DataStore.getTeacher(group.teacherId);
-        return count > 0 || hasTeacher;
-      });
-
-      if (validGroups.length === 0) {
-        grid.innerHTML = '<div class="empty-state">אין הקבצות עם תלמידים בשכבה זו</div>';
-        return;
-      }
-
-      const escapeHtml = window.SharedUtils ? window.SharedUtils.escapeHtml : (text) => {
+      // Escape HTML helper
+      const escapeHtml = (text) => {
         if (!text && text !== 0) return '';
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
       };
 
-      grid.innerHTML = validGroups.map((group) => {
-        const teacher = group.teacherId ? DataStore.getTeacher(group.teacherId) : null;
-        const count = DataStore.getGroupCount(group.id) || 0;
-        
-        // תיקון שם מורה שגוי - אם המורה הוא "איתי רז", נציג "יניב רז"
-        let teacherName = teacher ? teacher.name : '';
-        let teacherId = teacher ? teacher.id : '';
-        
-        // אם המורה הוא "איתי רז", נחפש את "יניב רז" במקום
-        if (teacherName === 'איתי רז') {
-          const yanivRaz = DataStore.teachers.find(t => t.name === 'יניב רז');
-          if (yanivRaz) {
-            teacherName = 'יניב רז';
-            teacherId = yanivRaz.id;
-          }
-        }
-        
-        const groupNameEscaped = escapeHtml(group.name);
-        const teacherNameEscaped = teacherName ? escapeHtml(teacherName) : '';
-        const teacherIdEscaped = teacherId ? escapeHtml(teacherId) : '';
+      // רינדור קבוצות
+      grid.innerHTML = groups.map((group) => {
+        if (!group || !group.id) return '';
+
+        // קבלת מורה
+        const teacher = group.teacherId && DataStore.getTeacher 
+          ? DataStore.getTeacher(group.teacherId) 
+          : null;
+
+        // קבלת מספר תלמידים
+        const count = DataStore.getGroupCount 
+          ? (DataStore.getGroupCount(group.id) || 0)
+          : 0;
+
+        // Escape HTML
+        const groupNameEscaped = escapeHtml(group.name || '');
+        const teacherName = teacher ? (teacher.name || '') : '';
+        const teacherNameEscaped = escapeHtml(teacherName);
+        const teacherIdEscaped = teacher ? escapeHtml(teacher.id) : '';
         const groupIdEscaped = escapeHtml(group.id);
-        
+
+        // בניית כותרת
         const groupTitle = teacherNameEscaped
           ? `הקבצה ${groupNameEscaped} - המורה <a href="teacher.html?teacherId=${teacherIdEscaped}" class="teacher-name-in-title" onclick="event.stopPropagation(); return false;">${teacherNameEscaped}</a>`
           : `הקבצה ${groupNameEscaped}`;
@@ -533,30 +545,41 @@
             </div>
           </a>
         `;
-      }).join('');
+      }).filter(html => html !== '').join('');
+
+      // אם אין קבוצות אחרי הסינון
+      if (!grid.innerHTML.trim()) {
+        grid.innerHTML = '<div class="empty-state">אין הקבצות בשכבה זו</div>';
+      }
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      try {
-        DataStore.load();
-        renderGroups();
-        
-        setInterval(() => {
-          try {
-            DataStore.load();
-            renderGroups();
-          } catch (e) {
-            console.error('שגיאה בעדכון:', e);
+    // טעינה ראשונית
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initLayerPage);
+    } else {
+      initLayerPage();
+    }
+
+    // עדכון אוטומטי כל 3 שניות
+    let updateInterval = null;
+    function startAutoUpdate() {
+      if (updateInterval) clearInterval(updateInterval);
+      
+      updateInterval = setInterval(() => {
+        try {
+          const urlParams = new URLSearchParams(window.location.search);
+          const layer = urlParams.get('layer');
+          if (layer) {
+            renderLayerPage(layer);
           }
-        }, 3000);
-      } catch (e) {
-        console.error('שגיאה בטעינת עמוד שכבה:', e);
-        const grid = document.getElementById('groupsGrid');
-        if (grid) {
-          grid.innerHTML = '<div class="empty-state">שגיאה בטעינת הנתונים. אנא רענן את הדף.</div>';
+        } catch (e) {
+          console.error('שגיאה בעדכון אוטומטי:', e);
         }
-      }
-    });
+      }, 3000);
+    }
+
+    // התחל עדכון אוטומטי אחרי טעינה ראשונית
+    setTimeout(startAutoUpdate, 500);
   </script>
 </body>
 </html>

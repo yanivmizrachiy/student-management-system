@@ -90,7 +90,7 @@ function checkForChanges() {
     
     // גם בדוק שינויים בקבצים ישירות (fallback)
     // אם יש שינוי בקובץ data.js או קבצי HTML אחרי הזמן האחרון
-    const importantFiles = ['data.js', 'index.html', 'student.html', 'group.html', 'class.html', 'layer.html', 'teacher.html'];
+    const importantFiles = ['data.js', 'index.html', 'student.html', 'group.html', 'class.html', 'layer.html', 'teacher.html', 'update-teachers.js', 'shared-utils.js'];
     const now = Date.now();
     
     for (const file of importantFiles) {
@@ -109,6 +109,22 @@ function checkForChanges() {
           fs.writeFileSync(SYNC_MARKER, JSON.stringify(syncData, null, 2));
           return syncData;
         }
+      }
+    }
+    
+    // גם בדוק localStorage dump file
+    const localStorageDump = path.join(PROJECT_PATH, 'localStorage-dump.json');
+    if (fs.existsSync(localStorageDump)) {
+      const stats = fs.statSync(localStorageDump);
+      if (now - stats.mtimeMs < 30000) {
+        const syncData = {
+          timestamp: new Date().toISOString(),
+          action: 'localStorage-export',
+          version: Date.now(),
+          source: 'localStorage-dump.json'
+        };
+        fs.writeFileSync(SYNC_MARKER, JSON.stringify(syncData, null, 2));
+        return syncData;
       }
     }
     
@@ -145,6 +161,21 @@ function syncToGitHub(syncData) {
     // הוסף את כל הקבצים החשובים
     console.log('📦 מוסיף קבצים...');
     execSync('git add *.html *.js *.md .gitignore package.json 2>&1', { stdio: 'inherit' });
+    
+    // גם נסה להוסיף localStorage export/dump אם קיים
+    try {
+      const exportFile = path.join(PROJECT_PATH, 'localStorage-export.json');
+      const dumpFile = path.join(PROJECT_PATH, 'localStorage-dump.json');
+      
+      if (fs.existsSync(exportFile)) {
+        execSync('git add localStorage-export.json 2>&1', { stdio: 'pipe' });
+      }
+      if (fs.existsSync(dumpFile)) {
+        execSync('git add localStorage-dump.json 2>&1', { stdio: 'pipe' });
+      }
+    } catch (e) {
+      // זה בסדר אם הקבצים לא קיימים
+    }
     
     // אל תכלול את marker files ב-commit (הם זמניים)
     try {

@@ -26,4 +26,9 @@ node_modules/
 # קבצי סנכרון אוטומטי
 .sync-marker.json
 .last-sync.txt
+.last-data-hash.txt
+
+# קבצי localStorage export (אופציונלי - אם רוצים לשמור ב-Git)
+# localStorage-export.json
+# localStorage-dump.json
 

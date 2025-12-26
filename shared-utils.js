@@ -48,6 +48,7 @@ function renderBreadcrumbs(items) {
 
 // Safe HTML escape - הגנה מפני XSS
 function escapeHtml(text) {
+  if (!text && text !== 0) return '';
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;

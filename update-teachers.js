@@ -6,6 +6,13 @@
 (function() {
   'use strict';
   
+  // בדוק אם כבר בוצע העדכון (מונע הרצה חוזרת)
+  const updateKey = 'teacherUpdate_אסנת_קרפט';
+  if (localStorage.getItem(updateKey) === 'completed') {
+    console.log('✅ עדכון מורים כבר בוצע בעבר');
+    return;
+  }
+  
   // בדוק אם DataStore נטען
   if (typeof DataStore === 'undefined') {
     console.error('❌ DataStore לא נטען');
@@ -182,6 +189,9 @@
   DataStore._invalidateCache(); // ביטול cache
   DataStore.save(true); // שמירה מיידית
   
+  // סמן שהעדכון בוצע
+  localStorage.setItem(updateKey, 'completed');
+  
   console.log(`\n✅ הושלם! הועברו ${transferred} תלמידים`);
   if (notFound.length > 0) {
     console.log(`⚠️  לא נמצאו ${notFound.length} תלמידים:`);
@@ -190,5 +200,12 @@
   
   console.log(`📊 סה"כ תלמידים בקבוצה של אסנת קרפט: ${DataStore.getGroupCount(newGroup.id)}`);
   console.log(`📊 סה"כ תלמידים בקבוצה של אילנית רז: ${DataStore.getGroupCount(oldGroup.id)}`);
+  
+  // רענן את הדף כדי לראות את השינויים
+  if (window.location.pathname.includes('index.html') || window.location.pathname === '/') {
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
+  }
 })();
 

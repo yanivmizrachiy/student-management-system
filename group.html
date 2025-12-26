@@ -531,7 +531,7 @@
             <td>${index + 1}</td>
             <td><a href="student.html?studentId=${student.id}" class="student-link">${student.lastName || ''}</a></td>
             <td><a href="student.html?studentId=${student.id}" class="student-link">${student.firstName || ''}</a></td>
-            <td>${studentClass ? `<a href="class.html?classId=${studentClass.id}" class="class-link">${studentClass.name}</a>` : ''}</td>
+            <td>${studentClass ? `<a href="class.html?classId=${studentClass.id}" class="class-link">${formatClassName(studentClass.name)}</a>` : ''}</td>
             <td class="teacher-name">${classTeacher ? `<a href="teacher.html?teacherId=${classTeacher.id}" class="teacher-name-link">${classTeacher.name}</a>` : ''}</td>
         `;
 

@@ -519,6 +519,13 @@
   </div>
 
   <script>
+    // פונקציה להסרת המילה "כיתה " מתחילת שם הכיתה
+    function formatClassName(className) {
+      if (!className) return '';
+      // הסר "כיתה " מהתחלה אם קיים
+      return className.replace(/^כיתה\s+/, '');
+    }
+
     const urlParams = new URLSearchParams(window.location.search);
     const studentId = urlParams.get('studentId');
 
@@ -588,7 +595,7 @@
         </div>
         <div class="info-item">
           <div class="info-label">כיתה</div>
-          <div class="info-value">${studentClass ? `<a href="class.html?classId=${studentClass.id}">${studentClass.name}</a>` : ''}</div>
+          <div class="info-value">${studentClass ? `<a href="class.html?classId=${studentClass.id}">${formatClassName(studentClass.name)}</a>` : ''}</div>
         </div>
         <div class="info-item">
           <div class="info-label">מחנכת</div>

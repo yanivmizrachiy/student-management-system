@@ -230,21 +230,26 @@
     }
 
     .teacher-link {
-      color: #ffd700;
+      color: #008080;
       text-decoration: none;
       font-weight: 700;
       transition: all 0.3s ease;
       display: inline-block;
       padding: 4px 12px;
       border-radius: 12px;
-      background: rgba(255, 215, 0, 0.15);
-      border: 1px solid rgba(255, 215, 0, 0.3);
+      background: rgba(0, 128, 128, 0.15);
+      border: 1px solid rgba(0, 128, 128, 0.3);
     }
 
     .teacher-link:hover {
-      color: #ffed4e;
-      background: rgba(255, 215, 0, 0.25);
+      color: #00b3b3;
+      background: rgba(0, 128, 128, 0.25);
       transform: scale(1.05);
+    }
+
+    .teacher-name-in-title {
+      color: #008080;
+      font-weight: 700;
     }
 
     .no-teacher {
@@ -485,9 +490,9 @@
         const teacher = group.teacherId ? DataStore.getTeacher(group.teacherId) : null;
         const count = DataStore.getGroupCount(group.id);
         
-        // בניית כותרת הכפתור: "הקבצה [שם] [מורה]"
+        // בניית כותרת הכפתור: "הקבצה [שם] - המורה [שם מורה]"
         const groupTitle = teacher 
-          ? `הקבצה ${group.name} ${teacher.name}`
+          ? `הקבצה ${group.name} - המורה <span class="teacher-name-in-title">${teacher.name}</span>`
           : `הקבצה ${group.name}`;
 
         return `

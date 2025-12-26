@@ -380,6 +380,10 @@
       document.getElementById('layerTitle').textContent = `שכבת ${layerName}`;
       document.getElementById('layerName').textContent = `שכבת ${layerName}`;
 
+      // עדכון מונה כללי של השכבה
+      const totalCount = DataStore.getLayerCount(layer);
+      document.getElementById('countNumber').textContent = totalCount;
+
       // הגדרת רקע לפי שכבה
       const layerColor = DataStore.getLayerColor(layer);
       document.querySelector('.header').style.background = layerColor.replace('linear-gradient(145deg, ', 'linear-gradient(135deg, ').replace(')', ', rgba(0,0,0,0.3))');

@@ -500,7 +500,7 @@
         
         // בניית כותרת הכפתור: "הקבצה [שם] - המורה [שם מורה]"
         const groupTitle = teacher 
-          ? `הקבצה ${group.name} - המורה <span class="teacher-name-in-title">${teacher.name}</span>`
+          ? `הקבצה ${group.name} - המורה <a href="teacher.html?teacherId=${teacher.id}" class="teacher-name-in-title">${teacher.name}</a>`
           : `הקבצה ${group.name}`;
 
         return `

@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+# Run the Python pre-commit validator.
+echo "✳️ Running GitHub workflow protection checks..."
+python scripts/precommit.py
+RESULT=$?
+if [ $RESULT -ne 0 ]; then
+  echo "❌ Pre-commit validation failed. Fix issues before committing."
+  exit 1
+fi
+exit 0
+

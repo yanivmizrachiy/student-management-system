@@ -103,8 +103,22 @@
 
 - המערכת עובדת בלבד בדפדפן (לא דורשת שרת)
 - כל הנתונים נשמרים מקומית בדפדפן
-- יש לבדוק את ה-localStorage לפני מחיקת נתונים
+- יש לבדוק את `localStorage` לפני מחיקת נתונים
 - המערכת מסנכרנת אוטומטית ל-GitHub (אם מוגדר)
+
+## 🚦 GitHub Automation חכם
+
+1. קבע את hooks של Git:
+   ```bash
+   git config core.hooksPath .githooks
+   ```
+2. לפני כל commit הרץ:
+   ```bash
+   python protect-layer-html.py layer.html
+   ```
+3. לאחר מכן תוכל לבצע commit רגיל; ה-hook יפעיל `scripts/precommit.py` אוטומטית.
+4. אם נדרשת בדיקה נוספת, הרץ: `python pre-change-validator.py before layer.html`.
+5. הקפד על `.gitignore` המעודכן שמסתיר `.change-snapshots/`, `.last-update.json`, `node_modules/`, קבצי `.log`, `.tmp` וכו'.
 
 ---
 

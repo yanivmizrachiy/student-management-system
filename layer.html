@@ -58,23 +58,6 @@
                   inset 0 1px 0 rgba(255,255,255,0.1);
     }
 
-    .nav-breadcrumbs {
-      margin-bottom: 20px;
-      font-size: 0.9rem;
-      color: rgba(255,255,255,0.7);
-    }
-
-    .nav-breadcrumbs a {
-      color: #667eea;
-      text-decoration: none;
-      transition: color 0.3s ease;
-      font-weight: 500;
-    }
-
-    .nav-breadcrumbs a:hover {
-      color: #ffffff;
-    }
-
     .header-content {
       display: flex;
       justify-content: space-between;
@@ -96,27 +79,6 @@
       -webkit-text-fill-color: transparent;
       background-clip: text;
       letter-spacing: -0.5px;
-    }
-
-    .layer-total-count {
-      display: flex;
-      align-items: baseline;
-      gap: 12px;
-      margin-top: 10px;
-    }
-
-    .count-number {
-      font-size: 2.8rem;
-      font-weight: 900;
-      color: #ffd700;
-      text-shadow: 0 0 20px rgba(255, 215, 0, 0.5),
-                   0 2px 10px rgba(0, 0, 0, 0.3);
-    }
-
-    .count-label {
-      font-size: 1.3rem;
-      color: rgba(255, 255, 255, 0.85);
-      font-weight: 500;
     }
 
     .nav-buttons {
@@ -150,15 +112,15 @@
 
     .groups-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 24px;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 16px;
       margin-bottom: 40px;
     }
 
     .group-card {
       background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-      border-radius: 16px;
-      padding: 24px;
+      border-radius: 12px;
+      padding: 12px;
       border: 1px solid rgba(102, 126, 234, 0.2);
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       text-decoration: none;
@@ -169,31 +131,12 @@
                   inset 0 1px 0 rgba(255,255,255,0.06);
       position: relative;
       overflow: hidden;
-      min-height: 140px;
-    }
-
-    .group-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.12), transparent);
-      transition: left 0.5s ease;
-    }
-
-    .group-card:hover::before {
-      left: 100%;
+      min-height: 90px;
     }
 
     .group-card:hover {
-      border-color: rgba(102, 126, 234, 0.4);
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3),
-                  0 2px 8px rgba(0,0,0,0.15),
-                  inset 0 1px 0 rgba(255,255,255,0.08);
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
     }
 
     .group-content {
@@ -205,54 +148,41 @@
     }
 
     .group-title {
-      font-size: 1.3rem;
+      font-size: 1.1rem;
       font-weight: 700;
       color: #ffffff;
       text-align: center;
-      line-height: 1.6;
-      margin-bottom: 16px;
+      line-height: 1.5;
+      margin-bottom: 8px;
       word-wrap: break-word;
     }
-
-    .teacher-name-link {
+    
+    .group-teacher {
+      font-size: 0.85rem;
+      font-weight: 600;
       color: #008080;
-      text-decoration: none;
-      font-weight: 700;
-      transition: all 0.3s ease;
-      background: rgba(255, 255, 255, 0.95);
-      padding: 3px 10px;
-      border-radius: 8px;
-      display: inline-block;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      border: 1px solid rgba(0, 128, 128, 0.3);
-      margin: 0 4px;
-    }
-
-    .teacher-name-link:hover {
-      color: #006666;
-      background: rgba(255, 255, 255, 1);
-      text-decoration: underline;
-      transform: scale(1.05);
-      box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+      text-align: center;
+      margin-bottom: 8px;
     }
 
     .group-count-section {
-      margin-top: auto;
-      padding-top: 16px;
+      margin-top: 8px;
+      padding-top: 8px;
       border-top: 1px solid rgba(255,255,255,0.12);
       text-align: center;
     }
 
     .group-count-badge {
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.25) 0%, rgba(118, 75, 162, 0.25) 100%);
-      padding: 6px 14px;
-      border-radius: 10px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      border: 1px solid rgba(255,255,255,0.15);
-      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-      color: rgba(255,255,255,0.95);
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.35) 0%, rgba(118, 75, 162, 0.35) 100%);
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border: 1px solid rgba(255,255,255,0.2);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      color: #ffffff;
       display: inline-block;
+      margin-top: 4px;
     }
 
     .empty-state {
@@ -273,29 +203,11 @@
         margin-bottom: 20px;
       }
 
-      .nav-breadcrumbs {
-        font-size: 0.75rem;
-        margin-bottom: 10px;
-      }
 
       .title-section h1 {
         font-size: 1.6rem;
       }
 
-      .layer-total-count {
-        flex-direction: column;
-        align-items: center;
-        gap: 5px;
-        margin-top: 8px;
-      }
-
-      .count-number {
-        font-size: 2rem;
-      }
-
-      .count-label {
-        font-size: 1rem;
-      }
 
       .nav-buttons {
         width: 100%;
@@ -311,12 +223,12 @@
 
       .groups-grid {
         grid-template-columns: 1fr;
-        gap: 16px;
+        gap: 12px;
       }
 
       .group-card {
-        padding: 20px;
-        min-height: 120px;
+        padding: 14px;
+        min-height: 100px;
       }
 
       .group-title {
@@ -324,14 +236,9 @@
         margin-bottom: 12px;
       }
 
-      .teacher-name-link {
-        padding: 2px 8px;
-        font-size: 0.95rem;
-      }
-
       .group-count-badge {
-        font-size: 0.85rem;
-        padding: 5px 12px;
+        font-size: 0.75rem;
+        padding: 4px 10px;
       }
 
       .header-content {
@@ -351,29 +258,11 @@
         margin-bottom: 25px;
       }
 
-      .nav-breadcrumbs {
-        font-size: 0.85rem;
-        margin-bottom: 15px;
-      }
 
       .title-section h1 {
         font-size: 2rem;
       }
 
-      .layer-total-count {
-        flex-direction: column;
-        align-items: center;
-        gap: 5px;
-        margin-top: 10px;
-      }
-
-      .count-number {
-        font-size: 2.2rem;
-      }
-
-      .count-label {
-        font-size: 1.1rem;
-      }
 
       .nav-buttons {
         width: 100%;
@@ -387,11 +276,11 @@
 
       .groups-grid {
         grid-template-columns: 1fr;
-        gap: 20px;
+        gap: 14px;
       }
 
       .group-card {
-        padding: 22px;
+        padding: 14px;
       }
 
       .group-title {
@@ -409,19 +298,11 @@
 <body>
   <div class="container">
     <div class="header" id="header">
-      <div class="nav-breadcrumbs" id="breadcrumbs">
-        <a href="index.html">בית</a> / <span id="layerName">שכבה</span>
-      </div>
       <div class="header-content">
         <div class="title-section">
           <h1 id="layerTitle">שכבה</h1>
-          <div class="layer-total-count" id="layerTotalCount">
-            <span class="count-number" id="countNumber">0</span>
-            <span class="count-label">תלמידים בשכבה</span>
-          </div>
         </div>
         <div class="nav-buttons">
-          <a href="index.html" class="nav-btn">🏠 בית</a>
           <a href="index.html" class="nav-btn">← חזרה</a>
         </div>
       </div>
@@ -436,86 +317,44 @@
     (function() {
       'use strict';
 
-      // קבלת פרמטר שכבה מה-URL
       function getLayerFromURL() {
-        if (typeof SharedUtils !== 'undefined' && SharedUtils.getURLParameter) {
-          return SharedUtils.getURLParameter('layer');
-        }
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get('layer');
+        return SharedUtils.getURLParameter('layer');
       }
 
-      // Escape HTML helper
-      function escapeHtml(text) {
-        if (!text && text !== 0) return '';
-        if (typeof SharedUtils !== 'undefined' && SharedUtils.escapeHtml) {
-          return SharedUtils.escapeHtml(text);
-        }
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-      }
-
-      // טעינת נתונים
-      function loadData() {
-        if (typeof DataStore === 'undefined') {
-          console.error('DataStore לא נטען');
-          return false;
-        }
-        DataStore.load(true);
-        return true;
-      }
-
-      // רינדור העמוד
       function renderPage() {
         const layer = getLayerFromURL();
         
         if (!layer) {
-          console.warn('לא צוינה שכבה');
           window.location.href = 'index.html';
           return;
         }
 
-        if (!loadData()) {
+        DataStore.load(true);
+        DataStore._invalidateCache();
+
+        if (!DataStore.students || !Array.isArray(DataStore.students)) {
+          setTimeout(renderPage, 200);
           return;
         }
 
-        // עדכון כותרות
-        const layerName = DataStore.getLayerName ? DataStore.getLayerName(layer) : `שכבה ${layer}`;
+        const layerName = DataStore.getLayerName(layer);
+        const totalCount = DataStore.getLayerCount(layer, false);
         const layerTitleEl = document.getElementById('layerTitle');
-        const layerNameEl = document.getElementById('layerName');
-        const countNumberEl = document.getElementById('countNumber');
-        
-        if (layerTitleEl) layerTitleEl.textContent = `שכבת ${layerName}`;
-        if (layerNameEl) layerNameEl.textContent = `שכבת ${layerName}`;
-
-        // עדכון מונה כולל
-        const totalCount = DataStore.getLayerCount ? DataStore.getLayerCount(layer) : 0;
-        if (countNumberEl) countNumberEl.textContent = totalCount || 0;
-
-        // עדכון רקע לפי שכבה
-        if (DataStore.getLayerColor) {
-          const layerColor = DataStore.getLayerColor(layer);
-          const headerEl = document.getElementById('header');
-          if (headerEl && layerColor) {
-            headerEl.style.background = layerColor.replace('linear-gradient(145deg, ', 'linear-gradient(135deg, ').replace(')', ', rgba(0,0,0,0.3))');
-          }
+        if (layerTitleEl) {
+          layerTitleEl.textContent = `שכבת ${layerName} - ${totalCount} לומדים`;
         }
 
-        // קבלת קבוצות
-        const groups = DataStore.getGroupsByLayer ? DataStore.getGroupsByLayer(layer) : [];
+        const headerEl = document.getElementById('header');
+        if (headerEl) {
+          headerEl.style.background = DataStore.getLayerColor(layer);
+        }
+
+        const groups = DataStore.getGroupsByLayer(layer);
         const grid = document.getElementById('groupsGrid');
+        if (!grid) return;
 
-        if (!grid) {
-          console.error('לא נמצא groupsGrid');
-          return;
-        }
-
-        // סינון קבוצות - רק עם תלמידים
         const groupsWithStudents = groups.filter(group => {
-          if (!group || !group.id) return false;
-          const count = DataStore.getGroupCount ? DataStore.getGroupCount(group.id) : 0;
-          return count > 0;
+          return group && group.id && DataStore.getGroupCount(group.id, false) > 0;
         });
 
         if (groupsWithStudents.length === 0) {
@@ -523,31 +362,18 @@
           return;
         }
 
-        // רינדור קבוצות
         grid.innerHTML = groupsWithStudents.map(group => {
-          const teacher = group.teacherId && DataStore.getTeacher 
-            ? DataStore.getTeacher(group.teacherId) 
-            : null;
-          const count = DataStore.getGroupCount 
-            ? (DataStore.getGroupCount(group.id) || 0)
-            : 0;
-
-          const groupNameEscaped = escapeHtml(group.name || '');
-          const teacherName = teacher ? (teacher.name || '') : '';
-          const teacherNameEscaped = escapeHtml(teacherName);
-          const teacherIdEscaped = teacher ? escapeHtml(teacher.id) : '';
-          const groupIdEscaped = escapeHtml(group.id);
-
-          // בניית כותרת: "הקבצה [שם] - המורה [שם מורה]"
-          let groupTitle = `הקבצה ${groupNameEscaped}`;
-          if (teacherNameEscaped) {
-            groupTitle += ` - המורה <a href="teacher.html?teacherId=${teacherIdEscaped}" class="teacher-name-link" onclick="event.stopPropagation(); return false;">${teacherNameEscaped}</a>`;
-          }
+          const teacher = DataStore.getTeacher(group.teacherId);
+          const count = DataStore.getGroupCount(group.id, false);
+          const groupName = SharedUtils.escapeHtml(group.name);
+          const teacherName = teacher ? SharedUtils.escapeHtml(teacher.name) : '';
+          const groupId = SharedUtils.escapeHtml(group.id);
 
           return `
-            <a href="group.html?groupId=${groupIdEscaped}" class="group-card">
+            <a href="group.html?groupId=${groupId}" class="group-card">
               <div class="group-content">
-                <div class="group-title">${groupTitle}</div>
+                <div class="group-title">${groupName}</div>
+                ${teacherName ? `<div class="group-teacher">${teacherName}</div>` : ''}
                 <div class="group-count-section">
                   <div class="group-count-badge">${count} תלמידים</div>
                 </div>
@@ -557,26 +383,22 @@
         }).join('');
       }
 
-      // אתחול
       function init() {
-        // המתן לטעינת DataStore
         if (typeof DataStore === 'undefined') {
           setTimeout(init, 100);
           return;
         }
 
-        // המתן קצת ל-auto-load-data.js
-        setTimeout(() => {
-          renderPage();
-        }, 300);
-
-        // עדכון אוטומטי כל 3 שניות
-        setInterval(() => {
-          renderPage();
-        }, 3000);
+        function loadAndRender() {
+          DataStore.load(true);
+          DataStore._invalidateCache();
+          setTimeout(renderPage, 200);
+        }
+        
+        loadAndRender();
+        setInterval(loadAndRender, 2000);
       }
 
-      // טעינה ראשונית
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
       } else {
@@ -584,6 +406,7 @@
       }
     })();
   </script>
+  <script src="live-reload.js"></script>
 </body>
 </html>
 

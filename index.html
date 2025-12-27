@@ -472,23 +472,65 @@
     }
 
     function updateCounts() {
-      document.getElementById('count7').textContent = DataStore.getLayerCount('7');
-      document.getElementById('count8').textContent = DataStore.getLayerCount('8');
-      document.getElementById('count9').textContent = DataStore.getLayerCount('9');
-      document.getElementById('totalCount').textContent = DataStore.getTotalCount();
+      DataStore.load(true);
+      
+      // ביטול cache לפני חישוב מונים
+      if (DataStore._invalidateCache) {
+        DataStore._invalidateCache();
+      }
+      
+      const count7 = DataStore.getLayerCount('7', false);
+      const count8 = DataStore.getLayerCount('8', false);
+      const count9 = DataStore.getLayerCount('9', false);
+      const total = DataStore.getTotalCount(false);
+      
+      const el7 = document.getElementById('count7');
+      const el8 = document.getElementById('count8');
+      const el9 = document.getElementById('count9');
+      const elTotal = document.getElementById('totalCount');
+      
+      if (el7) el7.textContent = count7 || 0;
+      if (el8) el8.textContent = count8 || 0;
+      if (el9) el9.textContent = count9 || 0;
+      if (elTotal) elTotal.textContent = total || 0;
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      DataStore.load();
       updateAdminUI();
-      updateCounts();
+      
+      function refreshCounts() {
+        // טעינת נתונים עם force
+        DataStore.load(true);
+        
+        // ביטול cache
+        if (DataStore._invalidateCache) {
+          DataStore._invalidateCache();
+        }
+        
+        // המתן קצת שהנתונים יטענו
+        setTimeout(() => {
+          updateCounts();
+        }, 100);
+      }
+      
+      // ניסיון ראשוני
+      refreshCounts();
+      
+      // המתן שהנתונים יטענו (auto-load-data.js רץ)
+      setTimeout(() => {
+        refreshCounts();
+      }, 1500);
+      
+      setTimeout(() => {
+        refreshCounts();
+      }, 3000);
       
       // עדכון כל 2 שניות
       setInterval(() => {
-        DataStore.load();
-        updateCounts();
+        refreshCounts();
       }, 2000);
     });
   </script>
+  <script src="live-reload.js"></script>
 </body>
 </html>

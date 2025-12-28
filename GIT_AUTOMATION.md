@@ -47,5 +47,27 @@
 - הפנה את הצוות ל-`README.md`, `GIT_AUTOMATION.md` ו-`PROTECTION_RULES.md`.
 - וודא שכולם מכירים את הסקריפטים ואיך להפעיל אותם.
 
+## 8. בדיקת דפי השכבות ב-GitHub Pages
+
+1. הפעל את השרת המקומי כדי לוודא שהדפים עובדים בדיוק כמו ב-GitHub:
+   ```bash
+   cd "Glide לניהול תלמידים_files"
+   python server.py
+   ```
+   - פתח ב-`http://localhost:8000/layer.html?layer=9`, נקה `localStorage` (DevTools > Application > Clear Storage) או פתח בחלון Incognito, ועדכן כדי לוודא שכרטיס נורית מויאל מופיע עם `class="group-card"` ו-`span` של `נורית מויאל`.
+2. סנכרן הכל ל־GitHub:
+   ```bash
+   git add .
+   git commit -m "Update layers"
+   git push origin main
+   ```
+   - ה-hook מפעיל `protect-layer-html.py`/`scripts/precommit.py` ומוודא שהקובץ לא נשבר; במידה והבדיקה נכשלת הכרטיס של נורית חושף בעיה.
+3. לאחר הפוש, פתח את הקישור היציב `https://yanivmizrachiy.github.io/student-management-system/layer.html?layer=9`:
+   - נקה `localStorage` או פתח בחלון Incognito כדי לאלץ את החידוש.
+   - ודא שנמצא אזור `class="group-card"` עם `span` שמכיל `נורית מויאל` וכתובתו "כיתה: ..." ו"21 תלמידים" (או המונה הרצוי).
+   - אם עדיין רואים “0 תלמידים” במציאות, בדוק את הקונסול אם `auto-load-data.js` ציין `📦 טוען את כל הקבוצות...`.
+
+אל תשכח שסקריפטים אלו מתעדכנים תמיד – העלה את כל הקבצים ל-GitHub לפני שאתה משווה את ההרצה המקומית לעמוד המתארח.
+
 בכך נשמור על ריפו נקי, מסונכרן, וכשיר לפריסה חכמה ומבוקרת.
 

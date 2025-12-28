@@ -9,12 +9,9 @@ import sys
 import os
 from pathlib import Path
 
-# רשימת אלמנטים קריטיים שחייבים להיות קיימים
 CRITICAL_ELEMENTS = {
     'required_ids': [
-        'layerTitle',
-        'groupsGrid',
-        'header'
+        'groupsGrid'
     ],
     'required_scripts': [
         'data.js',
@@ -23,23 +20,25 @@ CRITICAL_ELEMENTS = {
         'live-reload.js'
     ],
     'required_functions': [
-        'getLayerFromURL',
-        'renderPage',
-        'init'
+        'ensureData',
+        'buildCard',
+        'render'
     ],
     'required_css_classes': [
         '.group-card',
-        '.group-title',
-        '.group-teacher',
-        '.group-count-badge',
-        '.nav-btn'
+        '.group-meta',
+        '.group-count',
+        '.nurit-tag'
     ],
-    'required_html_structure': [
-        '<div class="container">',
-        '<div class="header" id="header">',
-        '<h1 id="layerTitle">',
-        '<div class="groups-grid" id="groupsGrid">',
-        '<a href="index.html" class="nav-btn">'
+    'required_strings': [
+        'setInterval(render, 4000)',
+        'const layerParam',
+        'render();',
+        '<!DOCTYPE html>',
+        'class="grid"'
+    ],
+    'required_keywords': [
+        'נורית מויאל'
     ]
 }
 
@@ -59,7 +58,6 @@ def check_file(file_path):
     
     issues = []
     
-    # Check IDs
     for element_id in CRITICAL_ELEMENTS['required_ids']:
         if f'id="{element_id}"' not in content:
             issues.append(f'MISSING id="{element_id}"')
@@ -69,21 +67,21 @@ def check_file(file_path):
         if f'src="{script}"' not in content:
             issues.append(f'MISSING script: {script}')
     
-    # Check Functions
     for func in CRITICAL_ELEMENTS['required_functions']:
         if f'function {func}' not in content:
             issues.append(f'MISSING function: {func}')
     
-    # Check CSS Classes
     for css_class in CRITICAL_ELEMENTS['required_css_classes']:
-        class_name = css_class.replace('.', '')
-        if f'.{class_name}' not in content:
+        if css_class not in content:
             issues.append(f'MISSING CSS class: {css_class}')
     
-    # Check HTML Structure
-    for structure in CRITICAL_ELEMENTS['required_html_structure']:
+    for structure in CRITICAL_ELEMENTS['required_strings']:
         if structure not in content:
-            issues.append(f'MISSING HTML structure: {structure}')
+            issues.append(f'MISSING required string/structure: {structure}')
+
+    for keyword in CRITICAL_ELEMENTS['required_keywords']:
+        if keyword not in content:
+            issues.append(f'MISSING keyword: {keyword}')
     
     if issues:
         print("=" * 60)

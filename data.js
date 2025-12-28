@@ -425,8 +425,12 @@
         getOrCreateClass(config.className);
       }
 
-      // מציאת/יצירת הקבצה
-      let group = this.groups.find(g => g.name === config.groupName && String(g.layer) === String(config.layer));
+      // מציאת/יצירת הקבצה (מזהה גם לפי teacherId כדי לאפשר קבוצות עם אותו שם למורים שונים)
+      let group = this.groups.find(g => 
+        g.name === config.groupName && 
+        String(g.layer) === String(config.layer) &&
+        g.teacherId === teacher.id
+      );
       if (!group) {
         group = {
           id: this.generateId(),

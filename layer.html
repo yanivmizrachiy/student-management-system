@@ -3,97 +3,57 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>שכבה - מערכת ניהול תלמידים</title>
+  <title>שכבת ט' – נורית מויאל</title>
   <script src="data.js"></script>
   <script src="shared-utils.js"></script>
   <script src="auto-load-data.js"></script>
   <style>
+    :root {
+      --bg: #070a16;
+      --card: rgba(255, 255, 255, 0.04);
+      --tag: rgba(255, 152, 0, 0.25);
+      --subtle: rgba(255, 255, 255, 0.7);
+    }
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
-
     body {
-      background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+      background: var(--bg);
+      color: white;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       min-height: 100vh;
-      color: white;
-      padding: 20px;
-      position: relative;
-      overflow-x: hidden;
+      padding: 32px 18px;
     }
-
     body::before {
       content: '';
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
-                  radial-gradient(circle at 80% 80%, rgba(120, 119, 198, 0.1) 0%, transparent 50%);
+      inset: 0;
+      background: radial-gradient(circle at 20% 30%, rgba(255,255,255,0.08), transparent 40%),
+                  radial-gradient(circle at 80% 70%, rgba(99,102,241,0.08), transparent 50%);
       pointer-events: none;
       z-index: 0;
     }
-
-    body > * {
+    .page {
       position: relative;
       z-index: 1;
-    }
-
-    .container {
-      max-width: 1400px;
+      max-width: 1200px;
       margin: 0 auto;
     }
-
-    .header {
-      background: rgba(255,255,255,0.08);
-      border-radius: 25px;
-      padding: 35px;
-      margin-bottom: 40px;
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255,255,255,0.15);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
-                  inset 0 1px 0 rgba(255,255,255,0.1);
-    }
-
-    .header-content {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 20px;
-    }
-
-    .title-section {
-      flex: 1;
-    }
-
-    .title-section h1 {
-      font-size: 2.6rem;
-      font-weight: 800;
-      margin-bottom: 15px;
-      background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      letter-spacing: -0.5px;
-    }
-
     .nav-buttons {
+      margin-bottom: 20px;
       display: flex;
       gap: 15px;
       flex-wrap: wrap;
     }
-
     .nav-btn {
       background: rgba(255,255,255,0.08);
       border: 1.5px solid rgba(255,255,255,0.15);
       border-radius: 12px;
-      padding: 9px 20px;
+      padding: 10px 20px;
       color: white;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       font-weight: 600;
       cursor: pointer;
       text-decoration: none;
@@ -102,311 +62,196 @@
       backdrop-filter: blur(10px);
       box-shadow: 0 3px 12px rgba(0,0,0,0.18);
     }
-
     .nav-btn:hover {
       background: rgba(255,255,255,0.14);
       border-color: rgba(255,255,255,0.25);
       transform: translateY(-2px);
       box-shadow: 0 5px 18px rgba(0,0,0,0.25);
     }
-
-    .groups-grid {
+    .hero {
+      background: linear-gradient(160deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+      border-radius: 28px;
+      padding: 28px;
+      margin-bottom: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 25px 60px rgba(0,0,0,0.45);
+    }
+    .hero h1 {
+      font-size: clamp(2.3rem, 3vw, 3rem);
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #ffffff, #c7d2fe);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      color: rgba(255, 255, 255, 0.75);
+      margin-bottom: 10px;
+    }
+    .hero small {
+      color: rgba(255, 255, 255, 0.55);
+    }
+    .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 16px;
-      margin-bottom: 40px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
     }
-
     .group-card {
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-      border-radius: 12px;
-      padding: 12px;
-      border: 1px solid rgba(102, 126, 234, 0.2);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      text-decoration: none;
-      display: block;
-      color: white;
-      backdrop-filter: blur(8px);
-      box-shadow: 0 2px 12px rgba(0,0,0,0.12),
-                  inset 0 1px 0 rgba(255,255,255,0.06);
-      position: relative;
-      overflow: hidden;
-      min-height: 90px;
-    }
-
-    .group-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
-    }
-
-    .group-content {
+      background: var(--card);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 20px;
+      min-height: 150px;
       display: flex;
       flex-direction: column;
-      height: 100%;
+      gap: 10px;
       position: relative;
-      z-index: 1;
+      overflow: hidden;
+      box-shadow: 0 18px 30px rgba(0,0,0,0.4);
     }
-
-    .group-title {
+    .group-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255,255,255,0.2), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .group-card:hover::after {
+      opacity: 1;
+    }
+    .group-card strong {
+      font-size: 1.35rem;
+      letter-spacing: 0.4px;
+    }
+    .group-meta {
+      font-size: 0.95rem;
+      color: var(--subtle);
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .group-meta span:first-child {
+      color: #17bebb;
+      font-weight: 600;
+    }
+    .group-count {
+      margin-top: auto;
       font-size: 1.1rem;
       font-weight: 700;
-      color: #ffffff;
-      text-align: center;
-      line-height: 1.5;
-      margin-bottom: 8px;
-      word-wrap: break-word;
+      color: #facc15;
     }
-    
-    .group-teacher {
-      font-size: 0.85rem;
+    .nurit-tag {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: var(--tag);
+      font-size: 0.8rem;
+      letter-spacing: 0.4px;
       font-weight: 600;
-      color: #008080;
-      text-align: center;
-      margin-bottom: 8px;
     }
-
-    .group-count-section {
-      margin-top: 8px;
-      padding-top: 8px;
-      border-top: 1px solid rgba(255,255,255,0.12);
-      text-align: center;
-    }
-
-    .group-count-badge {
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.35) 0%, rgba(118, 75, 162, 0.35) 100%);
-      padding: 4px 10px;
-      border-radius: 8px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      border: 1px solid rgba(255,255,255,0.2);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-      color: #ffffff;
-      display: inline-block;
-      margin-top: 4px;
-    }
-
     .empty-state {
       text-align: center;
-      padding: 60px 20px;
-      color: rgba(255,255,255,0.5);
-      font-size: 1.2rem;
-      grid-column: 1 / -1;
+      padding: 60px;
+      color: rgba(255,255,255,0.65);
     }
-
-    @media (max-width: 480px) {
+    @media (max-width: 600px) {
       body {
-        padding: 8px;
+        padding: 24px 12px;
       }
-
-      .header {
-        padding: 20px;
-        margin-bottom: 20px;
-      }
-
-
-      .title-section h1 {
-        font-size: 1.6rem;
-      }
-
-
-      .nav-buttons {
-        width: 100%;
-        flex-direction: column;
-        gap: 10px;
-      }
-
-      .nav-btn {
-        padding: 10px 15px;
-        font-size: 0.85rem;
-        width: 100%;
-      }
-
-      .groups-grid {
-        grid-template-columns: 1fr;
-        gap: 12px;
-      }
-
-      .group-card {
-        padding: 14px;
-        min-height: 100px;
-      }
-
-      .group-title {
-        font-size: 1.15rem;
-        margin-bottom: 12px;
-      }
-
-      .group-count-badge {
-        font-size: 0.75rem;
-        padding: 4px 10px;
-      }
-
-      .header-content {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 15px;
-      }
-    }
-
-    @media (max-width: 768px) {
-      body {
-        padding: 10px;
-      }
-
-      .header {
-        padding: 25px;
-        margin-bottom: 25px;
-      }
-
-
-      .title-section h1 {
-        font-size: 2rem;
-      }
-
-
-      .nav-buttons {
-        width: 100%;
-        justify-content: flex-start;
-      }
-
-      .nav-btn {
-        padding: 10px 20px;
-        font-size: 0.9rem;
-      }
-
-      .groups-grid {
-        grid-template-columns: 1fr;
-        gap: 14px;
-      }
-
-      .group-card {
-        padding: 14px;
-      }
-
-      .group-title {
-        font-size: 1.25rem;
-      }
-
-      .header-content {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 15px;
+      .hero {
+        padding: 22px;
       }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header" id="header">
-      <div class="header-content">
-        <div class="title-section">
-          <h1 id="layerTitle">שכבה</h1>
-        </div>
-        <div class="nav-buttons">
-          <a href="index.html" class="nav-btn">← חזרה</a>
-        </div>
-      </div>
+  <div class="page">
+    <div class="nav-buttons">
+      <a href="index.html" class="nav-btn">← חזרה לדף הבית</a>
     </div>
-
-    <div class="groups-grid" id="groupsGrid">
-      <div class="empty-state">טוען...</div>
-    </div>
+    <header class="hero">
+      <h1 id="layerTitle">שכבה</h1>
+      <p id="layerDescription">טוען...</p>
+    </header>
+    <section class="grid" id="groupsGrid">
+      <div class="empty-state">טוען קבוצות...</div>
+    </section>
   </div>
-
   <script>
     (function() {
       'use strict';
-
-      function getLayerFromURL() {
-        return SharedUtils.getURLParameter('layer');
+      const layerParam = SharedUtils.getURLParameter('layer');
+      if (!layerParam) {
+        document.body.innerHTML = '';
+        return;
       }
-
-      function renderPage() {
-        const layer = getLayerFromURL();
-        
-        if (!layer) {
-          window.location.href = 'index.html';
-          return;
-        }
-
+      function ensureData() {
         DataStore.load(true);
-        DataStore._invalidateCache();
-
-        if (!DataStore.students || !Array.isArray(DataStore.students)) {
-          setTimeout(renderPage, 200);
-          return;
-        }
-
-        const layerName = DataStore.getLayerName(layer);
-        const totalCount = DataStore.getLayerCount(layer, false);
-        const layerTitleEl = document.getElementById('layerTitle');
-        if (layerTitleEl) {
-          layerTitleEl.textContent = `שכבת ${layerName} - ${totalCount} לומדים`;
-        }
-
-        const headerEl = document.getElementById('header');
-        if (headerEl) {
-          headerEl.style.background = DataStore.getLayerColor(layer);
-        }
-
-        const groups = DataStore.getGroupsByLayer(layer);
-        const grid = document.getElementById('groupsGrid');
-        if (!grid) return;
-
-        const groupsWithStudents = groups.filter(group => {
-          return group && group.id && DataStore.getGroupCount(group.id, false) > 0;
-        });
-
-        if (groupsWithStudents.length === 0) {
-          grid.innerHTML = '<div class="empty-state">אין הקבצות עם תלמידים בשכבה זו</div>';
-          return;
-        }
-
-        grid.innerHTML = groupsWithStudents.map(group => {
-          const teacher = DataStore.getTeacher(group.teacherId);
-          const count = DataStore.getGroupCount(group.id, false);
-          const groupName = SharedUtils.escapeHtml(group.name);
-          const teacherName = teacher ? SharedUtils.escapeHtml(teacher.name) : '';
-          const groupId = SharedUtils.escapeHtml(group.id);
-
-          return `
-            <a href="group.html?groupId=${groupId}" class="group-card">
-              <div class="group-content">
-                <div class="group-title">${groupName}</div>
-                ${teacherName ? `<div class="group-teacher">${teacherName}</div>` : ''}
-                <div class="group-count-section">
-                  <div class="group-count-badge">${count} תלמידים</div>
-                </div>
-              </div>
-            </a>
-          `;
-        }).join('');
-      }
-
-      function init() {
-        if (typeof DataStore === 'undefined') {
-          setTimeout(init, 100);
-          return;
-        }
-
-        function loadAndRender() {
-          DataStore.load(true);
+        if (DataStore._invalidateCache) {
           DataStore._invalidateCache();
-          setTimeout(renderPage, 200);
         }
-        
-        loadAndRender();
-        setInterval(loadAndRender, 2000);
       }
-
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-      } else {
-        init();
+      function buildCard(group) {
+        const teacher = DataStore.getTeacher(group.teacherId);
+        const count = DataStore.getGroupCount(group.id, false);
+        const card = document.createElement('article');
+        card.className = 'group-card';
+        card.innerHTML = `
+          <strong>${SharedUtils.escapeHtml(group.name)}</strong>
+          <div class="group-meta">
+            <span>${teacher ? SharedUtils.escapeHtml(teacher.name) : 'מורה לא ידוע'}</span>
+            <span>כיתה: ${group.className || 'כללי'}</span>
+            <span>${count} תלמידים</span>
+          </div>
+          <div class="group-count">${count} תלמידים</div>
+        `;
+        if (teacher && teacher.name === 'נורית מויאל') {
+          const badge = document.createElement('span');
+          badge.className = 'nurit-tag';
+          badge.textContent = 'נורית מויאל';
+          card.appendChild(badge);
+        }
+        return card;
       }
+      function render() {
+        ensureData();
+        if (!Array.isArray(DataStore.students) || DataStore.students.length === 0) {
+          return setTimeout(render, 200);
+        }
+        const groups = DataStore.getGroupsByLayer(layerParam);
+        const grid = document.getElementById('groupsGrid');
+        const filtered = groups.filter(group => DataStore.getGroupCount(group.id, false) > 0);
+        const layerName = DataStore.getLayerName(layerParam);
+        const totalCount = DataStore.getLayerCount(layerParam, false);
+        const titleEl = document.getElementById('layerTitle');
+        const descEl = document.getElementById('layerDescription');
+        if (titleEl) {
+          titleEl.textContent = `שכבת ${layerName} - ${totalCount} לומדים`;
+        }
+        if (descEl) {
+          descEl.textContent = `בשכבה זו ${filtered.length} קבוצות פעילות`;
+        }
+        if (!filtered.length) {
+          grid.innerHTML = '<div class="empty-state">אין קבוצות זמינות כרגע, נסה לרענן.</div>';
+          return;
+        }
+        grid.innerHTML = '';
+        filtered.forEach(group => {
+          const card = buildCard(group);
+          card.style.cursor = 'pointer';
+          card.addEventListener('click', () => {
+            window.location.href = `group.html?groupId=${encodeURIComponent(group.id)}`;
+          });
+          grid.appendChild(card);
+        });
+      }
+      render();
+      setInterval(render, 4000);
     })();
   </script>
   <script src="live-reload.js"></script>
 </body>
 </html>
-

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ניקוי localStorage</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 40px;
+      background: #f5f5f5;
+      text-align: center;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+    button {
+      background: #4CAF50;
+      color: white;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 10px;
+    }
+    button:hover {
+      background: #45a049;
+    }
+    .info {
+      margin-top: 20px;
+      padding: 15px;
+      background: #e3f2fd;
+      border-radius: 5px;
+      color: #1976d2;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>ניקוי localStorage</h1>
+    <p>לחץ על הכפתור למטה כדי לנקות את כל הנתונים השמורים בדפדפן.</p>
+    <p><strong>זה יגרום לאתר לטעון את כל הנתונים מחדש, כולל קבוצת נורית מויאל.</strong></p>
+    
+    <button onclick="clearStorage()">נקה localStorage</button>
+    <button onclick="window.location.href='index.html'">חזור לאתר</button>
+    
+    <div id="status" class="info" style="display:none;"></div>
+  </div>
+
+  <script>
+    function clearStorage() {
+      try {
+        // נקה את כל localStorage
+        localStorage.clear();
+        
+        const status = document.getElementById('status');
+        status.style.display = 'block';
+        status.style.background = '#c8e6c9';
+        status.style.color = '#2e7d32';
+        status.innerHTML = '✅ localStorage נוקה בהצלחה!<br>כעת תועבר לדף הבית והנתונים ייטענו מחדש.';
+        
+        // המתן שנייה ואז עבור לדף הבית
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 1500);
+      } catch (e) {
+        alert('שגיאה בניקוי: ' + e.message);
+      }
+    }
+  </script>
+</body>
+</html>
+

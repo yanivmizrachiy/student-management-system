@@ -13,7 +13,7 @@
       const data = JSON.parse(existingData);
       if (data.students && data.students.length > 0) {
         console.log('✅ נמצאו נתונים קיימים ב-localStorage');
-        return; // יש כבר נתונים, לא צריך לטעון
+        // אין הפסקה: נמשיך לטעון את כל הקבוצות כדי לרענן מורים/קבוצות חדשות
       }
     } catch (e) {
       // המשך לטעינה
@@ -31,11 +31,8 @@
   // טען את הנתונים
   DataStore.load();
   
-  // אם אין תלמידים, טען את כל הקבוצות
-  if (DataStore.students.length === 0) {
-    console.log('📦 טוען את כל הקבוצות...');
-    loadAllGroups();
-  }
+  console.log('📦 טוען את כל הקבוצות...');
+  loadAllGroups();
   
   // Helper function to create students array from name pairs
   function createStudents(namePairs, className = null) {

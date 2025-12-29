@@ -206,7 +206,7 @@
     // ============================================
     _countCache: {},
     _cacheTimestamp: null,
-    _cacheTTL: 5000, // 5 שניות
+    _cacheTTL: 2000, // 2 שניות (הוקטן מ-5 שניות)
 
     /**
      * ביטול cache
@@ -214,14 +214,30 @@
     _invalidateCache() {
       this._countCache = {};
       this._cacheTimestamp = null;
+      // דיבוג - רק ב-development
+      if (console && console.debug) {
+        console.debug('🗑️ Cache נמחק');
+      }
     },
 
     /**
      * קבלת מונה מ-cache
      */
     _getCachedCount(key, useCache) {
-      if (useCache && this._countCache[key] &&
-          this._cacheTimestamp && (Date.now() - this._cacheTimestamp < this._cacheTTL)) {
+      // אם לא להשתמש ב-cache או שאין cache timestamp - לא להשתמש ב-cache
+      if (!useCache || !this._cacheTimestamp) {
+        return null;
+      }
+      // בדיקת תאריך תפוגה
+      const age = Date.now() - this._cacheTimestamp;
+      if (age >= this._cacheTTL) {
+        // Cache פג תוקף - מחק אותו
+        this._countCache = {};
+        this._cacheTimestamp = null;
+        return null;
+      }
+      // החזר מה-cache אם קיים
+      if (this._countCache[key] !== undefined) {
         return this._countCache[key];
       }
       return null;

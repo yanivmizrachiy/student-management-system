@@ -120,7 +120,26 @@
 4. אם נדרשת בדיקה נוספת, הרץ: `python pre-change-validator.py before layer.html`.
 5. הקפד על `.gitignore` המעודכן שמסתיר `.change-snapshots/`, `.last-update.json`, `node_modules/`, קבצי `.log`, `.tmp` וכו'.
 
+## 🛡️ מנגנון הגנה אוטומטי
+
+**חשוב מאוד:** לפני כל שינוי בקוד, תמיד הרץ:
+```bash
+python safe-edit.py before
+```
+
+אחרי כל שינוי, תמיד הרץ:
+```bash
+python safe-edit.py after
+```
+
+זה יוודא שלא שברת דברים קיימים!
+
+לפרטים נוספים, ראה:
+- `PROTECTION_SYSTEM.md` - מדריך מפורט
+- `AUTO_PROTECTION_GUIDE.md` - מדריך אוטומטי
+- `AI_PROTECTION_WORKFLOW.md` - תהליך עבודה ל-AI
+
 ---
 
-**גרסה:** 1.0  
+**גרסה:** 1.1  
 **עדכון אחרון:** 2024

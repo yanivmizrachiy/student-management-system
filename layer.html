@@ -141,17 +141,6 @@
       font-weight: 700;
       color: #facc15;
     }
-    .nurit-tag {
-      position: absolute;
-      top: 12px;
-      right: 14px;
-      padding: 5px 12px;
-      border-radius: 999px;
-      background: var(--tag);
-      font-size: 0.8rem;
-      letter-spacing: 0.4px;
-      font-weight: 600;
-    }
     .empty-state {
       text-align: center;
       padding: 60px;
@@ -188,56 +177,113 @@
         document.body.innerHTML = '';
         return;
       }
+      
+      let retryCount = 0;
+      const MAX_RETRIES = 50; // מקסימום 10 שניות (50 * 200ms)
+      
       function ensureData() {
         DataStore.load(true);
         if (DataStore._invalidateCache) {
           DataStore._invalidateCache();
         }
       }
+      
+      function waitForData(callback, maxWait = 10000) {
+        const startTime = Date.now();
+        const checkInterval = 200; // בדיקה כל 200ms
+        
+        const checkData = setInterval(() => {
+          ensureData();
+          
+          // בדיקה אם יש תלמידים וקבוצות
+          const hasData = Array.isArray(DataStore.students) && 
+                         DataStore.students.length > 0 &&
+                         Array.isArray(DataStore.groups) &&
+                         DataStore.groups.length > 0;
+          
+          if (hasData || (window.__dataLoaded === true)) {
+            clearInterval(checkData);
+            callback();
+          } else if (Date.now() - startTime > maxWait) {
+            clearInterval(checkData);
+            console.warn('⚠️ זמן המתנה לטעינת נתונים פג - ממשיכים בכל זאת');
+            callback();
+          }
+        }, checkInterval);
+      }
+      
       function buildCard(group) {
         const teacher = DataStore.getTeacher(group.teacherId);
         const count = DataStore.getGroupCount(group.id, false);
         const card = document.createElement('article');
         card.className = 'group-card';
+        
         card.innerHTML = `
           <strong>${SharedUtils.escapeHtml(group.name)}</strong>
           <div class="group-meta">
             <span>${teacher ? SharedUtils.escapeHtml(teacher.name) : 'מורה לא ידוע'}</span>
-            <span>כיתה: ${group.className || 'כללי'}</span>
-            <span>${count} תלמידים</span>
           </div>
           <div class="group-count">${count} תלמידים</div>
         `;
-        if (teacher && teacher.name === 'נורית מויאל') {
-          const badge = document.createElement('span');
-          badge.className = 'nurit-tag';
-          badge.textContent = 'נורית מויאל';
-          card.appendChild(badge);
-        }
         return card;
       }
+      
       function render() {
         ensureData();
+        
+        // בדיקה בסיסית
         if (!Array.isArray(DataStore.students) || DataStore.students.length === 0) {
-          return setTimeout(render, 200);
+          retryCount++;
+          if (retryCount < MAX_RETRIES) {
+            return setTimeout(render, 200);
+          } else {
+            console.error('❌ לא הצלחנו לטעון נתונים אחרי ' + MAX_RETRIES + ' ניסיונות');
+            const grid = document.getElementById('groupsGrid');
+            if (grid) {
+              grid.innerHTML = '<div class="empty-state">שגיאה בטעינת נתונים. אנא רענן את הדף.</div>';
+            }
+            return;
+          }
         }
+        
+        retryCount = 0; // איפוס מונה הניסיונות
+        
         const groups = DataStore.getGroupsByLayer(layerParam);
+        console.log(`📊 נמצאו ${groups.length} קבוצות בשכבה ${layerParam}`);
+        
+        // לוג כל הקבוצות
+        groups.forEach(g => {
+          const teacher = DataStore.getTeacher(g.teacherId);
+          const count = DataStore.getGroupCount(g.id, false);
+          console.log(`   - ${g.name} (${teacher ? teacher.name : 'ללא מורה'}): ${count} תלמידים`);
+        });
+        
         const grid = document.getElementById('groupsGrid');
-        const filtered = groups.filter(group => DataStore.getGroupCount(group.id, false) > 0);
+        const filtered = groups.filter(group => {
+          const count = DataStore.getGroupCount(group.id, false);
+          return count > 0;
+        });
+        
+        console.log(`✅ ${filtered.length} קבוצות עם תלמידים`);
+        
         const layerName = DataStore.getLayerName(layerParam);
         const totalCount = DataStore.getLayerCount(layerParam, false);
         const titleEl = document.getElementById('layerTitle');
         const descEl = document.getElementById('layerDescription');
+        
         if (titleEl) {
           titleEl.textContent = `שכבת ${layerName} - ${totalCount} לומדים`;
         }
         if (descEl) {
           descEl.textContent = `בשכבה זו ${filtered.length} קבוצות פעילות`;
         }
+        
         if (!filtered.length) {
           grid.innerHTML = '<div class="empty-state">אין קבוצות זמינות כרגע, נסה לרענן.</div>';
+          console.warn('⚠️ לא נמצאו קבוצות לשכבה', layerParam);
           return;
         }
+        
         grid.innerHTML = '';
         filtered.forEach(group => {
           const card = buildCard(group);
@@ -247,9 +293,50 @@
           });
           grid.appendChild(card);
         });
+        
+        // דיבוג - בדיקה ספציפית לנורית
+        const nuritGroups = filtered.filter(g => {
+          const teacher = DataStore.getTeacher(g.teacherId);
+          return teacher && teacher.name === 'נורית מויאל';
+        });
+        if (nuritGroups.length > 0) {
+          console.log(`✅ נורית מויאל מופיעה: ${nuritGroups.length} קבוצה/ות`);
+          nuritGroups.forEach(g => {
+            const count = DataStore.getGroupCount(g.id, false);
+            console.log(`   ✅ ${g.name}: ${count} תלמידים`);
+          });
+        } else if (layerParam === '9') {
+          console.warn('⚠️ נורית מויאל לא נמצאה בשכבה ט\' - בודקים את כל הקבוצות...');
+          // בדיקה מפורטת יותר
+          const allGroups = DataStore.getGroupsByLayer('9');
+          const allTeachers = DataStore.teachers.filter(t => t.name === 'נורית מויאל');
+          console.log(`   - סה"כ קבוצות בשכבה ט': ${allGroups.length}`);
+          console.log(`   - מורים בשם נורית מויאל: ${allTeachers.length}`);
+          if (allTeachers.length > 0) {
+            allTeachers.forEach(t => {
+              const teacherGroups = allGroups.filter(g => g.teacherId === t.id);
+              console.log(`   - קבוצות של נורית (ID: ${t.id}): ${teacherGroups.length}`);
+              teacherGroups.forEach(g => {
+                const count = DataStore.getGroupCount(g.id, false);
+                console.log(`     - ${g.name}: ${count} תלמידים`);
+              });
+            });
+          }
+        }
       }
-      render();
-      setInterval(render, 4000);
+      
+      // המתן לנתונים לפני רינדור ראשוני
+      waitForData(() => {
+        render();
+        // רענון כל 4 שניות
+        setInterval(render, 4000);
+      });
+      
+      // האזנה לאירוע dataLoaded
+      window.addEventListener('dataLoaded', () => {
+        console.log('📡 אירוע dataLoaded התקבל - מריץ render');
+        render();
+      });
     })();
   </script>
   <script src="live-reload.js"></script>

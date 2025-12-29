@@ -121,11 +121,11 @@
     }
 
     .layer-btn:hover {
-      transform: translateY(-4px) scale(1.01);
-      box-shadow: 0 12px 32px rgba(0,0,0,0.45),
-                  0 5px 15px rgba(0,0,0,0.25),
-                  inset 0 1px 0 rgba(255,255,255,0.12);
-      border-color: rgba(255,255,255,0.15);
+      transform: translateY(-2px) scale(1.005);
+      box-shadow: 0 10px 28px rgba(0,0,0,0.4),
+                  0 4px 12px rgba(0,0,0,0.22),
+                  inset 0 1px 0 rgba(255,255,255,0.1);
+      border-color: rgba(255,255,255,0.12);
     }
 
     .layer-title {
@@ -498,7 +498,17 @@
     document.addEventListener('DOMContentLoaded', () => {
       updateAdminUI();
       
+      let updateTimeout = null;
+      let isUpdating = false;
+      
       function refreshCounts() {
+        // מניעת עדכונים כפולים
+        if (isUpdating) {
+          return;
+        }
+        
+        isUpdating = true;
+        
         // טעינת נתונים עם force
         DataStore.load(true);
         
@@ -507,28 +517,39 @@
           DataStore._invalidateCache();
         }
         
-        // המתן קצת שהנתונים יטענו
-        setTimeout(() => {
-          updateCounts();
-        }, 100);
+        // עדכון מיידי ללא קפיצות
+        updateCounts();
+        
+        isUpdating = false;
       }
       
-      // ניסיון ראשוני
+      // debounce - מניעת עדכונים מרובים
+      function debouncedRefresh() {
+        if (updateTimeout) {
+          clearTimeout(updateTimeout);
+        }
+        updateTimeout = setTimeout(() => {
+          refreshCounts();
+        }, 300);
+      }
+      
+      // עדכון ראשוני
       refreshCounts();
       
       // המתן שהנתונים יטענו (auto-load-data.js רץ)
       setTimeout(() => {
         refreshCounts();
-      }, 1500);
-      
-      setTimeout(() => {
-        refreshCounts();
-      }, 3000);
-      
-      // עדכון כל 2 שניות
-      setInterval(() => {
-        refreshCounts();
       }, 2000);
+      
+      // עדכון כל 5 שניות (פחות תכוף - מניעת קפיצות)
+      setInterval(() => {
+        debouncedRefresh();
+      }, 5000);
+      
+      // האזנה לאירוע dataLoaded מ-auto-load-data.js
+      window.addEventListener('dataLoaded', () => {
+        debouncedRefresh();
+      });
     });
   </script>
   <script src="live-reload.js"></script>

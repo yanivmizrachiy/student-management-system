@@ -27,8 +27,7 @@ CRITICAL_ELEMENTS = {
     'required_css_classes': [
         '.group-card',
         '.group-meta',
-        '.group-count',
-        '.nurit-tag'
+        '.group-count'
     ],
     'required_strings': [
         'setInterval(render, 4000)',

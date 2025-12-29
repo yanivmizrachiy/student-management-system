@@ -28,11 +28,24 @@
     return;
   }
   
-  // טען את הנתונים
-  DataStore.load();
+  // טען את הנתונים עם force
+  DataStore.load(true);
+  
+  // ביטול cache לפני טעינה
+  if (DataStore._invalidateCache) {
+    DataStore._invalidateCache();
+  }
   
   console.log('📦 טוען את כל הקבוצות...');
+  
+  // טען את כל הקבוצות וסמן כשסיימנו
   loadAllGroups();
+  
+  // סמן שהטעינה הסתיימה (עבור layer.html)
+  window.__dataLoaded = true;
+  window.dispatchEvent(new CustomEvent('dataLoaded'));
+  
+  console.log('✅ כל הנתונים נטענו - הטעינה הסתיימה');
   
   // Helper function to create students array from name pairs
   function createStudents(namePairs, className = null) {
@@ -294,12 +307,18 @@
       lastName, firstName, className: `כיתה ט'${classNum}`
     }));
     
-    DataStore.importGroup({
+    // קבוצת נורית מויאל - בדיקה מפורטת
+    console.log('📝 טוען קבוצת נורית מויאל...');
+    console.log(`   - שכבה: 9, קבוצה: א'1, תלמידים: ${students14.length}`);
+    const nuritResult = DataStore.importGroup({
       layer: '9',
       groupName: 'א\'1',
       teacherName: 'נורית מויאל',
       className: 'כיתה ט\'3'
     }, students14);
+    console.log(`✅ קבוצת נורית נטענה: ${nuritResult.added}/${nuritResult.total} תלמידים`);
+    console.log(`   - קבוצה ID: ${nuritResult.group.id}`);
+    console.log(`   - מורה ID: ${nuritResult.teacher.id}, שם: ${nuritResult.teacher.name}`);
     
     // קבוצה 15: ט' - מקדמת (מירית אפריים)
     const students15 = [
@@ -320,8 +339,52 @@
     
     console.log('✅ כל הנתונים נטענו בהצלחה!');
     console.log(`📊 סה"כ תלמידים: ${DataStore.students.length}`);
+    console.log(`📊 סה"כ קבוצות: ${DataStore.groups.length}`);
+    console.log(`📊 סה"כ מורים: ${DataStore.teachers.length}`);
     
-    // רענן את הדף כדי לראות את הנתונים
+    // בדיקה ספציפית לנורית מויאל - מפורט
+    console.log('🔍 בודק קבוצות של נורית מויאל...');
+    console.log(`   - סה"כ קבוצות ב-DataStore: ${DataStore.groups.length}`);
+    console.log(`   - סה"כ מורים ב-DataStore: ${DataStore.teachers.length}`);
+    
+    const nuritTeachers = DataStore.teachers.filter(t => t.name === 'נורית מויאל');
+    console.log(`   - מורים בשם נורית מויאל: ${nuritTeachers.length}`);
+    nuritTeachers.forEach(t => {
+      console.log(`     - מורה ID: ${t.id}, שם: ${t.name}`);
+    });
+    
+    const nuritGroups = DataStore.groups.filter(g => {
+      const teacher = DataStore.getTeacher(g.teacherId);
+      const isNurit = teacher && teacher.name === 'נורית מויאל';
+      if (isNurit) {
+        console.log(`   - נמצאה קבוצה של נורית: ${g.name} (ID: ${g.id}, שכבה: ${g.layer})`);
+      }
+      return isNurit;
+    });
+    
+    if (nuritGroups.length > 0) {
+      console.log(`✅ נמצאו ${nuritGroups.length} קבוצות של נורית מויאל`);
+      nuritGroups.forEach(g => {
+        const count = DataStore.getGroupCount(g.id, false);
+        const teacher = DataStore.getTeacher(g.teacherId);
+        console.log(`   ✅ ${g.name} (שכבה ${g.layer}): ${count} תלמידים, מורה: ${teacher ? teacher.name : 'לא נמצא'}`);
+      });
+    } else {
+      console.error('❌ לא נמצאו קבוצות של נורית מויאל!');
+      console.log('   בודקים את כל הקבוצות בשכבה 9...');
+      const layer9Groups = DataStore.groups.filter(g => String(g.layer) === '9');
+      layer9Groups.forEach(g => {
+        const teacher = DataStore.getTeacher(g.teacherId);
+        const count = DataStore.getGroupCount(g.id, false);
+        console.log(`     - ${g.name}: ${teacher ? teacher.name : 'ללא מורה'} (${count} תלמידים)`);
+      });
+    }
+    
+    // סמן שהטעינה הסתיימה
+    window.__dataLoaded = true;
+    window.dispatchEvent(new CustomEvent('dataLoaded'));
+    
+    // רענן את הדף כדי לראות את הנתונים (רק ב-index.html)
     if (window.location.pathname.includes('index.html') || window.location.pathname === '/') {
       setTimeout(() => {
         window.location.reload();

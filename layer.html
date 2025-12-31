@@ -76,6 +76,31 @@
       border: 1px solid rgba(255, 255, 255, 0.15);
       box-shadow: 0 25px 60px rgba(0,0,0,0.45);
     }
+    /* רקע ירוק כהה פרימיום לשכבת ח' */
+    .hero.layer-8 {
+      background: linear-gradient(145deg, #00695c 0%, #004d40 40%, #00251a 100%) !important;
+      border: 2px solid rgba(0, 200, 83, 0.5) !important;
+      box-shadow: 0 25px 60px rgba(0, 200, 83, 0.3), 
+                  0 0 40px rgba(0, 200, 83, 0.15),
+                  inset 0 0 60px rgba(0, 200, 83, 0.1) !important;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero.layer-8::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at 30% 30%, rgba(0, 200, 83, 0.3) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .hero.layer-8 > * {
+      position: relative;
+      z-index: 1;
+    }
     .hero h1 {
       font-size: clamp(2.3rem, 3vw, 3rem);
       margin-bottom: 8px;
@@ -84,12 +109,33 @@
       background-clip: text;
       -webkit-text-fill-color: transparent;
     }
+    /* כיתוב בהיר וקריא לשכבת ח' */
+    .hero.layer-8 h1 {
+      background: linear-gradient(135deg, #ffffff 0%, #a5f3fc 50%, #67e8f9 100%) !important;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent !important;
+      text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
     .hero p {
       color: rgba(255, 255, 255, 0.75);
       margin-bottom: 10px;
     }
+    /* כיתוב בהיר וקריא לשכבת ח' */
+    .hero.layer-8 p {
+      color: rgba(255, 255, 255, 0.95) !important;
+      font-weight: 600;
+      font-size: 1.15rem;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
     .hero small {
       color: rgba(255, 255, 255, 0.55);
+    }
+    .hero.layer-8 small {
+      color: rgba(255, 255, 255, 0.85) !important;
+      font-weight: 500;
     }
     .grid {
       display: grid;
@@ -178,6 +224,16 @@
         return;
       }
       
+      // הוספת class מיוחד לשכבת ח' (layer-8)
+      const heroEl = document.querySelector('.hero');
+      if (heroEl) {
+        if (layerParam === '8') {
+          heroEl.classList.add('layer-8');
+        } else {
+          heroEl.classList.remove('layer-8');
+        }
+      }
+      
       let retryCount = 0;
       const MAX_RETRIES = 50; // מקסימום 10 שניות (50 * 200ms)
       
@@ -230,6 +286,16 @@
       
       function render() {
         ensureData();
+        
+        // הוספת class מיוחד לשכבת ח' (layer-8) ב-hero
+        const heroEl = document.querySelector('.hero');
+        if (heroEl) {
+          if (layerParam === '8') {
+            heroEl.classList.add('layer-8');
+          } else {
+            heroEl.classList.remove('layer-8');
+          }
+        }
         
         // בדיקה בסיסית
         if (!Array.isArray(DataStore.students) || DataStore.students.length === 0) {

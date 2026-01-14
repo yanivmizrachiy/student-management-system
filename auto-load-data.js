@@ -31,10 +31,6 @@
   // טען את כל הקבוצות וסמן כשסיימנו
   loadAllGroups();
   
-  // סמן שהטעינה הסתיימה (עבור layer.html)
-  window.__dataLoaded = true;
-  window.dispatchEvent(new CustomEvent('dataLoaded'));
-  
   // Helper function to create students array from name pairs
   function createStudents(namePairs, className = null) {
     return namePairs.map(([lastName, firstName, classNum]) => ({
@@ -68,7 +64,7 @@
       ['גידניאן', 'אלרואי משה', '4'], ['דנון', 'עדי', '3'], ['חקימוב', 'ארטיום', '3'],
       ['יונה', 'עידו', '4'], ['ירמיהו', 'נתנאל', '3'], ['כהן', 'אגם', '4'],
       ['כהן', 'גיא', '4'], ['כהן', 'נחמו דניאל', '4'], ['מזרחי', 'סתיו', '3'],
-      ['סולטן', 'דוד', '4'], ['סנבטו', 'מנסאו', '3'], ['קוסשוילי', 'רבקה', '3'],
+      ['סולטן', 'דוד', '4'], ['קוסשוילי', 'רבקה', '3'],
       ['רחמים', 'אייל', '3'], ['ששון', 'נהוראי שלמה', '4']
     ].map(([lastName, firstName, classNum]) => ({
       lastName, firstName, className: `כיתה ז'${classNum}`
@@ -87,7 +83,7 @@
       ['אלמליח', 'ליאן', '4'], ['ארגזאז', 'יהלי', '3'], ['עמרם בן חמו', 'ירון', '3'],
       ['בן מיכאל', 'אושר', '3'], ['דאבוש', 'אסף', '3'], ['אל האילן', 'בת', '4'],
       ['הולנדר', 'אושרי', '4'], ['לוי אילן', 'עילאי', '2'], ['מזרחי', 'ליאן', '4'],
-      ['מזרחי', 'ליה', '4'], ['צוגרב', 'נטליה', '4']
+      ['מזרחי', 'ליה', '4'], ['סנבטו', 'מנסאו', '3'], ['צוגרב', 'נטליה', '4']
     ].map(([lastName, firstName, classNum]) => ({
       lastName, firstName, className: `כיתה ז'${classNum}`
     }));
@@ -249,7 +245,7 @@
       ['בן סעדון', 'יאיר'], ['דגפו', 'יואל'], ['וובה', 'הלי'], ['זדה', 'אורין'],
       ['חנניה', 'סלין מור'], ['יוסף', 'לירז מיכאל'], ['כהן', 'הדס'], ['ליסרמן', 'יונתן'],
       ['נג\'מיאן', 'רומי'], ['דואק', 'ליאור חי'], ['זקן', 'אייל'], ['יעקובי', 'אורי'],
-      ['כצמן', 'אדליה'], ['לוי', 'שיר רעיה'], ['פונטיה', 'ליאן'], ['תאיר', 'פרג'],
+      ['כצמן', 'אדליה'], ['לוי', 'שיר רעיה'], ['מזרחי', 'שיר'], ['פונטיה', 'ליאן'], ['תאיר', 'פרג'],
       ['קזיניץ', 'דניאל'], ['קנדלקאר', 'עידן'], ['שחר', 'ליה'], ['שימנסקי', 'מיכאל'],
       ['שרעבי', 'אביב']
     ].filter(([lastName, firstName]) => lastName && firstName && lastName.trim() && firstName.trim()).map(([lastName, firstName]) => ({
@@ -335,6 +331,76 @@
         const count = DataStore.getGroupCount(g.id, false);
         console.log(`   - ${g.name}: ${teacher ? teacher.name : 'ללא מורה'} (${count} תלמידים)`);
       });
+    }
+    
+    // יצירת מחנכים חדשים (לא מורי מתמטיקה - מחנכים של כיתות)
+    const homeroomTeachers = [
+      'שלומית בדיחי',
+      'דניאל טולדנו',
+      'סיגל בן אלי',
+      'גלית עג\'מי'
+    ];
+    
+    homeroomTeachers.forEach(teacherName => {
+      let teacher = DataStore.teachers.find(t => t.name === teacherName);
+      if (!teacher) {
+        teacher = { id: DataStore.generateId(), name: teacherName };
+        DataStore.teachers.push(teacher);
+        console.log(`✅ נוצר מחנך חדש: ${teacherName}`);
+      }
+    });
+    
+    // עדכון מחנכים לכיתות ספציפיות
+    const classTeachers = [
+      { className: "כיתה ז'1", layer: "7", teacherName: "אילנית רז" },
+      { className: "כיתה ח'2", layer: "8", teacherName: "גלית עג'מי" },
+      { className: "כיתה ט'1", layer: "9", teacherName: "שלומית בדיחי" },
+      { className: "כיתה ט'3", layer: "9", teacherName: "נורית מויאל" },
+      { className: "כיתה ט'4", layer: "9", teacherName: "סיגל בן אלי" },
+      { className: "כיתה ט'5", layer: "9", teacherName: "דניאל טולדנו" }
+    ];
+    
+    classTeachers.forEach(({ className, layer, teacherName }) => {
+      const classItem = DataStore.classes.find(c => 
+        c.name === className && String(c.layer) === String(layer)
+      );
+      
+      if (classItem) {
+        const teacher = DataStore.teachers.find(t => t.name === teacherName);
+        if (teacher) {
+          classItem.teacherId = teacher.id;
+          console.log(`✅ עודכן מחנך לכיתה ${className}: ${teacherName}`);
+        } else {
+          console.warn(`⚠️ לא נמצא מחנך: ${teacherName} עבור כיתה ${className}`);
+        }
+      } else {
+        console.warn(`⚠️ לא נמצאה כיתה: ${className} בשכבה ${layer}`);
+      }
+    });
+    
+    // שמירה ל-localStorage דרך DataStore.save() - שימוש במנגנון המרכזי
+    // הערה: importGroup כבר שומר את הנתונים, אז שמירה נוספת כאן רק אם יש עדכונים נוספים
+    try {
+      const saved = DataStore.save(true); // force save עם ביטול cache אוטומטי
+      if (saved) {
+        console.log('✅ נתונים נשמרו ל-localStorage');
+      } else {
+        console.warn('⚠️ שמירה נכשלה - ייתכן ש-localStorage מלא');
+      }
+    } catch (e) {
+      console.error('❌ שגיאה בשמירת נתונים:', e);
+      if (e.name === 'QuotaExceededError') {
+        console.warn('⚠️ localStorage מלא - נדרש ניקוי. נסה לנקות את ה-localStorage');
+        // ניסיון לנקות נתונים ישנים
+        try {
+          const oldData = JSON.parse(localStorage.getItem('schoolData') || '{}');
+          if (oldData.students && oldData.students.length > 1000) {
+            console.warn('⚠️ יותר מדי תלמידים - ייתכן שצריך לנקות נתונים ישנים');
+          }
+        } catch (cleanError) {
+          console.error('❌ שגיאה בניקוי:', cleanError);
+        }
+      }
     }
     
     // סמן שהטעינה הסתיימה

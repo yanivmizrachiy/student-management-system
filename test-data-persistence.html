@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>בדיקות שמירת נתונים - מערכת ניהול תלמידים</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 20px;
+      background: #f5f5f5;
+      direction: rtl;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #2962ff;
+      border-bottom: 3px solid #2962ff;
+      padding-bottom: 10px;
+    }
+    .test-section {
+      margin: 30px 0;
+      padding: 20px;
+      background: #f9f9f9;
+      border-radius: 8px;
+      border-right: 4px solid #2962ff;
+    }
+    .test-section h2 {
+      color: #1e4ed8;
+      margin-top: 0;
+    }
+    .test-item {
+      margin: 15px 0;
+      padding: 15px;
+      background: white;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+    }
+    .test-item h3 {
+      margin-top: 0;
+      color: #333;
+    }
+    .status {
+      display: inline-block;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+    .status.pass {
+      background: #4caf50;
+      color: white;
+    }
+    .status.fail {
+      background: #f44336;
+      color: white;
+    }
+    .status.warning {
+      background: #ff9800;
+      color: white;
+    }
+    .status.info {
+      background: #2196f3;
+      color: white;
+    }
+    .details {
+      margin-top: 10px;
+      padding: 10px;
+      background: #f5f5f5;
+      border-radius: 5px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      white-space: pre-wrap;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    button {
+      background: #2962ff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 5px;
+    }
+    button:hover {
+      background: #1e4ed8;
+    }
+    button.danger {
+      background: #f44336;
+    }
+    button.danger:hover {
+      background: #d32f2f;
+    }
+    .summary {
+      margin-top: 30px;
+      padding: 20px;
+      background: #e3f2fd;
+      border-radius: 8px;
+      border: 2px solid #2196f3;
+    }
+    .summary h2 {
+      margin-top: 0;
+      color: #1976d2;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 30px;
+      background: #e0e0e0;
+      border-radius: 15px;
+      overflow: hidden;
+      margin: 10px 0;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #4caf50, #8bc34a);
+      transition: width 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔍 בדיקות שמירת נתונים - מערכת ניהול תלמידים</h1>
+    
+    <div style="margin: 20px 0;">
+      <button onclick="runAllTests()">▶️ הרץ את כל הבדיקות</button>
+      <button onclick="clearResults()">🗑️ נקה תוצאות</button>
+      <button class="danger" onclick="backupAndClear()">⚠️ גבה ונקה נתונים (זהירות!)</button>
+    </div>
+
+    <div id="summary" class="summary" style="display: none;">
+      <h2>סיכום תוצאות</h2>
+      <div class="progress-bar">
+        <div id="progressFill" class="progress-fill" style="width: 0%">0%</div>
+      </div>
+      <div id="summaryContent"></div>
+    </div>
+
+    <div id="testResults"></div>
+  </div>
+
+  <!-- טעינת DataStore -->
+  <script src="data.js"></script>
+  
+  <script>
+    let testResults = [];
+    let backupData = null;
+
+    // שמירת גיבוי לפני ניקוי
+    function backupAndClear() {
+      if (!confirm('⚠️ זה יגבה את כל הנתונים הנוכחיים וינקה את localStorage. האם אתה בטוח?')) {
+        return;
+      }
+      
+      try {
+        backupData = localStorage.getItem('schoolData');
+        const isAdminBackup = localStorage.getItem('isAdmin');
+        
+        localStorage.clear();
+        
+        // שחזור isAdmin
+        if (isAdminBackup) {
+          localStorage.setItem('isAdmin', isAdminBackup);
+        }
+        
+        // שחזור DataStore
+        DataStore.load(true);
+        
+        alert('✅ נתונים נגבו ונקו. הגיבוי נשמר בזיכרון (לא ב-localStorage).');
+        console.log('גיבוי נתונים:', backupData);
+      } catch (e) {
+        alert('❌ שגיאה בגיבוי: ' + e.message);
+        console.error(e);
+      }
+    }
+
+    function clearResults() {
+      document.getElementById('testResults').innerHTML = '';
+      document.getElementById('summary').style.display = 'none';
+      testResults = [];
+    }
+
+    function addTestResult(section, title, passed, details, data = null) {
+      testResults.push({ section, title, passed, details, data });
+      
+      const resultDiv = document.createElement('div');
+      resultDiv.className = 'test-item';
+      
+      const statusClass = passed ? 'pass' : 'fail';
+      const statusText = passed ? '✅ עבר' : '❌ נכשל';
+      
+      resultDiv.innerHTML = `
+        <h3>${title}</h3>
+        <span class="status ${statusClass}">${statusText}</span>
+        <div class="details">${details}</div>
+      `;
+      
+      document.getElementById('testResults').appendChild(resultDiv);
+    }
+
+    // ============================================
+    // בדיקות שמירה וטעינה בסיסיות
+    // ============================================
+    function testBasicSaveLoad() {
+      const section = 'שמירה וטעינה בסיסיות';
+      
+      try {
+        // בדיקה 1: האם localStorage זמין
+        if (typeof localStorage === 'undefined') {
+          addTestResult(section, 'זמינות localStorage', false, 'localStorage לא זמין בדפדפן זה');
+          return;
+        }
+        addTestResult(section, 'זמינות localStorage', true, 'localStorage זמין');
+
+        // בדיקה 2: שמירה וטעינה בסיסית
+        const testData = { test: 'value', timestamp: Date.now() };
+        localStorage.setItem('__test_save', JSON.stringify(testData));
+        const loaded = JSON.parse(localStorage.getItem('__test_save'));
+        localStorage.removeItem('__test_save');
+        
+        if (loaded && loaded.test === 'value') {
+          addTestResult(section, 'שמירה וטעינה בסיסית', true, 'הנתונים נשמרו ונקראו בהצלחה');
+        } else {
+          addTestResult(section, 'שמירה וטעינה בסיסית', false, 'הנתונים לא נשמרו/נקראו כראוי');
+        }
+
+        // בדיקה 3: בדיקת DataStore.load
+        const beforeLoad = DataStore.students.length;
+        DataStore.load(true);
+        const afterLoad = DataStore.students.length;
+        
+        addTestResult(section, 'טעינת DataStore', true, 
+          `נטענו ${afterLoad} תלמידים (לפני: ${beforeLoad})`);
+
+        // בדיקה 4: בדיקת מבנה הנתונים
+        const savedData = localStorage.getItem('schoolData');
+        if (savedData) {
+          try {
+            const parsed = JSON.parse(savedData);
+            const hasStudents = Array.isArray(parsed.students);
+            const hasClasses = Array.isArray(parsed.classes);
+            const hasGroups = Array.isArray(parsed.groups);
+            const hasTeachers = Array.isArray(parsed.teachers);
+            const hasGradeColumns = Array.isArray(parsed.gradeColumns);
+            
+            if (hasStudents && hasClasses && hasGroups && hasTeachers && hasGradeColumns) {
+              addTestResult(section, 'מבנה נתונים תקין', true, 
+                `תלמידים: ${parsed.students.length}, כיתות: ${parsed.classes.length}, ` +
+                `קבוצות: ${parsed.groups.length}, מורים: ${parsed.teachers.length}, ` +
+                `עמודות ציונים: ${parsed.gradeColumns.length}`);
+            } else {
+              addTestResult(section, 'מבנה נתונים תקין', false, 
+                `חסרים שדות: students=${hasStudents}, classes=${hasClasses}, ` +
+                `groups=${hasGroups}, teachers=${hasTeachers}, gradeColumns=${hasGradeColumns}`);
+            }
+          } catch (e) {
+            addTestResult(section, 'מבנה נתונים תקין', false, 'שגיאה בפענוח JSON: ' + e.message);
+          }
+        } else {
+          addTestResult(section, 'מבנה נתונים תקין', false, 'אין נתונים ב-localStorage');
+        }
+
+      } catch (e) {
+        addTestResult(section, 'שגיאה כללית', false, 'שגיאה: ' + e.message + '\n' + e.stack);
+      }
+    }
+
+    // ============================================
+    // בדיקת שמירת ציונים
+    // ============================================
+    function testGradeSaving() {
+      const section = 'שמירת ציונים';
+      
+      try {
+        // בדיקה 1: מציאת תלמיד קיים
+        DataStore.load(true);
+        const students = DataStore.students;
+        
+        if (students.length === 0) {
+          addTestResult(section, 'בדיקת ציונים - אין תלמידים', false, 
+            'אין תלמידים במערכת לבדיקה');
+          return;
+        }
+
+        const testStudent = students[0];
+        const originalGrades = JSON.parse(JSON.stringify(testStudent.grades || {}));
+        
+        // בדיקה 2: שמירת ציון חדש
+        const testColumnId = 'test_grade_' + Date.now();
+        const testGrade = '95';
+        
+        // הוספת עמודת ציון לבדיקה אם אין
+        if (!DataStore.gradeColumns.find(c => c.id === testColumnId)) {
+          DataStore.gradeColumns.push({
+            id: testColumnId,
+            name: 'בדיקה זמנית'
+          });
+        }
+        
+        // שמירת ציון
+        if (!testStudent.grades) {
+          testStudent.grades = {};
+        }
+        testStudent.grades[testColumnId] = testGrade;
+        
+        // בדיקת הרשאות לפני שמירה
+        const wasAdmin = DataStore.isAdmin;
+        if (!wasAdmin) {
+          DataStore.isAdmin = true; // זמנית להרשאה
+        }
+        
+        const saveResult = DataStore.save(true);
+        
+        if (!wasAdmin) {
+          DataStore.isAdmin = false; // החזרת מצב קודם
+        }
+        
+        if (!saveResult) {
+          addTestResult(section, 'שמירת ציון - הרשאות', false, 
+            'השמירה נכשלה - בעיית הרשאות');
+          return;
+        }
+        
+        // בדיקה 3: טעינה מחדש ובדיקה שהציון נשמר
+        DataStore.load(true);
+        const reloadedStudent = DataStore.getStudent(testStudent.id);
+        
+        if (reloadedStudent && reloadedStudent.grades && reloadedStudent.grades[testColumnId] === testGrade) {
+          addTestResult(section, 'שמירת ציון - שמירה וטעינה', true, 
+            `ציון ${testGrade} נשמר ונקרא בהצלחה`);
+          
+          // ניקוי - החזרת מצב קודם
+          reloadedStudent.grades[testColumnId] = originalGrades[testColumnId] || undefined;
+          if (Object.keys(reloadedStudent.grades).length === 0) {
+            delete reloadedStudent.grades;
+          }
+          DataStore.gradeColumns = DataStore.gradeColumns.filter(c => c.id !== testColumnId);
+          DataStore.save(true);
+        } else {
+          addTestResult(section, 'שמירת ציון - שמירה וטעינה', false, 
+            `הציון לא נשמר. מצופה: ${testGrade}, נמצא: ${reloadedStudent?.grades?.[testColumnId] || 'אין'}`);
+        }
+
+      } catch (e) {
+        addTestResult(section, 'שגיאה בשמירת ציונים', false, 
+          'שגיאה: ' + e.message + '\n' + e.stack);
+      }
+    }
+
+    // ============================================
+    // בדיקת שמירת שדות תלמיד
+    // ============================================
+    function testStudentFieldSaving() {
+      const section = 'שמירת שדות תלמיד';
+      
+      try {
+        DataStore.load(true);
+        const students = DataStore.students;
+        
+        if (students.length === 0) {
+          addTestResult(section, 'בדיקת שדות - אין תלמידים', false, 
+            'אין תלמידים במערכת לבדיקה');
+          return;
+        }
+
+        const testStudent = students[0];
+        const originalFirstName = testStudent.firstName;
+        const testValue = 'בדיקה_' + Date.now();
+        
+        // בדיקת הרשאות
+        const wasAdmin = DataStore.isAdmin;
+        if (!wasAdmin) {
+          DataStore.isAdmin = true;
+        }
+        
+        // שמירת שינוי
+        testStudent.firstName = testValue;
+        const saveResult = DataStore.save(true);
+        
+        if (!wasAdmin) {
+          DataStore.isAdmin = false;
+        }
+        
+        if (!saveResult) {
+          addTestResult(section, 'שמירת שדה - הרשאות', false, 
+            'השמירה נכשלה - בעיית הרשאות');
+          return;
+        }
+        
+        // טעינה מחדש ובדיקה
+        DataStore.load(true);
+        const reloadedStudent = DataStore.getStudent(testStudent.id);
+        
+        if (reloadedStudent && reloadedStudent.firstName === testValue) {
+          addTestResult(section, 'שמירת שדה - שמירה וטעינה', true, 
+            `שדה firstName נשמר ונקרא בהצלחה: "${testValue}"`);
+          
+          // החזרת מצב קודם
+          reloadedStudent.firstName = originalFirstName;
+          DataStore.save(true);
+        } else {
+          addTestResult(section, 'שמירת שדה - שמירה וטעינה', false, 
+            `השדה לא נשמר. מצופה: "${testValue}", נמצא: "${reloadedStudent?.firstName || 'אין'}"`);
+        }
+
+      } catch (e) {
+        addTestResult(section, 'שגיאה בשמירת שדות', false, 
+          'שגיאה: ' + e.message + '\n' + e.stack);
+      }
+    }
+
+    // ============================================
+    // בדיקת שמירת עמודות ציונים
+    // ============================================
+    function testGradeColumnSaving() {
+      const section = 'שמירת עמודות ציונים';
+      
+      try {
+        DataStore.load(true);
+        const originalCount = DataStore.gradeColumns.length;
+        const testColumnName = 'בדיקה_' + Date.now();
+        
+        // בדיקת הרשאות
+        const wasAdmin = DataStore.isAdmin;
+        if (!wasAdmin) {
+          DataStore.isAdmin = true;
+        }
+        
+        // הוספת עמודה
+        const newColumn = {
+          id: DataStore.generateId(),
+          name: testColumnName
+        };
+        DataStore.gradeColumns.push(newColumn);
+        const saveResult = DataStore.save(true);
+        
+        if (!wasAdmin) {
+          DataStore.isAdmin = false;
+        }
+        
+        if (!saveResult) {
+          addTestResult(section, 'שמירת עמודה - הרשאות', false, 
+            'השמירה נכשלה - בעיית הרשאות');
+          // ניקוי
+          DataStore.gradeColumns.pop();
+          return;
+        }
+        
+        // טעינה מחדש ובדיקה
+        DataStore.load(true);
+        const foundColumn = DataStore.gradeColumns.find(c => c.id === newColumn.id);
+        
+        if (foundColumn && foundColumn.name === testColumnName) {
+          addTestResult(section, 'שמירת עמודה - שמירה וטעינה', true, 
+            `עמודה "${testColumnName}" נשמרה ונקראה בהצלחה`);
+          
+          // ניקוי - הסרת העמודה
+          DataStore.gradeColumns = DataStore.gradeColumns.filter(c => c.id !== newColumn.id);
+          DataStore.save(true);
+        } else {
+          addTestResult(section, 'שמירת עמודה - שמירה וטעינה', false, 
+            `העמודה לא נשמרה. מצופה: "${testColumnName}", נמצא: ${foundColumn ? foundColumn.name : 'אין'}`);
+        }
+
+      } catch (e) {
+        addTestResult(section, 'שגיאה בשמירת עמודות', false, 
+          'שגיאה: ' + e.message + '\n' + e.stack);
+      }
+    }
+
+    // ============================================
+    // בדיקת תקינות נתונים (Data Integrity)
+    // ============================================
+    function testDataIntegrity() {
+      const section = 'תקינות נתונים';
+      
+      try {
+        DataStore.load(true);
+        
+        // בדיקה 1: כל התלמידים צריכים להיות קשורים לכיתה וקבוצה תקינים
+        let studentsWithoutClass = 0;
+        let studentsWithoutGroup = 0;
+        let studentsWithInvalidClass = 0;
+        let studentsWithInvalidGroup = 0;
+        
+        DataStore.students.forEach(student => {
+          if (!student.classId) {
+            studentsWithoutClass++;
+          } else if (!DataStore.getClass(student.classId)) {
+            studentsWithInvalidClass++;
+          }
+          
+          if (!student.groupId) {
+            studentsWithoutGroup++;
+          } else if (!DataStore.getGroup(student.groupId)) {
+            studentsWithInvalidGroup++;
+          }
+        });
+        
+        const integrityIssues = [];
+        if (studentsWithoutClass > 0) {
+          integrityIssues.push(`${studentsWithoutClass} תלמידים ללא classId`);
+        }
+        if (studentsWithInvalidClass > 0) {
+          integrityIssues.push(`${studentsWithInvalidClass} תלמידים עם classId לא תקין`);
+        }
+        if (studentsWithoutGroup > 0) {
+          integrityIssues.push(`${studentsWithoutGroup} תלמידים ללא groupId`);
+        }
+        if (studentsWithInvalidGroup > 0) {
+          integrityIssues.push(`${studentsWithInvalidGroup} תלמידים עם groupId לא תקין`);
+        }
+        
+        if (integrityIssues.length === 0) {
+          addTestResult(section, 'קשרי תלמידים-כיתות-קבוצות', true, 
+            `כל ${DataStore.students.length} התלמידים קשורים תקין`);
+        } else {
+          addTestResult(section, 'קשרי תלמידים-כיתות-קבוצות', false, 
+            'בעיות תקינות:\n' + integrityIssues.join('\n'));
+        }
+        
+        // בדיקה 2: כל הקבוצות צריכות להיות קשורות למורה תקין
+        let groupsWithoutTeacher = 0;
+        let groupsWithInvalidTeacher = 0;
+        
+        DataStore.groups.forEach(group => {
+          if (!group.teacherId) {
+            groupsWithoutTeacher++;
+          } else if (!DataStore.getTeacher(group.teacherId)) {
+            groupsWithInvalidTeacher++;
+          }
+        });
+        
+        const groupIssues = [];
+        if (groupsWithoutTeacher > 0) {
+          groupIssues.push(`${groupsWithoutTeacher} קבוצות ללא teacherId`);
+        }
+        if (groupsWithInvalidTeacher > 0) {
+          groupIssues.push(`${groupsWithInvalidTeacher} קבוצות עם teacherId לא תקין`);
+        }
+        
+        if (groupIssues.length === 0) {
+          addTestResult(section, 'קשרי קבוצות-מורים', true, 
+            `כל ${DataStore.groups.length} הקבוצות קשורות תקין`);
+        } else {
+          addTestResult(section, 'קשרי קבוצות-מורים', false, 
+            'בעיות תקינות:\n' + groupIssues.join('\n'));
+        }
+        
+        // בדיקה 3: אין כפילויות ID
+        const studentIds = DataStore.students.map(s => s.id);
+        const classIds = DataStore.classes.map(c => c.id);
+        const groupIds = DataStore.groups.map(g => g.id);
+        const teacherIds = DataStore.teachers.map(t => t.id);
+        
+        const duplicateStudentIds = studentIds.filter((id, index) => studentIds.indexOf(id) !== index);
+        const duplicateClassIds = classIds.filter((id, index) => classIds.indexOf(id) !== index);
+        const duplicateGroupIds = groupIds.filter((id, index) => groupIds.indexOf(id) !== index);
+        const duplicateTeacherIds = teacherIds.filter((id, index) => teacherIds.indexOf(id) !== index);
+        
+        const duplicateIssues = [];
+        if (duplicateStudentIds.length > 0) {
+          duplicateIssues.push(`${duplicateStudentIds.length} כפילויות ID תלמידים`);
+        }
+        if (duplicateClassIds.length > 0) {
+          duplicateIssues.push(`${duplicateClassIds.length} כפילויות ID כיתות`);
+        }
+        if (duplicateGroupIds.length > 0) {
+          duplicateIssues.push(`${duplicateGroupIds.length} כפילויות ID קבוצות`);
+        }
+        if (duplicateTeacherIds.length > 0) {
+          duplicateIssues.push(`${duplicateTeacherIds.length} כפילויות ID מורים`);
+        }
+        
+        if (duplicateIssues.length === 0) {
+          addTestResult(section, 'אין כפילויות ID', true, 
+            'כל ה-IDs ייחודיים');
+        } else {
+          addTestResult(section, 'אין כפילויות ID', false, 
+            'נמצאו כפילויות:\n' + duplicateIssues.join('\n'));
+        }
+
+      } catch (e) {
+        addTestResult(section, 'שגיאה בבדיקת תקינות', false, 
+          'שגיאה: ' + e.message + '\n' + e.stack);
+      }
+    }
+
+    // ============================================
+    // בדיקת שמירה אחרי טעינה מחדש
+    // ============================================
+    function testPersistenceAfterReload() {
+      const section = 'שמירה אחרי טעינה מחדש';
+      
+      try {
+        DataStore.load(true);
+        const originalData = localStorage.getItem('schoolData');
+        
+        if (!originalData) {
+          addTestResult(section, 'בדיקת שמירה - אין נתונים', false, 
+            'אין נתונים ב-localStorage לבדיקה');
+          return;
+        }
+        
+        // שמירת מצב נוכחי
+        const beforeReload = {
+          studentsCount: DataStore.students.length,
+          classesCount: DataStore.classes.length,
+          groupsCount: DataStore.groups.length,
+          teachersCount: DataStore.teachers.length,
+          gradeColumnsCount: DataStore.gradeColumns.length
+        };
+        
+        // סימולציה של טעינה מחדש - ניקוי וטעינה
+        const savedData = localStorage.getItem('schoolData');
+        DataStore._resetData();
+        DataStore.load(true);
+        
+        const afterReload = {
+          studentsCount: DataStore.students.length,
+          classesCount: DataStore.classes.length,
+          groupsCount: DataStore.groups.length,
+          teachersCount: DataStore.teachers.length,
+          gradeColumnsCount: DataStore.gradeColumns.length
+        };
+        
+        const matches = 
+          beforeReload.studentsCount === afterReload.studentsCount &&
+          beforeReload.classesCount === afterReload.classesCount &&
+          beforeReload.groupsCount === afterReload.groupsCount &&
+          beforeReload.teachersCount === afterReload.teachersCount &&
+          beforeReload.gradeColumnsCount === afterReload.gradeColumnsCount;
+        
+        if (matches) {
+          addTestResult(section, 'שמירה אחרי טעינה מחדש', true, 
+            `כל הנתונים נשמרו: תלמידים=${afterReload.studentsCount}, ` +
+            `כיתות=${afterReload.classesCount}, קבוצות=${afterReload.groupsCount}, ` +
+            `מורים=${afterReload.teachersCount}, עמודות=${afterReload.gradeColumnsCount}`);
+        } else {
+          addTestResult(section, 'שמירה אחרי טעינה מחדש', false, 
+            `נתונים לא תואמים:\nלפני: ${JSON.stringify(beforeReload, null, 2)}\n` +
+            `אחרי: ${JSON.stringify(afterReload, null, 2)}`);
+        }
+
+      } catch (e) {
+        addTestResult(section, 'שגיאה בבדיקת שמירה', false, 
+          'שגיאה: ' + e.message + '\n' + e.stack);
+      }
+    }
+
+    // ============================================
+    // בדיקת Debounce בשמירה
+    // ============================================
+    function testSaveDebounce() {
+      const section = 'Debounce בשמירה';
+      
+      try {
+        // בדיקה שהשמירה לא מיידית (debounce)
+        const wasAdmin = DataStore.isAdmin;
+        if (!wasAdmin) {
+          DataStore.isAdmin = true;
+        }
+        
+        const startTime = Date.now();
+        DataStore.save(false); // לא immediate
+        const callTime = Date.now() - startTime;
+        
+        // השמירה צריכה להיות מיידית בקריאה (לא לחכות ל-timeout)
+        if (callTime < 50) {
+          addTestResult(section, 'Debounce - קריאה מיידית', true, 
+            `הפונקציה save() חזרה מיידית (${callTime}ms)`);
+        } else {
+          addTestResult(section, 'Debounce - קריאה מיידית', false, 
+            `הפונקציה save() לא חזרה מיידית (${callTime}ms)`);
+        }
+        
+        // בדיקה שהשמירה המיידית עובדת
+        const immediateResult = DataStore.save(true);
+        if (immediateResult !== false) {
+          addTestResult(section, 'Debounce - שמירה מיידית', true, 
+            'שמירה מיידית (immediate=true) עובדת');
+        } else {
+          addTestResult(section, 'Debounce - שמירה מיידית', false, 
+            'שמירה מיידית נכשלה');
+        }
+        
+        if (!wasAdmin) {
+          DataStore.isAdmin = false;
+        }
+
+      } catch (e) {
+        addTestResult(section, 'שגיאה בבדיקת Debounce', false, 
+          'שגיאה: ' + e.message + '\n' + e.stack);
+      }
+    }
+
+    // ============================================
+    // הרצת כל הבדיקות
+    // ============================================
+    function runAllTests() {
+      clearResults();
+      document.getElementById('summary').style.display = 'block';
+      
+      console.log('🚀 מתחיל להריץ בדיקות...');
+      
+      // הרצת כל הבדיקות
+      testBasicSaveLoad();
+      testGradeSaving();
+      testStudentFieldSaving();
+      testGradeColumnSaving();
+      testDataIntegrity();
+      testPersistenceAfterReload();
+      testSaveDebounce();
+      
+      // חישוב סיכום
+      const total = testResults.length;
+      const passed = testResults.filter(r => r.passed).length;
+      const failed = total - passed;
+      const percentage = total > 0 ? Math.round((passed / total) * 100) : 0;
+      
+      // עדכון סיכום
+      document.getElementById('progressFill').style.width = percentage + '%';
+      document.getElementById('progressFill').textContent = percentage + '%';
+      
+      const summaryHTML = `
+        <p><strong>סה"כ בדיקות:</strong> ${total}</p>
+        <p><strong style="color: #4caf50;">עברו:</strong> ${passed}</p>
+        <p><strong style="color: #f44336;">נכשלו:</strong> ${failed}</p>
+        <p><strong>אחוז הצלחה:</strong> ${percentage}%</p>
+      `;
+      document.getElementById('summaryContent').innerHTML = summaryHTML;
+      
+      console.log(`✅ סיימתי! ${passed}/${total} בדיקות עברו (${percentage}%)`);
+      
+      // הדפסת סיכום לקונסול
+      console.group('📊 סיכום בדיקות');
+      testResults.forEach(result => {
+        const icon = result.passed ? '✅' : '❌';
+        console.log(`${icon} ${result.section} - ${result.title}: ${result.passed ? 'עבר' : 'נכשל'}`);
+        if (!result.passed) {
+          console.log('   פרטים:', result.details);
+        }
+      });
+      console.groupEnd();
+    }
+
+    // טעינה ראשונית
+    window.addEventListener('DOMContentLoaded', () => {
+      console.log('📋 דף בדיקות נטען. לחץ על "הרץ את כל הבדיקות" להתחלה.');
+    });
+  </script>
+</body>
+</html>

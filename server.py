@@ -81,24 +81,62 @@ def main():
     watcher_thread.start()
     
     print("\n" + "="*60)
-    print("Live Reload Server Started!")
+    print("🚀 Live Reload Server Started!")
     print("="*60)
-    print(f"URL: http://localhost:{PORT}")
-    print("Auto-refresh: Enabled (checks every second)")
+    print(f"🌐 URL: http://localhost:{PORT}")
+    print(f"📁 Directory: {os.getcwd()}")
+    print("🔄 Auto-refresh: Enabled (checks every second)")
     print("="*60 + "\n")
     print("Press Ctrl+C to stop\n")
     
-    try:
-        with socketserver.TCPServer(("", PORT), MyHTTPRequestHandler) as httpd:
-            httpd.serve_forever()
-    except KeyboardInterrupt:
-        print("\n\nServer stopped...")
-    except OSError as e:
-        if "Address already in use" in str(e) or (hasattr(e, 'errno') and e.errno == 10048):
-            print(f"\nPort {PORT} is already in use!")
-            print("Close the previous server or change the port\n")
-        else:
-            print(f"\nError: {e}\n")
+    max_retries = 5
+    retry_count = 0
+    
+    while retry_count < max_retries:
+        try:
+            # נסה ליצור שרת עם אפשרות לשימוש חוזר בכתובת
+            socketserver.TCPServer.allow_reuse_address = True
+            with socketserver.TCPServer(("", PORT), MyHTTPRequestHandler) as httpd:
+                print(f"✅ Server listening on port {PORT}")
+                httpd.serve_forever()
+                break
+        except KeyboardInterrupt:
+            print("\n\n🛑 Server stopped by user...")
+            break
+        except OSError as e:
+            if "Address already in use" in str(e) or (hasattr(e, 'errno') and e.errno == 10048):
+                retry_count += 1
+                if retry_count < max_retries:
+                    print(f"\n⚠️  Port {PORT} is already in use!")
+                    print(f"   Attempting to free port... (attempt {retry_count}/{max_retries})")
+                    # נסה לעצור תהליכים ישנים
+                    try:
+                        import socket
+                        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                        time.sleep(2)
+                    except:
+                        pass
+                else:
+                    print(f"\n❌ Port {PORT} is still in use after {max_retries} attempts!")
+                    print("   Please close the previous server manually\n")
+                    break
+            else:
+                print(f"\n❌ Error: {e}\n")
+                retry_count += 1
+                if retry_count < max_retries:
+                    print(f"   Retrying in 3 seconds... (attempt {retry_count}/{max_retries})")
+                    time.sleep(3)
+                else:
+                    break
+        except Exception as e:
+            print(f"\n❌ Unexpected error: {e}\n")
+            retry_count += 1
+            if retry_count < max_retries:
+                print(f"   Retrying in 3 seconds... (attempt {retry_count}/{max_retries})")
+                time.sleep(3)
+            else:
+                break
 
 if __name__ == "__main__":
     main()

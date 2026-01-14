@@ -137,6 +137,12 @@
           return false;
         }
 
+        // בדיקת תקינות נתונים לפני שמירה
+        if (!this._validateData()) {
+          console.error('❌ נתונים לא תקינים - לא נשמרו');
+          return false;
+        }
+
         const data = {
           students: this.students,
           classes: this.classes,
@@ -154,6 +160,15 @@
           console.error('שגיאה בשמירת נתונים:', e);
           if (e.name === 'QuotaExceededError') {
             console.warn('localStorage מלא, מנסה לנקות...');
+            // ניסיון לנקות נתונים ישנים
+            try {
+              const oldData = JSON.parse(localStorage.getItem('schoolData') || '{}');
+              if (oldData.students && oldData.students.length > 1000) {
+                console.warn('⚠️ יותר מדי תלמידים - ייתכן שצריך לנקות נתונים ישנים');
+              }
+            } catch (cleanError) {
+              console.error('❌ שגיאה בניקוי:', cleanError);
+            }
           }
           return false;
         }
@@ -199,6 +214,47 @@
       } catch (e) {
         console.debug('Git sync marker:', e.message);
       }
+    },
+
+    /**
+     * בדיקת תקינות נתונים לפני שמירה
+     */
+    _validateData() {
+      const issues = [];
+      
+      // בדיקה שהכל הוא arrays
+      if (!Array.isArray(this.students)) {
+        issues.push('students אינו array');
+        this.students = [];
+      }
+      if (!Array.isArray(this.classes)) {
+        issues.push('classes אינו array');
+        this.classes = [];
+      }
+      if (!Array.isArray(this.groups)) {
+        issues.push('groups אינו array');
+        this.groups = [];
+      }
+      if (!Array.isArray(this.teachers)) {
+        issues.push('teachers אינו array');
+        this.teachers = [];
+      }
+      if (!Array.isArray(this.gradeColumns)) {
+        issues.push('gradeColumns אינו array');
+        this.gradeColumns = [];
+      }
+      
+      // בדיקה בסיסית של מבנה נתונים
+      if (this.students.length > 0 && !this.students[0].hasOwnProperty('id')) {
+        issues.push('תלמידים חסר שדה id');
+      }
+      
+      if (issues.length > 0) {
+        console.warn('⚠️ בעיות תקינות נתונים:', issues);
+        return false;
+      }
+      
+      return true;
     },
 
     // ============================================
@@ -381,7 +437,7 @@
      * יצירת ID ייחודי
      */
     generateId() {
-      return Date.now().toString(36) + Math.random().toString(36).substr(2);
+      return Date.now().toString(36) + Math.random().toString(36).slice(2);
     },
 
     /**
@@ -431,6 +487,11 @@
             teacherId: config.classTeacherId || null
           };
           this.classes.push(classItem);
+        } else {
+          // עדכון מחנך אם צוין classTeacherId וכיתה קיימת
+          if (config.classTeacherId && !classItem.teacherId) {
+            classItem.teacherId = config.classTeacherId;
+          }
         }
         classesUsed.add(classItem);
         return classItem;

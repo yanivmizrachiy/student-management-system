@@ -414,20 +414,25 @@
     @media (max-width: 480px) {
       body {
         padding: 8px;
+        overflow-x: hidden;
       }
 
       .header {
-        padding: 15px;
+        padding: 15px 12px;
         margin-bottom: 20px;
       }
 
       .nav-breadcrumbs {
-        font-size: 0.8rem;
+        font-size: 0.75rem;
         margin-bottom: 10px;
+        word-wrap: break-word;
+        line-height: 1.4;
       }
 
       .title-section h1 {
-        font-size: 1.5rem;
+        font-size: 1.3rem;
+        line-height: 1.2;
+        word-wrap: break-word;
       }
 
       .nav-buttons {
@@ -440,139 +445,190 @@
         padding: 10px 15px;
         font-size: 0.85rem;
         width: 100%;
+        box-sizing: border-box;
+        text-align: center;
       }
 
       .student-card {
-        padding: 15px;
+        padding: 15px 12px;
+        box-sizing: border-box;
       }
 
       .student-image {
-        width: 120px;
-        height: 120px;
         margin-bottom: 20px;
       }
 
+      .student-image img {
+        max-width: 120px;
+        max-height: 120px;
+        width: 100%;
+        height: auto;
+      }
+
       .student-info {
+        grid-template-columns: 1fr;
         gap: 12px;
       }
 
+      .info-item {
+        padding: 15px;
+        box-sizing: border-box;
+      }
+
       .info-label {
-        font-size: 0.85rem;
+        font-size: 0.8rem;
       }
 
       .info-value {
-        font-size: 1rem;
+        font-size: 0.95rem;
+        word-wrap: break-word;
       }
 
       .info-edit-input {
-        font-size: 1rem;
+        font-size: 0.95rem;
         padding: 8px 10px;
+        width: 100%;
+        box-sizing: border-box;
       }
 
       .grades-grid {
         grid-template-columns: 1fr;
-        gap: 15px;
+        gap: 12px;
       }
 
       .grade-item {
         padding: 12px;
+        box-sizing: border-box;
       }
 
       .grade-label {
-        font-size: 0.85rem;
+        font-size: 0.8rem;
       }
 
       .grade-value, .grade-input {
-        font-size: 1rem;
+        font-size: 0.95rem;
+      }
+
+      .grade-input {
+        width: 100%;
+        box-sizing: border-box;
       }
 
       .admin-controls {
         margin-bottom: 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
       }
 
       .control-btn {
         padding: 10px 15px;
-        font-size: 0.9rem;
+        font-size: 0.85rem;
         width: 100%;
         margin-left: 0;
-        margin-bottom: 10px;
+        margin-bottom: 0;
+        box-sizing: border-box;
+        text-align: center;
       }
 
-      .files-grid {
+      .files-list {
         grid-template-columns: 1fr;
+        gap: 10px;
       }
 
       .file-item {
-        padding: 10px;
-        font-size: 0.9rem;
+        padding: 12px;
+        box-sizing: border-box;
+        font-size: 0.85rem;
+      }
+
+      .file-item a {
+        word-wrap: break-word;
       }
 
       .notes-textarea {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
         min-height: 120px;
         padding: 12px;
+        width: 100%;
+        box-sizing: border-box;
       }
 
       .header-content {
         flex-direction: column;
         align-items: flex-start;
-        gap: 15px;
+        gap: 12px;
       }
 
       .grades-title {
-        font-size: 1.3rem;
+        font-size: 1.2rem;
       }
 
       .files-title {
-        font-size: 1.3rem;
+        font-size: 1.2rem;
+      }
+
+      .notes-title {
+        font-size: 1.2rem;
       }
     }
 
     @media (max-width: 768px) {
       body {
         padding: 10px;
+        overflow-x: hidden;
       }
 
       .header {
-        padding: 20px;
+        padding: 20px 15px;
         margin-bottom: 20px;
       }
 
       .nav-breadcrumbs {
         font-size: 0.85rem;
         margin-bottom: 15px;
+        word-wrap: break-word;
       }
 
       .title-section h1 {
-        font-size: 1.8rem;
+        font-size: 1.7rem;
+        line-height: 1.2;
+        word-wrap: break-word;
       }
 
       .nav-buttons {
         width: 100%;
         justify-content: flex-start;
+        flex-wrap: wrap;
       }
 
       .nav-btn {
-        padding: 10px 20px;
+        padding: 10px 18px;
         font-size: 0.9rem;
+        min-width: 120px;
       }
 
       .admin-controls {
         margin-bottom: 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
       }
 
       .control-btn {
-        padding: 10px 20px;
+        padding: 10px 18px;
         font-size: 0.9rem;
         margin-left: 0;
-        margin-bottom: 10px;
-        display: block;
+        margin-bottom: 0;
         width: 100%;
-        max-width: 200px;
+        max-width: 250px;
+        box-sizing: border-box;
+        text-align: center;
       }
 
       .student-card {
-        padding: 20px;
+        padding: 20px 15px;
+        box-sizing: border-box;
       }
 
       .student-info {
@@ -580,23 +636,39 @@
         gap: 15px;
       }
 
+      .info-item {
+        padding: 18px;
+        box-sizing: border-box;
+      }
+
       .info-value {
-        font-size: 1.1rem;
+        font-size: 1.05rem;
+        word-wrap: break-word;
       }
 
       .student-image img {
         max-width: 150px;
         max-height: 150px;
+        width: 100%;
+        height: auto;
       }
 
       .grades-grid {
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-        gap: 10px;
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 12px;
+      }
+
+      .grade-item {
+        box-sizing: border-box;
       }
 
       .files-list {
         grid-template-columns: 1fr;
-        gap: 10px;
+        gap: 12px;
+      }
+
+      .file-item {
+        box-sizing: border-box;
       }
     }
   </style>

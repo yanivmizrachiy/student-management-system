@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>צפייה באתר - מערכת ניהול תלמידים</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .container {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    .toolbar {
+      background: #1a1a1a;
+      padding: 10px 20px;
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      border-bottom: 2px solid #333;
+      z-index: 1000;
+    }
+    .toolbar button, .toolbar a {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+    .toolbar button:hover, .toolbar a:hover {
+      background: #5568d3;
+    }
+    .url-display {
+      flex: 1;
+      background: #2a2a2a;
+      color: #fff;
+      padding: 8px 15px;
+      border-radius: 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      border: 1px solid #444;
+    }
+    .iframe-container {
+      flex: 1;
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 50px);
+      overflow: hidden;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+    .loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #667eea;
+      font-size: 1.2rem;
+      z-index: 100;
+    }
+    .loading.hidden {
+      display: none;
+    }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(102, 126, 234, 0.3);
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 15px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="toolbar">
+      <button onclick="loadLocal()">🏠 מקומי</button>
+      <button onclick="loadOnline()">🌐 מקוון</button>
+      <button onclick="reload()">🔄 רענון</button>
+      <div class="url-display" id="currentUrl">טוען...</div>
+    </div>
+    <div class="iframe-container">
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <div>טוען את האתר...</div>
+      </div>
+      <iframe 
+        id="siteFrame"
+        src=""
+        allow="fullscreen"
+        onload="hideLoading()">
+      </iframe>
+    </div>
+  </div>
+  
+  <script>
+    const iframe = document.getElementById('siteFrame');
+    const loading = document.getElementById('loading');
+    const currentUrl = document.getElementById('currentUrl');
+    
+    function hideLoading() {
+      loading.classList.add('hidden');
+      updateUrl();
+    }
+    
+    function showLoading() {
+      loading.classList.remove('hidden');
+    }
+    
+    function updateUrl() {
+      try {
+        const src = iframe.src;
+        currentUrl.textContent = src;
+      } catch (e) {
+        currentUrl.textContent = 'לא ניתן להציג כתובת';
+      }
+    }
+    
+    function loadLocal() {
+      showLoading();
+      iframe.src = 'http://localhost:8000/index.html';
+      updateUrl();
+    }
+    
+    function loadOnline() {
+      showLoading();
+      iframe.src = 'https://yanivmizrachiy.github.io/student-management-system/';
+      updateUrl();
+    }
+    
+    function reload() {
+      showLoading();
+      iframe.src = iframe.src;
+      updateUrl();
+    }
+    
+    // נסה לפתוח את הגרסה המקומית תחילה
+    function tryLoadLocal() {
+      showLoading();
+      const testImg = new Image();
+      testImg.onload = () => {
+        loadLocal();
+      };
+      testImg.onerror = () => {
+        console.log('מקומי לא עובד, עובר למקוון...');
+        loadOnline();
+      };
+      testImg.src = 'http://localhost:8000/favicon.ico?' + Date.now();
+    }
+    
+    // נסה לטעון את המקומי תחילה
+    tryLoadLocal();
+    
+    // עדכון כתובת כל פעם שהאתר נטען
+    iframe.addEventListener('load', () => {
+      hideLoading();
+    });
+    
+    // רענון אוטומטי כל 5 שניות אם המקומי לא עובד
+    let retryCount = 0;
+    const maxRetries = 12; // 60 שניות
+    const retryInterval = setInterval(() => {
+      if (iframe.src.includes('localhost') && retryCount < maxRetries) {
+        const testImg = new Image();
+        testImg.onload = () => {
+          if (iframe.src.includes('github.io')) {
+            loadLocal();
+          }
+        };
+        testImg.onerror = () => {
+          retryCount++;
+        };
+        testImg.src = 'http://localhost:8000/favicon.ico?' + Date.now();
+      } else {
+        clearInterval(retryInterval);
+      }
+    }, 5000);
+  </script>
+</body>
+</html>

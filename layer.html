@@ -449,17 +449,32 @@
         }
       }
       
+      // שמירת interval ID למניעת memory leaks
+      let renderInterval = null;
+      
       // המתן לנתונים לפני רינדור ראשוני
       waitForData(() => {
         render();
-        // רענון כל 4 שניות
-        setInterval(render, 4000);
+        // רענון כל 4 שניות - שמירת ID למניעת memory leaks
+        if (renderInterval) {
+          clearInterval(renderInterval);
+        }
+        renderInterval = setInterval(render, 4000);
       });
       
       // האזנה לאירוע dataLoaded
-      window.addEventListener('dataLoaded', () => {
+      const dataLoadedHandler = () => {
         console.log('📡 אירוע dataLoaded התקבל - מריץ render');
         render();
+      };
+      window.addEventListener('dataLoaded', dataLoadedHandler);
+      
+      // ניקוי לפני סגירת הדף - מניעת memory leaks
+      window.addEventListener('beforeunload', () => {
+        if (renderInterval) {
+          clearInterval(renderInterval);
+        }
+        window.removeEventListener('dataLoaded', dataLoadedHandler);
       });
     })();
   </script>

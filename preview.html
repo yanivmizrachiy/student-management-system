@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>תצוגה מקדימה - מערכת ניהול תלמידים</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #0a0a0a;
+      overflow: hidden;
+    }
+    .iframe-wrapper {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+    .loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #0a0a0a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 1000;
+      transition: opacity 0.3s;
+    }
+    .loading-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(102, 126, 234, 0.3);
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .loading-text {
+      color: #667eea;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="loading-overlay" id="loading">
+    <div class="spinner"></div>
+    <div class="loading-text">טוען את האתר...</div>
+  </div>
+  
+  <div class="iframe-wrapper">
+    <iframe 
+      id="siteFrame"
+      src="http://localhost:8000/index.html"
+      allow="fullscreen"
+      onload="hideLoading()">
+    </iframe>
+  </div>
+  
+  <script>
+    function hideLoading() {
+      const loading = document.getElementById('loading');
+      if (loading) {
+        setTimeout(() => {
+          loading.classList.add('hidden');
+        }, 500);
+      }
+    }
+    
+    // נסה לפתוח גם את הגרסה המקוונת אם המקומי לא עובד
+    setTimeout(() => {
+      const iframe = document.getElementById('siteFrame');
+      iframe.onerror = () => {
+        iframe.src = 'https://yanivmizrachiy.github.io/student-management-system/';
+      };
+    }, 5000);
+  </script>
+</body>
+</html>

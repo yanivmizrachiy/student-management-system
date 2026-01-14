@@ -369,21 +369,36 @@
         const descEl = document.getElementById('layerDescription');
         const heroEl = document.querySelector('.hero');
         
-        // הסרת כל רקע טורקיז מהכותרת והרקע
+        // תיקון כותרות - עיצוב אחיד לכל השכבות
         if (titleEl) {
           titleEl.textContent = `שכבת ${layerName} - ${totalCount} תלמידים`;
-          // הסרת כל style דינמי שעלול להוסיף רקע טורקיז
+          // הסרת כל style דינמי שעלול להוסיף רקע טורקיז או צבעים אחרים
           titleEl.style.background = '';
           titleEl.style.backgroundColor = '';
           titleEl.style.backgroundImage = '';
+          titleEl.style.color = '';
+          titleEl.style.textShadow = '';
+          titleEl.style.fontWeight = '';
+          titleEl.style.letterSpacing = '';
+          // הסרת כל classes שקשורים לשכבות ספציפיות
+          titleEl.classList.remove('layer-7', 'layer-8', 'layer-9');
         }
         if (heroEl) {
-          // וידוא שהרקע של hero הוא רק הגרדיאנט הלבן הסטנדרטי
+          // וידוא שהרקע של hero הוא רק הגרדיאנט הלבן הסטנדרטי - אחיד לכל השכבות
           heroEl.style.background = 'linear-gradient(160deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02))';
           heroEl.style.backgroundColor = '';
+          heroEl.style.backgroundImage = '';
+          heroEl.style.border = '';
+          heroEl.style.boxShadow = '';
+          // הסרת כל classes שקשורים לשכבות ספציפיות
+          heroEl.classList.remove('layer-7', 'layer-8', 'layer-9');
         }
         if (descEl) {
           descEl.textContent = `בשכבה זו ${filtered.length} קבוצות פעילות`;
+          // וידוא שהתיאור גם אחיד
+          descEl.style.color = '';
+          descEl.style.fontWeight = '';
+          descEl.style.fontSize = '';
         }
         
         if (!filtered.length) {

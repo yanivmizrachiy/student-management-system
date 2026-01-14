@@ -69,6 +69,8 @@
     }
     .hero {
       background: linear-gradient(160deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)) !important;
+      background-color: transparent !important;
+      background-image: none !important;
       border-radius: 28px;
       padding: 28px;
       margin-bottom: 30px;
@@ -83,6 +85,7 @@
       background-clip: text;
       -webkit-text-fill-color: transparent;
       background-color: transparent !important;
+      background-image: none !important;
     }
     .hero p {
       color: rgba(255, 255, 255, 0.75);
@@ -369,27 +372,25 @@
         const descEl = document.getElementById('layerDescription');
         const heroEl = document.querySelector('.hero');
         
-        // תיקון כותרות - עיצוב אחיד לכל השכבות
+        // תיקון כותרות - הסרת רקע טורקיז שמסתיר את הטקסט
         if (titleEl) {
           titleEl.textContent = `שכבת ${layerName} - ${totalCount} לומדים`;
           // הסרת כל style דינמי שעלול להוסיף רקע טורקיז או צבעים אחרים
-          titleEl.style.background = '';
-          titleEl.style.backgroundColor = '';
-          titleEl.style.backgroundImage = '';
-          titleEl.style.color = '';
-          titleEl.style.textShadow = '';
-          titleEl.style.fontWeight = '';
-          titleEl.style.letterSpacing = '';
+          titleEl.style.cssText = '';
+          titleEl.style.background = 'transparent';
+          titleEl.style.backgroundColor = 'transparent';
+          titleEl.style.backgroundImage = 'none';
           // הסרת כל classes שקשורים לשכבות ספציפיות
           titleEl.classList.remove('layer-7', 'layer-8', 'layer-9');
         }
         if (heroEl) {
-          // וידוא שהרקע של hero הוא רק הגרדיאנט הלבן הסטנדרטי - אחיד לכל השכבות
+          // הסרת כל רקע טורקיז - וידוא שהרקע הוא רק הגרדיאנט הלבן הסטנדרטי
+          heroEl.style.cssText = '';
           heroEl.style.background = 'linear-gradient(160deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02))';
-          heroEl.style.backgroundColor = '';
-          heroEl.style.backgroundImage = '';
-          heroEl.style.border = '';
-          heroEl.style.boxShadow = '';
+          heroEl.style.backgroundColor = 'transparent';
+          heroEl.style.backgroundImage = 'none';
+          heroEl.style.border = '1px solid rgba(255, 255, 255, 0.15)';
+          heroEl.style.boxShadow = '0 25px 60px rgba(0,0,0,0.45)';
           // הסרת כל classes שקשורים לשכבות ספציפיות
           heroEl.classList.remove('layer-7', 'layer-8', 'layer-9');
         }

@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}שכבת {{ grade.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- כותרת גדולה עם שם השכבה -->
+    <h1 class="mb-4 fw-bold" style="font-size: 2.5rem; color: #4a148c;">
+        <i class="bi bi-mortarboard-fill me-3"></i>
+        שכבת {{ grade.name }}
+    </h1>
+    
+    <!-- כפתורים תלת-ממדיים לכל הקבצה -->
+    <div class="row g-4 mb-4">
+        {% for group in groups %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card group-card h-100 border-0 shadow-lg" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); cursor: pointer;" onclick="window.location.href='{% url 'group_page' group.id %}'">
+                <div class="card-body text-white p-4">
+                    <h3 class="mb-3 fw-bold">{{ group.name }}</h3>
+                    <p class="mb-3" style="font-size: 1.1rem;">
+                        <i class="bi bi-person-badge me-2"></i>
+                        <strong>מורה:</strong> {{ group.teacher }}
+                    </p>
+                    <div class="d-flex align-items-center" style="font-size: 1.3rem; font-weight: bold;">
+                        <i class="bi bi-people-fill me-2"></i>
+                        <span class="live-counter">{{ group.student_count|default:0 }}</span> תלמידים
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">אין הקבצות בשכבה זו</div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- סיכום כולל בתחתית -->
+    <div class="card shadow-lg border-0">
+        <div class="card-body text-center p-4">
+            <h3 class="mb-0 fw-bold" style="color: #4a148c;">
+                <i class="bi bi-graph-up me-3"></i>
+                סה"כ תלמידים בשכבה: <span class="text-primary" style="font-size: 2rem;">{{ total_students|default:0 }}</span>
+            </h3>
+        </div>
+    </div>
+</div>
+
+<style>
+    .group-card {
+        transition: all 0.3s ease;
+    }
+    
+    .group-card:hover {
+        transform: translateY(-8px) scale(1.05);
+        box-shadow: 0 20px 40px rgba(102, 126, 234, 0.4) !important;
+    }
+    
+    .live-counter {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #ffd700;
+    }
+</style>
+{% endblock %}
+

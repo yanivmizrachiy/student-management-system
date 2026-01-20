@@ -7,7 +7,6 @@ import api from '../services/api';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const login = useAuthStore((state) => state.login);
@@ -24,8 +23,10 @@ export default function LoginPage() {
   useEffect(() => {
     const fetchCounts = async () => {
       try {
+        // Create request config without auth for public endpoint
+        // Don't send Authorization header at all for public endpoint
         const response = await api.get('/grades');
-        const grades = response.data;
+        const grades = response.data || [];
         const counts = {
           grade7: grades.find((g: any) => g.name === '7th' || g.name === 'ז' || g.name === 'כיתה ז')?.studentCount || 0,
           grade8: grades.find((g: any) => g.name === '8th' || g.name === 'ח' || g.name === 'כיתה ח')?.studentCount || 0,
@@ -33,8 +34,11 @@ export default function LoginPage() {
           total: grades.reduce((sum: number, g: any) => sum + (g.studentCount || 0), 0),
         };
         setGradeCounts(counts);
-      } catch (err) {
-        // Ignore errors on login page
+      } catch (err: any) {
+        // Log error for debugging but don't show to user
+        if (err?.response?.status !== 401 && err?.response?.status !== 403) {
+          console.warn('Error fetching grade counts:', err?.response?.status || err?.message);
+        }
       }
     };
     fetchCounts();
@@ -48,12 +52,53 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      await login(email, password);
+      await login(email);
       navigate('/grades');
     } catch (err: any) {
       setError(err.response?.data?.message || 'שגיאה בהתחברות');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGradeClick = async (gradeName: string) => {
+    try {
+      // Check if user is logged in
+      const token = localStorage.getItem('auth-storage');
+      let isLoggedIn = false;
+      if (token) {
+        try {
+          const parsed = JSON.parse(token);
+          if (parsed.state?.token) {
+            isLoggedIn = true;
+          }
+        } catch (e) {
+          // Invalid token
+        }
+      }
+
+      // Get grades and find the selected grade
+      const response = await api.get('/grades');
+      const grades = response.data || [];
+      const gradeNames = [
+        gradeName === '7th' ? ['7th', 'ז', 'כיתה ז'] : 
+        gradeName === '8th' ? ['8th', 'ח', 'כיתה ח'] : 
+        ['9th', 'ט', 'כיתה ט']
+      ].flat();
+      
+      const selectedGrade = grades.find((g: any) => 
+        gradeNames.some(name => g.name === name || g.name?.includes(name))
+      );
+
+      if (selectedGrade) {
+        // Navigate to grade page with gradeId in URL
+        navigate(`/grades?gradeId=${selectedGrade.id}`);
+      } else {
+        // Grade not found - navigate to grades page anyway
+        navigate('/grades');
+      }
+    } catch (err: any) {
+      setError('שגיאה בטעינת נתוני הכיתה');
     }
   };
 
@@ -108,23 +153,6 @@ export default function LoginPage() {
                     />
                   </Form.Group>
 
-                  <Form.Group className="mb-3">
-                    <Form.Control
-                      type="password"
-                      placeholder="סיסמה"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      dir="ltr"
-                      className="form-control-lg"
-                      style={{
-                        background: 'rgba(255, 255, 255, 0.1)',
-                        border: '2px solid rgba(255, 255, 255, 0.3)',
-                        color: 'white',
-                      }}
-                    />
-                  </Form.Group>
-
                   {error && (
                     <Alert variant="danger" className="text-center">
                       {error}
@@ -163,6 +191,7 @@ export default function LoginPage() {
                 initial={{ opacity: 0, y: 30, rotateX: -15 }}
                 animate={{ opacity: 1, y: 0, rotateX: 0 }}
                 transition={{ delay: 0.7, duration: 0.6 }}
+                onClick={() => handleGradeClick('7th')}
                 style={{
                   background: 'linear-gradient(135deg, #ff6b9d 0%, #c44569 100%)',
                   boxShadow: '0 15px 35px rgba(198, 69, 105, 0.4)',
@@ -222,6 +251,7 @@ export default function LoginPage() {
                 initial={{ opacity: 0, y: 30, rotateX: -15 }}
                 animate={{ opacity: 1, y: 0, rotateX: 0 }}
                 transition={{ delay: 0.9, duration: 0.6 }}
+                onClick={() => handleGradeClick('8th')}
                 style={{
                   background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
                   boxShadow: '0 15px 35px rgba(79, 172, 254, 0.4)',
@@ -281,6 +311,7 @@ export default function LoginPage() {
                 initial={{ opacity: 0, y: 30, rotateX: -15 }}
                 animate={{ opacity: 1, y: 0, rotateX: 0 }}
                 transition={{ delay: 1.1, duration: 0.6 }}
+                onClick={() => handleGradeClick('9th')}
                 style={{
                   background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
                   boxShadow: '0 15px 35px rgba(67, 233, 123, 0.4)',

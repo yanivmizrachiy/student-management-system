@@ -11,6 +11,21 @@ const api = axios.create({
 // Add request interceptor for better error handling
 api.interceptors.request.use(
   (config) => {
+    // Only add token if Authorization header is not already set
+    if (!config.headers.Authorization) {
+      // Load token dynamically for each request
+      const token = localStorage.getItem('auth-storage');
+      if (token) {
+        try {
+          const parsed = JSON.parse(token);
+          if (parsed.state?.token) {
+            config.headers.Authorization = `Bearer ${parsed.state.token}`;
+          }
+        } catch (e) {
+          // Ignore
+        }
+      }
+    }
     return config;
   },
   (error) => {
@@ -39,18 +54,9 @@ api.interceptors.response.use(
   }
 );
 
-// Load token from storage on init
-const token = localStorage.getItem('auth-storage');
-if (token) {
-  try {
-    const parsed = JSON.parse(token);
-    if (parsed.state?.token) {
-      api.defaults.headers.common['Authorization'] = `Bearer ${parsed.state.token}`;
-    }
-  } catch (e) {
-    // Ignore
-  }
-}
+// Token will be loaded dynamically in the request interceptor
+// This allows the token to be updated when the user logs in
+// Note: Some endpoints (like /grades GET) are public and don't require auth
 
 export default api;
 

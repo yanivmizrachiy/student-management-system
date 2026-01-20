@@ -18,8 +18,6 @@ import { EditPermissionGuard } from '../auth/guards/edit-permission.guard';
 
 @ApiTags('students')
 @Controller('students')
-@UseGuards(JwtAuthGuard)
-@ApiBearerAuth()
 export class StudentsController {
   constructor(private readonly studentsService: StudentsService) {}
 

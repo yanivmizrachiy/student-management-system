@@ -65,8 +65,14 @@ export class StudentsService {
 
   async update(id: string, studentData: Partial<Student>, user: User): Promise<Student> {
     const oldStudent = await this.findOne(id);
+    if (!oldStudent) {
+      throw new Error(`Student with ID ${id} not found`);
+    }
     await this.studentsRepository.update(id, studentData);
     const newStudent = await this.findOne(id);
+    if (!newStudent) {
+      throw new Error(`Student with ID ${id} not found after update`);
+    }
     
     // Log changes
     for (const key in studentData) {
@@ -88,11 +94,15 @@ export class StudentsService {
   }
 
   async remove(id: string, user: User): Promise<void> {
+    const student = await this.findOne(id);
+    if (!student) {
+      throw new Error(`Student with ID ${id} not found`);
+    }
     await this.auditService.log({
       entity: 'Student',
       entityId: id,
       field: 'deleted',
-      oldValue: JSON.stringify(await this.findOne(id)),
+      oldValue: JSON.stringify(student),
       newValue: null,
       userId: user.id,
     });

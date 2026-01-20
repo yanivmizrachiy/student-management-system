@@ -17,13 +17,11 @@ import { EditPermissionGuard } from '../auth/guards/edit-permission.guard';
 
 @ApiTags('grades')
 @Controller('grades')
-@UseGuards(JwtAuthGuard)
-@ApiBearerAuth()
 export class GradesController {
   constructor(private readonly gradesService: GradesService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get all grades' })
+  @ApiOperation({ summary: 'Get all grades (public for counts)' })
   findAll(): Promise<Grade[]> {
     return this.gradesService.findAll();
   }

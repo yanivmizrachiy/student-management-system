@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Container, Card, Button, Badge, Spinner, Row, Col } from 'react-bootstrap';
 import { useAuthStore } from '../store/authStore';
@@ -25,6 +25,7 @@ export default function GradePage() {
   const [groups, setGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { logout, user } = useAuthStore();
   const isManager = user?.role === 'manager' || user?.email === 'yaniv@example.com';
 
@@ -41,6 +42,17 @@ export default function GradePage() {
       realtimeService.unsubscribe('grade:updated');
     };
   }, []);
+
+  // React to URL parameter changes
+  useEffect(() => {
+    const gradeIdFromUrl = searchParams.get('gradeId');
+    if (gradeIdFromUrl && grades.length > 0) {
+      const gradeFromUrl = grades.find((g: Grade) => g.id === gradeIdFromUrl);
+      if (gradeFromUrl && selectedGrade?.id !== gradeFromUrl.id) {
+        setSelectedGrade(gradeFromUrl);
+      }
+    }
+  }, [searchParams, grades]);
 
   useEffect(() => {
     if (selectedGrade) {
@@ -60,7 +72,18 @@ export default function GradePage() {
     try {
       const response = await api.get('/grades');
       setGrades(response.data);
-      if (response.data.length > 0 && !selectedGrade) {
+      
+      // Check if gradeId is in URL params
+      const gradeIdFromUrl = searchParams.get('gradeId');
+      if (gradeIdFromUrl && response.data.length > 0) {
+        const gradeFromUrl = response.data.find((g: Grade) => g.id === gradeIdFromUrl);
+        if (gradeFromUrl) {
+          setSelectedGrade(gradeFromUrl);
+        } else if (!selectedGrade) {
+          // If grade from URL not found, select first grade
+          setSelectedGrade(response.data[0]);
+        }
+      } else if (response.data.length > 0 && !selectedGrade) {
         setSelectedGrade(response.data[0]);
       }
     } catch (error) {

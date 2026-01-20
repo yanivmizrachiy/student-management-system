@@ -17,17 +17,27 @@ export class GradesService {
   ) {}
 
   async findAll(): Promise<Grade[]> {
-    return this.gradesRepository.find({
+    const grades = await this.gradesRepository.find({
       relations: ['groups', 'students'],
       order: { name: 'ASC' },
     });
+    // Calculate studentCount dynamically from relations
+    return grades.map(grade => ({
+      ...grade,
+      studentCount: grade.students?.length || 0,
+    }));
   }
 
   async findOne(id: string): Promise<Grade> {
-    return this.gradesRepository.findOne({
+    const grade = await this.gradesRepository.findOne({
       where: { id },
       relations: ['groups', 'students'],
     });
+    if (grade) {
+      // Calculate studentCount dynamically from relations
+      grade.studentCount = grade.students?.length || 0;
+    }
+    return grade;
   }
 
   async create(gradeData: Partial<Grade>, user: User): Promise<Grade> {
@@ -49,8 +59,14 @@ export class GradesService {
 
   async update(id: string, gradeData: Partial<Grade>, user: User): Promise<Grade> {
     const oldGrade = await this.findOne(id);
+    if (!oldGrade) {
+      throw new Error(`Grade with ID ${id} not found`);
+    }
     await this.gradesRepository.update(id, gradeData);
     const newGrade = await this.findOne(id);
+    if (!newGrade) {
+      throw new Error(`Grade with ID ${id} not found after update`);
+    }
     
     // Log changes
     for (const key in gradeData) {
@@ -72,11 +88,15 @@ export class GradesService {
   }
 
   async remove(id: string, user: User): Promise<void> {
+    const grade = await this.findOne(id);
+    if (!grade) {
+      throw new Error(`Grade with ID ${id} not found`);
+    }
     await this.auditService.log({
       entity: 'Grade',
       entityId: id,
       field: 'deleted',
-      oldValue: JSON.stringify(await this.findOne(id)),
+      oldValue: JSON.stringify(grade),
       newValue: null,
       userId: user.id,
     });

@@ -17,25 +17,40 @@ export class GroupsService {
   ) {}
 
   async findAll(): Promise<Group[]> {
-    return this.groupsRepository.find({
+    const groups = await this.groupsRepository.find({
       relations: ['grade', 'teacher', 'students'],
       order: { name: 'ASC' },
     });
+    // Calculate studentCount dynamically from relations
+    return groups.map(group => ({
+      ...group,
+      studentCount: group.students?.length || 0,
+    }));
   }
 
   async findByGrade(gradeId: string): Promise<Group[]> {
-    return this.groupsRepository.find({
+    const groups = await this.groupsRepository.find({
       where: { gradeId },
       relations: ['grade', 'teacher', 'students'],
       order: { name: 'ASC' },
     });
+    // Calculate studentCount dynamically from relations
+    return groups.map(group => ({
+      ...group,
+      studentCount: group.students?.length || 0,
+    }));
   }
 
   async findOne(id: string): Promise<Group> {
-    return this.groupsRepository.findOne({
+    const group = await this.groupsRepository.findOne({
       where: { id },
       relations: ['grade', 'teacher', 'students'],
     });
+    if (group) {
+      // Calculate studentCount dynamically from relations
+      group.studentCount = group.students?.length || 0;
+    }
+    return group;
   }
 
   async create(groupData: Partial<Group>, user: User): Promise<Group> {
@@ -57,8 +72,14 @@ export class GroupsService {
 
   async update(id: string, groupData: Partial<Group>, user: User): Promise<Group> {
     const oldGroup = await this.findOne(id);
+    if (!oldGroup) {
+      throw new Error(`Group with ID ${id} not found`);
+    }
     await this.groupsRepository.update(id, groupData);
     const newGroup = await this.findOne(id);
+    if (!newGroup) {
+      throw new Error(`Group with ID ${id} not found after update`);
+    }
     
     // Log changes
     for (const key in groupData) {
@@ -80,11 +101,15 @@ export class GroupsService {
   }
 
   async remove(id: string, user: User): Promise<void> {
+    const group = await this.findOne(id);
+    if (!group) {
+      throw new Error(`Group with ID ${id} not found`);
+    }
     await this.auditService.log({
       entity: 'Group',
       entityId: id,
       field: 'deleted',
-      oldValue: JSON.stringify(await this.findOne(id)),
+      oldValue: JSON.stringify(group),
       newValue: null,
       userId: user.id,
     });

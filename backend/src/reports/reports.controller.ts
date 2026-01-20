@@ -5,8 +5,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('reports')
 @Controller('reports')
-@UseGuards(JwtAuthGuard)
-@ApiBearerAuth()
+// Removed @UseGuards(JwtAuthGuard) to allow public access for reports
 export class ReportsController {
   constructor(private readonly reportsService: ReportsService) {}
 

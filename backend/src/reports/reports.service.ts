@@ -82,6 +82,10 @@ export class ReportsService {
       relations: ['groups', 'students'],
     });
 
+    if (!grade) {
+      throw new Error(`Grade with ID ${gradeId} not found`);
+    }
+
     const groups = await this.groupsRepository.find({
       where: { gradeId },
       relations: ['students'],
@@ -149,6 +153,10 @@ export class ReportsService {
       relations: ['students'],
     });
 
+    if (!group) {
+      throw new Error(`Group with ID ${groupId} not found`);
+    }
+
     const attendance = await this.attendanceRepository.find({
       where: { student: { groupId } },
     });
@@ -192,6 +200,10 @@ export class ReportsService {
       where: { id: studentId },
       relations: ['assessments', 'attendance'],
     });
+
+    if (!student) {
+      throw new Error(`Student with ID ${studentId} not found`);
+    }
 
     const gradesOverTime = student.assessments
       .sort((a, b) => a.date.getTime() - b.date.getTime())

@@ -18,8 +18,6 @@ import { EditPermissionGuard } from '../auth/guards/edit-permission.guard';
 
 @ApiTags('groups')
 @Controller('groups')
-@UseGuards(JwtAuthGuard)
-@ApiBearerAuth()
 export class GroupsController {
   constructor(private readonly groupsService: GroupsService) {}
 

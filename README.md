@@ -2,6 +2,15 @@
 
 מערכת ניהול תלמידים חכמה ומתקדמת בעברית - מערכת מלאה עם React Frontend ו-NestJS Backend.
 
+## 🔗 קישורים חיצוניים
+
+- **📦 math-tutor-app** - המערכת המקורית: [https://github.com/yanivmizrachiy/math-tutor-app](https://github.com/yanivmizrachiy/math-tutor-app)
+- **📚 מאגר זה**: [https://github.com/yanivmizrachiy/student-management-system](https://github.com/yanivmizrachiy/student-management-system)
+- **🔄 מדריך סנכרון**: [README_SYNC.md](README_SYNC.md)
+- **📊 בדיקת תלמידים**: [README_CHECK_STUDENTS.md](README_CHECK_STUDENTS.md)
+
+> 💡 **רוצה לייבא נתונים מ-math-tutor-app?** השתמש ב-[סקריפט הסנכרון](#-סנכרון-נתונים-מ-math-tutor-app) לייבוא אוטומטי!
+
 ## 🎨 תכונות UI/UX
 
 - ✅ דף כניסה עם רקע סגול כהה, טקסט לבן, וכותרות "מערכת חכמה לניהול תלמידים"
@@ -111,6 +120,43 @@ npm run dev
 3. מפעיל את Backend
 4. מפעיל את Frontend
 5. פותח את הדפדפן
+
+## 🔄 סנכרון נתונים מ-math-tutor-app
+
+אם יש לך נתונים קיימים ב-**[math-tutor-app](https://github.com/yanivmizrachiy/math-tutor-app)** (Cloudflare D1), אתה יכול לייבא אותם אוטומטית!
+
+> 📦 **עדיין לא הורדת את math-tutor-app?**  
+> שכפל אותו מכאן: `git clone https://github.com/yanivmizrachiy/math-tutor-app.git`
+
+### Windows (PowerShell):
+```powershell
+# הפעלה עם סנכרון אוטומטי
+.\FIX_AND_START.ps1 --sync
+
+# או סנכרון ידני
+.\scripts\sync-from-cloudflare.ps1
+```
+
+### Linux/Mac:
+```bash
+# סנכרון ידני
+./scripts/sync-from-cloudflare.sh ../math-tutor-app
+```
+
+### מה הסקריפט עושה?
+1. ✅ מתחבר ל-Cloudflare
+2. ✅ מייצא את כל התלמידים, שיעורים, תשלומים
+3. ✅ יוצר גיבוי של המסד הנוכחי
+4. ✅ ממיר את הנתונים לפורמט התואם
+5. ✅ מכניס למסד הנתונים PostgreSQL
+
+### Dry Run (בדיקה בלבד):
+```powershell
+.\scripts\sync-from-cloudflare.ps1 -DryRun
+```
+זה יראה לך מה יקרה **בלי לשנות כלום**!
+
+📖 **למדריך מפורט ראה:** [README_SYNC.md](README_SYNC.md)
 
 ## 🗺 Navigation
 

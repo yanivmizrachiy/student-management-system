@@ -173,6 +173,20 @@ studend_managment_new/
 
 ## 🚀 Deployment
 
+### Quick Start (Local Development)
+
+```bash
+# Option 1: Use the automated script (Windows)
+.\FIX_AND_START.ps1
+
+# Option 2: Use the automated script with data sync
+.\FIX_AND_START.ps1 -Sync
+
+# Option 3: Manual setup
+cd backend && docker-compose up -d && npm run start:dev
+cd ../frontend && npm run dev
+```
+
 ### Docker
 
 ```bash
@@ -186,9 +200,33 @@ docker build -t student-management-frontend .
 docker run -p 80:80 student-management-frontend
 ```
 
-### Production
+### Production Deployment
 
-המערכת מוכנה ל-deployment ב-Vercel (Frontend) ו-Railway/Render (Backend).
+The system is ready for production deployment to modern cloud platforms:
+
+- **Frontend:** Vercel (configured with `frontend/vercel.json`)
+- **Backend:** Railway (configured with `railway.toml`)
+- **Database:** Railway PostgreSQL or any PostgreSQL provider
+- **CI/CD:** GitHub Actions (`.github/workflows/deploy.yml`)
+
+📖 **Full deployment guide:** See [DEPLOYMENT.md](./DEPLOYMENT.md) for complete step-by-step instructions.
+
+### Data Synchronization
+
+Sync student data from Cloudflare D1 to PostgreSQL:
+
+```bash
+# Windows
+npm run sync
+
+# Linux/Mac
+./scripts/sync-from-cloudflare.sh
+
+# Dry run (preview only)
+npm run sync:dry
+```
+
+📖 **Sync documentation:** See [README_SYNC.md](./README_SYNC.md) for detailed sync instructions.
 
 ## 📝 הערות חשובות
 

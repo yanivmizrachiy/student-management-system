@@ -53,6 +53,7 @@ uploads/
 # Documentation (keep only README.md)
 *.md
 !README.md
+!README_STARTUP.md
 !frontend/README.md
 !backend/README.md
 

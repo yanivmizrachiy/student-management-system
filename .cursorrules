@@ -1,10 +1,46 @@
 # Student Management System - Cursor AI Assistant Rules
 
+## ⚠️ CRITICAL: PROJECT SCOPE DEFINITION
+
+**THIS IS A STUDENT MANAGEMENT SYSTEM - NOT A WORKSHEET GENERATOR!**
+
+❌ **This project is NOT:**
+- A worksheet creation website
+- A homework generator
+- An educational content creator
+- A teaching materials platform
+- A lesson planning tool
+- An exam/quiz builder
+
+✅ **This project IS:**
+- **Student Information Management System** (מערכת ניהול תלמידים)
+- Database of students, grades, groups
+- Attendance tracking system
+- Assessment/grades recording
+- Student profile management
+- Real-time monitoring and reports
+- Data import from external sources (math-tutor-app)
+
+**FOCUS**: Managing student records, not creating educational content!
+
+---
+
 ## 🎯 Project Overview
 
 **Name**: Smart Student Management System (מערכת ניהול תלמידים חכמה)  
 **Type**: Full-stack web application for Hebrew-speaking educational institutions  
 **Purpose**: Comprehensive student management with real-time updates, charts, analytics, and data synchronization from external sources
+
+**Core Functions**:
+1. **Student Records Management** - CRUD operations for students
+2. **Attendance Tracking** - Who came to class, who's absent
+3. **Grades/Assessments** - Recording student performance
+4. **Groups & Classes Management** - Organizing students into grades/groups
+5. **Reports & Analytics** - Statistics and charts about students
+6. **Data Import** - Importing student data from math-tutor-app (Cloudflare D1)
+7. **Real-time Updates** - Live counters and notifications via WebSocket
+
+**NOT INCLUDED**: Creating worksheets, homework, lessons, educational content, teaching materials
 
 ## 🏗️ Architecture
 
@@ -677,6 +713,33 @@ wrangler d1 list
 
 ## 🤖 Instructions for Cursor AI
 
+### ⚠️ MOST IMPORTANT - READ FIRST:
+
+**THIS IS A STUDENT MANAGEMENT SYSTEM, NOT A WORKSHEET/HOMEWORK CREATOR!**
+
+When the user asks for features, always interpret in the context of:
+- ✅ Managing student records (add, edit, view students)
+- ✅ Tracking attendance (present/absent/late)
+- ✅ Recording grades/assessments (test scores, evaluations)
+- ✅ Organizing classes and groups
+- ✅ Generating reports about students
+- ✅ Importing student data from external sources
+
+**NEVER** assume the user wants to:
+- ❌ Create worksheets or educational materials
+- ❌ Generate homework assignments
+- ❌ Build lesson plans
+- ❌ Create quizzes or exams
+- ❌ Design teaching content
+
+**Example Clarifications**:
+- "Add a student" = Create student record in database (NOT create a worksheet for a student)
+- "Create a report" = Generate statistics report about students (NOT create homework report)
+- "Import data" = Import student records from math-tutor-app (NOT import worksheet templates)
+- "Files" = Student-related files (grades, documents, photos) (NOT educational materials)
+
+### Core Development Guidelines:
+
 When working with this codebase:
 
 1. **Language**: Use Hebrew for UI text and comments. Use English for code.
@@ -689,6 +752,19 @@ When working with this codebase:
 8. **Real-time**: Emit WebSocket events after data changes for live updates.
 9. **Documentation**: Update README when adding features or changing architecture.
 10. **Consistency**: Follow existing patterns. Match code style of surrounding code.
+
+### ❌ What NOT to Suggest:
+
+**NEVER suggest or implement features for:**
+- Creating worksheets, homework, or educational materials
+- Generating math problems, questions, or exercises
+- Building lesson plans or teaching content
+- Creating quizzes, tests, or exams (only RECORDING grades is OK)
+- Educational content management
+- Worksheet templates or generators
+- Teaching resource libraries
+
+**Remember**: We manage STUDENTS, not CONTENT!
 
 ### When Adding New Features:
 - Create module with controller, service, entities

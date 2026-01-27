@@ -66,11 +66,11 @@ npm install
 ```bash
 cd ../frontend
 npm install
-cd ..
 ```
 
 ### 3.4 הפעלת PostgreSQL
 
+מתוך תיקיית הפרויקט הראשית:
 ```bash
 cd backend
 docker-compose up -d
@@ -163,9 +163,12 @@ lsof -ti:8080 | xargs kill -9
 
 ### ❌ שגיאות npm install
 
-```bash
-# נקה cache וניסיון מחדש
-npm cache clean --force
+```powershell
+# Windows PowerShell
+Remove-Item -Recurse -Force node_modules, package-lock.json -ErrorAction SilentlyContinue
+npm install
+
+# macOS/Linux
 rm -rf node_modules package-lock.json
 npm install
 ```

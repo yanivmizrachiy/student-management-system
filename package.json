@@ -2,6 +2,7 @@
   "name": "student-management-system",
   "version": "1.0.0",
   "description": "Smart student management system with auto-sync from math-tutor-app",
+  "homepage": "https://github.com/yanivmizrachiy/student-management-system#readme",
   "scripts": {
     "sync": "pwsh -File scripts/sync-from-cloudflare.ps1",
     "sync:dry": "pwsh -File scripts/sync-from-cloudflare.ps1 -DryRun:$true",
@@ -11,11 +12,15 @@
     "type": "git",
     "url": "https://github.com/yanivmizrachiy/student-management-system.git"
   },
+  "related": {
+    "math-tutor-app": "https://github.com/yanivmizrachiy/math-tutor-app"
+  },
   "keywords": [
     "student-management",
     "education",
     "cloudflare",
-    "data-sync"
+    "data-sync",
+    "math-tutor-app"
   ],
   "author": "Yaniv Raz",
   "license": "MIT"

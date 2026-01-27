@@ -2,6 +2,14 @@
 
 מערכת ניהול תלמידים חכמה ומתקדמת בעברית - מערכת מלאה עם React Frontend ו-NestJS Backend.
 
+## 🔗 קישורים חיצוניים
+
+- **📦 math-tutor-app** - המערכת המקורית: [https://github.com/yanivmizrachiy/math-tutor-app](https://github.com/yanivmizrachiy/math-tutor-app)
+- **📚 מאגר זה**: [https://github.com/yanivmizrachiy/student-management-system](https://github.com/yanivmizrachiy/student-management-system)
+- **🔄 מדריך סנכרון**: [README_SYNC.md](README_SYNC.md)
+
+> 💡 **רוצה לייבא נתונים מ-math-tutor-app?** השתמש ב-[סקריפט הסנכרון](#-סנכרון-נתונים-מ-math-tutor-app) לייבוא אוטומטי!
+
 ## 🎨 תכונות UI/UX
 
 - ✅ דף כניסה עם רקע סגול כהה, טקסט לבן, וכותרות "מערכת חכמה לניהול תלמידים"
@@ -114,7 +122,10 @@ npm run dev
 
 ## 🔄 סנכרון נתונים מ-math-tutor-app
 
-אם יש לך נתונים קיימים ב-**math-tutor-app** (Cloudflare D1), אתה יכול לייבא אותם אוטומטית!
+אם יש לך נתונים קיימים ב-**[math-tutor-app](https://github.com/yanivmizrachiy/math-tutor-app)** (Cloudflare D1), אתה יכול לייבא אותם אוטומטית!
+
+> 📦 **עדיין לא הורדת את math-tutor-app?**  
+> שכפל אותו מכאן: `git clone https://github.com/yanivmizrachiy/math-tutor-app.git`
 
 ### Windows (PowerShell):
 ```powershell

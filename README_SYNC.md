@@ -1,5 +1,16 @@
 # 🔄 מדריך סנכרון מ-math-tutor-app
 
+## 🔗 קישור למאגר math-tutor-app
+
+**📦 הורד את math-tutor-app מכאן:**  
+👉 [https://github.com/yanivmizrachiy/math-tutor-app](https://github.com/yanivmizrachiy/math-tutor-app)
+
+```bash
+# שכפל את המאגר
+git clone https://github.com/yanivmizrachiy/math-tutor-app.git
+cd math-tutor-app
+```
+
 ## מה זה?
 
 אם יש לך את הפרויקט **math-tutor-app** עם נתונים ב-Cloudflare D1, אתה יכול לייבא אותם ל-**student-management-system** באופן אוטומטי!

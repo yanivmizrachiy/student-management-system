@@ -1,5 +1,49 @@
 # Student Management System - Cursor AI Assistant Rules
 
+## 🚨 MANDATORY RULES - MUST FOLLOW WITHOUT EXCEPTION
+
+**YOU MUST FOLLOW THESE RULES EXACTLY. NO EXCEPTIONS. NO DEVIATIONS.**
+
+### Rule #1: UNDERSTAND REQUIREMENTS FIRST
+- ⚠️ **STOP!** Read the user's requirement 3 times before doing ANYTHING
+- Ask clarifying questions if ANYTHING is unclear
+- NEVER assume what the user wants
+- NEVER add features the user didn't ask for
+- NEVER remove features the user didn't tell you to remove
+
+### Rule #2: NO ERRORS ALLOWED
+- ⚠️ **ZERO TOLERANCE for errors**
+- Test EVERY change before suggesting it
+- Verify syntax, imports, types, logic
+- Check for breaking changes
+- Run linters and type checkers mentally
+- If unsure → ASK, don't guess
+
+### Rule #3: SHOW, DON'T BREAK
+- When asked to "show" or "display" → provide COMPLETE, WORKING code
+- NEVER provide partial code
+- NEVER use "..." or "// rest of code"
+- ALWAYS show the full implementation
+- ALWAYS maintain existing functionality
+
+### Rule #4: FOLLOW EXISTING PATTERNS
+- Use the EXACT same code style as existing code
+- Follow the SAME naming conventions
+- Use the SAME file structure
+- Maintain the SAME architecture patterns
+- Don't introduce new patterns without explicit permission
+
+### Rule #5: VALIDATE BEFORE SUGGESTING
+**Before suggesting ANY change, verify:**
+- ✅ Does this match the user's requirement EXACTLY?
+- ✅ Will this code run without errors?
+- ✅ Are all imports correct?
+- ✅ Are all types correct?
+- ✅ Does this break anything?
+- ✅ Is this the minimal change needed?
+
+---
+
 ## ⚠️ CRITICAL: PROJECT SCOPE DEFINITION
 
 **THIS IS A STUDENT MANAGEMENT SYSTEM - NOT A WORKSHEET GENERATOR!**
@@ -791,3 +835,220 @@ When working with this codebase:
 - Maintain backward compatibility
 
 **Remember**: This system handles educational data. Accuracy and data integrity are critical. Always test thoroughly!
+
+---
+
+## 🔒 ERROR PREVENTION CHECKLIST
+
+### Before EVERY code suggestion, verify:
+
+**✅ SYNTAX CHECK:**
+- [ ] All brackets/braces are balanced
+- [ ] All strings are properly closed
+- [ ] All imports are correct and exist
+- [ ] No typos in variable/function names
+- [ ] Semicolons where needed (TypeScript)
+
+**✅ TYPE CHECK:**
+- [ ] All types are correct
+- [ ] No `any` types unless absolutely necessary
+- [ ] Interfaces match actual data structures
+- [ ] Props are correctly typed in React components
+- [ ] Database entities match the schema
+
+**✅ LOGIC CHECK:**
+- [ ] Code does what the user asked
+- [ ] No infinite loops
+- [ ] All edge cases handled
+- [ ] Error handling is present
+- [ ] No memory leaks
+
+**✅ BREAKING CHANGES:**
+- [ ] Existing functionality still works
+- [ ] No removed functionality without permission
+- [ ] API contracts maintained
+- [ ] Database migrations are reversible
+- [ ] Tests still pass
+
+**✅ SECURITY:**
+- [ ] Input is sanitized
+- [ ] SQL injection prevented
+- [ ] XSS attacks prevented
+- [ ] Authentication checked where needed
+- [ ] Sensitive data not logged
+
+---
+
+## 📋 REQUIREMENT VALIDATION PROCESS
+
+### When user gives a requirement:
+
+**STEP 1: UNDERSTAND**
+```
+1. Read requirement carefully 3 times
+2. Identify WHAT they want (the feature/change)
+3. Identify WHY they want it (the goal)
+4. Identify WHERE it affects (which files/components)
+5. Identify CONSTRAINTS (what must NOT change)
+```
+
+**STEP 2: CLARIFY**
+```
+ASK if:
+- Any part is ambiguous
+- Multiple interpretations possible
+- Impact on existing features unclear
+- Requirements conflict with architecture
+- Requirements are too broad
+```
+
+**STEP 3: PLAN**
+```
+1. List files that need changes
+2. List minimal changes needed
+3. Identify potential breaking points
+4. Plan rollback strategy
+5. Identify test scenarios
+```
+
+**STEP 4: VALIDATE PLAN**
+```
+Ask yourself:
+- Does this EXACTLY match user's request?
+- Is this the MINIMAL change?
+- Will this work WITHOUT errors?
+- Are all dependencies handled?
+- Is existing functionality preserved?
+```
+
+**STEP 5: IMPLEMENT**
+```
+- Write complete, working code
+- No partial implementations
+- No "..." placeholders
+- All imports included
+- All types correct
+```
+
+**STEP 6: VERIFY**
+```
+Before showing to user:
+- Mentally run the code
+- Check for syntax errors
+- Verify logic flow
+- Confirm requirement met
+- Double-check nothing broken
+```
+
+---
+
+## 🚫 ABSOLUTE PROHIBITIONS
+
+### NEVER do these things:
+
+**1. NEVER assume:**
+- What the user wants
+- What features to add
+- What code style to use
+- What libraries to include
+
+**2. NEVER break:**
+- Existing functionality
+- Working tests
+- API contracts
+- Database integrity
+
+**3. NEVER ignore:**
+- User's explicit requirements
+- Existing code patterns
+- Type safety
+- Error handling
+
+**4. NEVER provide:**
+- Incomplete code with "..."
+- Code that won't compile
+- Code without imports
+- Code without types
+
+**5. NEVER skip:**
+- Testing your suggestions
+- Checking for errors
+- Validating requirements
+- Following the checklist
+
+---
+
+## ✅ QUALITY GATES
+
+### Every code suggestion MUST pass ALL these gates:
+
+**GATE 1: REQUIREMENT MATCH**
+- ✅ Does this do EXACTLY what user asked?
+- ✅ Nothing more, nothing less?
+
+**GATE 2: ZERO ERRORS**
+- ✅ Will this compile without errors?
+- ✅ Will this run without runtime errors?
+- ✅ Are all dependencies satisfied?
+
+**GATE 3: NO BREAKING CHANGES**
+- ✅ Does existing functionality still work?
+- ✅ Are existing tests still passing?
+- ✅ Is backward compatibility maintained?
+
+**GATE 4: CODE QUALITY**
+- ✅ Follows project conventions?
+- ✅ Properly typed?
+- ✅ Properly documented?
+- ✅ Secure and safe?
+
+**GATE 5: COMPLETENESS**
+- ✅ All code is complete (no "...")?
+- ✅ All imports included?
+- ✅ All types defined?
+- ✅ Ready to use immediately?
+
+**If ANY gate fails → DO NOT suggest the code. Fix it first or ask for clarification.**
+
+---
+
+## 🎯 WHEN USER SAYS "SHOW ME"
+
+When user asks to "show" or "display" the website/feature:
+
+**YOU MUST:**
+1. ✅ Provide COMPLETE, working code
+2. ✅ Include ALL imports
+3. ✅ Include ALL types/interfaces
+4. ✅ Include proper error handling
+5. ✅ Make it ready to copy-paste and run
+6. ✅ Ensure it matches requirements EXACTLY
+7. ✅ Verify it has ZERO errors
+
+**YOU MUST NOT:**
+1. ❌ Use "..." or "// rest of code"
+2. ❌ Skip any parts of the implementation
+3. ❌ Assume anything is "obvious"
+4. ❌ Leave TODOs or placeholders
+5. ❌ Provide code that won't work immediately
+
+---
+
+## 💯 SUCCESS CRITERIA
+
+**Your response is successful ONLY when:**
+
+✅ User's requirement is met **EXACTLY**  
+✅ Code works **WITHOUT ERRORS**  
+✅ Nothing is broken  
+✅ Code is complete and ready to use  
+✅ User can implement immediately  
+✅ All quality gates passed  
+✅ All checks completed  
+
+**If you're not 100% certain → ASK FIRST, don't guess!**
+
+---
+
+**REMEMBER: REQUIREMENTS FIRST, ZERO ERRORS, COMPLETE CODE, NO ASSUMPTIONS**
+

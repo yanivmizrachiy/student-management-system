@@ -112,6 +112,40 @@ npm run dev
 4. מפעיל את Frontend
 5. פותח את הדפדפן
 
+## 🔄 סנכרון נתונים מ-math-tutor-app
+
+אם יש לך נתונים קיימים ב-**math-tutor-app** (Cloudflare D1), אתה יכול לייבא אותם אוטומטית!
+
+### Windows (PowerShell):
+```powershell
+# הפעלה עם סנכרון אוטומטי
+.\FIX_AND_START.ps1 --sync
+
+# או סנכרון ידני
+.\scripts\sync-from-cloudflare.ps1
+```
+
+### Linux/Mac:
+```bash
+# סנכרון ידני
+./scripts/sync-from-cloudflare.sh ../math-tutor-app
+```
+
+### מה הסקריפט עושה?
+1. ✅ מתחבר ל-Cloudflare
+2. ✅ מייצא את כל התלמידים, שיעורים, תשלומים
+3. ✅ יוצר גיבוי של המסד הנוכחי
+4. ✅ ממיר את הנתונים לפורמט התואם
+5. ✅ מכניס למסד הנתונים PostgreSQL
+
+### Dry Run (בדיקה בלבד):
+```powershell
+.\scripts\sync-from-cloudflare.ps1 -DryRun
+```
+זה יראה לך מה יקרה **בלי לשנות כלום**!
+
+📖 **למדריך מפורט ראה:** [README_SYNC.md](README_SYNC.md)
+
 ## 🗺 Navigation
 
 - `/login` - דף כניסה עם כפתורי שכבות

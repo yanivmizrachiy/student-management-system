@@ -409,6 +409,11 @@ npm run lint             # Run ESLint
 npm run test             # Run tests
 npm run test:watch       # Run tests in watch mode
 npm run test:cov         # Generate coverage report
+
+# Database checking scripts
+npm run check:db         # Check all database content
+npm run check:class      # Check students in class ח1
+npm run delete:demo      # Delete demo/test data
 ```
 
 ### Frontend (from `frontend/` directory):
@@ -440,6 +445,38 @@ npm run sync             # Run data sync
 npm run sync:dry         # Run data sync in dry-run mode
 npm run start:sync       # Start with sync
 ```
+
+## 📊 Database Checking Scripts
+
+The system includes utility scripts to check and manage database content:
+
+### Check Database Content
+```bash
+cd backend
+npm run check:db        # or: npx ts-node check-database.ts
+```
+Shows: All grades, groups, students with counts and lists
+
+### Check Specific Class (e.g., ח1)
+```bash
+cd backend
+npm run check:class     # or: npx ts-node check-class-h1.ts
+```
+Shows: Students in class ח1 specifically with full details
+
+### Delete Demo/Test Data
+```bash
+cd backend
+npm run delete:demo     # or: npx ts-node delete-demo-data.ts
+```
+Removes: Demo/test students, grades, and groups
+
+### Direct SQL Queries
+```bash
+docker exec -it student_management_postgres psql -U postgres -d student_management
+```
+
+For more details, see [README_CHECK_STUDENTS.md](README_CHECK_STUDENTS.md)
 
 ## 📋 Environment Variables
 

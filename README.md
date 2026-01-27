@@ -7,6 +7,7 @@
 - **📦 math-tutor-app** - המערכת המקורית: [https://github.com/yanivmizrachiy/math-tutor-app](https://github.com/yanivmizrachiy/math-tutor-app)
 - **📚 מאגר זה**: [https://github.com/yanivmizrachiy/student-management-system](https://github.com/yanivmizrachiy/student-management-system)
 - **🔄 מדריך סנכרון**: [README_SYNC.md](README_SYNC.md)
+- **📊 בדיקת תלמידים**: [README_CHECK_STUDENTS.md](README_CHECK_STUDENTS.md)
 
 > 💡 **רוצה לייבא נתונים מ-math-tutor-app?** השתמש ב-[סקריפט הסנכרון](#-סנכרון-נתונים-מ-math-tutor-app) לייבוא אוטומטי!
 

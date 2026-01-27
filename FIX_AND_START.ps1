@@ -1,6 +1,11 @@
 # 🔧 סקריפט תיקון והפעלה מלא
 # תיקון שגיאות והפעלת כל השרתים
 
+param(
+    [switch]$Sync,
+    [switch]$DryRun
+)
+
 Write-Host "═══════════════════════════════════════════" -ForegroundColor Cyan
 Write-Host "   🔧 תיקון שגיאות והפעלה" -ForegroundColor Yellow
 Write-Host "═══════════════════════════════════════════" -ForegroundColor Cyan
@@ -48,6 +53,32 @@ if (-not (Test-Path "node_modules")) {
 }
 Set-Location ..
 Write-Host ""
+
+# שלב 2.5: סנכרון נתונים (אם נדרש)
+if ($Sync) {
+    Write-Host "🔄 שלב 2.5: סנכרון נתונים מ-Cloudflare..." -ForegroundColor Yellow
+    
+    $syncArgs = @()
+    if ($DryRun) {
+        $syncArgs += "-DryRun"
+    }
+    $syncArgs += "-Backup"
+    
+    $syncScript = Join-Path $PSScriptRoot "scripts\sync-from-cloudflare.ps1"
+    
+    if (Test-Path $syncScript) {
+        & $syncScript @syncArgs
+        
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "⚠️  הסנכרון נכשל, אבל ממשיך..." -ForegroundColor Yellow
+        } else {
+            Write-Host "✅ סנכרון הושלם!" -ForegroundColor Green
+        }
+    } else {
+        Write-Host "⚠️  סקריפט הסנכרון לא נמצא ב-scripts/sync-from-cloudflare.ps1" -ForegroundColor Yellow
+    }
+    Write-Host ""
+}
 
 # שלב 3: בדיקת Docker
 Write-Host "🐳 שלב 3: בדיקת Docker Desktop..." -ForegroundColor Yellow

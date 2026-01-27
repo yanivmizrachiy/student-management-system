@@ -15,7 +15,8 @@ if ($syncFromCloudflare) {
     Write-Host ""
     
     if (Test-Path "scripts/sync-from-cloudflare.ps1") {
-        & "scripts/sync-from-cloudflare.ps1" -DryRun:$false
+        # הפעלה ללא DryRun - סנכרון אמיתי
+        & "scripts/sync-from-cloudflare.ps1"
     } else {
         Write-Host "⚠️  סקריפט סנכרון לא נמצא" -ForegroundColor Yellow
     }

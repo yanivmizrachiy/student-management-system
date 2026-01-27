@@ -1,6 +1,12 @@
 # 🔧 סקריפט תיקון והפעלה מלא
 # תיקון שגיאות והפעלת כל השרתים
 
+param(
+    [switch]$Sync,
+    [switch]$SkipDocker,
+    [switch]$SkipBuild
+)
+
 Write-Host "═══════════════════════════════════════════" -ForegroundColor Cyan
 Write-Host "   🔧 תיקון שגיאות והפעלה" -ForegroundColor Yellow
 Write-Host "═══════════════════════════════════════════" -ForegroundColor Cyan
@@ -113,6 +119,21 @@ Write-Host ""
 # שלב 7: פתיחת דפדפן
 Write-Host "🌐 שלב 7: פתיחת דפדפן..." -ForegroundColor Yellow
 Start-Sleep -Seconds 5
+
+# Optional: Sync data from Cloudflare
+if ($Sync) {
+    Write-Host ""
+    Write-Host "🔄 שלב 8: סינכרון נתונים מ-Cloudflare..." -ForegroundColor Yellow
+    try {
+        & "$PSScriptRoot\scripts\sync-from-cloudflare.ps1" -Backup
+        Write-Host "✅ סינכרון הושלם!" -ForegroundColor Green
+    } catch {
+        Write-Host "⚠️  שגיאה בסינכרון: $_" -ForegroundColor Yellow
+        Write-Host "המשך ללא סינכרון..." -ForegroundColor Cyan
+    }
+}
+
+Write-Host ""
 Write-Host "═══════════════════════════════════════════" -ForegroundColor Cyan
 Write-Host "   ✅ הסקריפט הושלם!" -ForegroundColor Green
 Write-Host "═══════════════════════════════════════════" -ForegroundColor Cyan

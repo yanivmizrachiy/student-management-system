@@ -37,6 +37,20 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Copy public html into dist (force)
+        run: |
+          echo "== copy public/*.html to dist =="
+          if [ -d dist ]; then
+            ls -la public || true
+            cp -f public/klalim.html public/state.html dist/ 2>/dev/null || true
+            ls -la dist | head -n 50 || true
+          else
+            echo "❌ dist לא קיימת (ה-build שלך כנראה מייצר תיקייה אחרת)."
+            echo "הדפסה מהירה של עץ תיקיות ברוט:"
+            ls -la
+            exit 1
+          fi
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 

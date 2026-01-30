@@ -37,6 +37,40 @@ jobs:
       - name: Build
         run: npm run build
 
+
+      - name: SMART_COPY_PUBLIC_HTML_TO_PAGES_OUTPUT
+        run: |
+          set -e
+          echo "== [smart-copy] pwd =="
+          pwd
+          echo "== [smart-copy] locate output dir =="
+          OUT=""
+          for d in dist build out .output/public .next; do
+            if [ -d "$d" ]; then OUT="$d"; break; fi
+          done
+          if [ -z "$OUT" ]; then
+            OUT="$(find . -maxdepth 6 -type d \( -name dist -o -name build -o -name out \) 2>/dev/null | head -n 1 || true)"
+          fi
+          echo "OUT=${OUT:-NONE}"
+          if [ -z "$OUT" ]; then
+            echo "❌ לא נמצאה תיקיית output. מציג עץ תיקיות:"
+            ls -la
+            find . -maxdepth 3 -type d | head -n 200
+            exit 1
+          fi
+
+          echo "== [smart-copy] locate html sources anywhere =="
+          SRC_K="$(find . -maxdepth 8 -type f -name klalim.html 2>/dev/null | head -n 1 || true)"
+          SRC_S="$(find . -maxdepth 8 -type f -name state.html  2>/dev/null | head -n 1 || true)"
+          echo "SRC klalim: ${SRC_K:-NONE}"
+          echo "SRC state : ${SRC_S:-NONE}"
+
+          echo "== [smart-copy] copy if found =="
+          [ -n "$SRC_K" ] && cp -f "$SRC_K" "$OUT/klalim.html" || true
+          [ -n "$SRC_S" ] && cp -f "$SRC_S" "$OUT/state.html"  || true
+
+          echo "== [smart-copy] confirm in output =="
+          ls -la "$OUT" | head -n 200 || true
       - name: Copy public html into dist (force)
         run: |
           echo "== copy public/*.html to dist =="

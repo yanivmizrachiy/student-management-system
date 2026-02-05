@@ -6,6 +6,23 @@ Write-Host "   🔧 תיקון שגיאות והפעלה" -ForegroundColor Yello
 Write-Host "═══════════════════════════════════════════" -ForegroundColor Cyan
 Write-Host ""
 
+# אופציה לסנכרון אוטומטי
+$syncFromCloudflare = $args -contains "--sync" -or $args -contains "-s"
+
+if ($syncFromCloudflare) {
+    Write-Host "🔄 מצב סנכרון מופעל!" -ForegroundColor Cyan
+    Write-Host "מנסה לסנכרן נתונים מ-math-tutor-app..." -ForegroundColor Yellow
+    Write-Host ""
+    
+    if (Test-Path "scripts/sync-from-cloudflare.ps1") {
+        # הפעלה ללא DryRun - סנכרון אמיתי
+        & "scripts/sync-from-cloudflare.ps1"
+    } else {
+        Write-Host "⚠️  סקריפט סנכרון לא נמצא" -ForegroundColor Yellow
+    }
+    Write-Host ""
+}
+
 # עצירת תהליכי Node קיימים
 Write-Host "🛑 עצירת תהליכי Node קיימים..." -ForegroundColor Yellow
 Get-Process | Where-Object {$_.ProcessName -eq "node"} | Stop-Process -Force -ErrorAction SilentlyContinue

@@ -1,0 +1,1054 @@
+# Student Management System - Cursor AI Assistant Rules
+
+## 🚨 MANDATORY RULES - MUST FOLLOW WITHOUT EXCEPTION
+
+**YOU MUST FOLLOW THESE RULES EXACTLY. NO EXCEPTIONS. NO DEVIATIONS.**
+
+### Rule #1: UNDERSTAND REQUIREMENTS FIRST
+- ⚠️ **STOP!** Read the user's requirement 3 times before doing ANYTHING
+- Ask clarifying questions if ANYTHING is unclear
+- NEVER assume what the user wants
+- NEVER add features the user didn't ask for
+- NEVER remove features the user didn't tell you to remove
+
+### Rule #2: NO ERRORS ALLOWED
+- ⚠️ **ZERO TOLERANCE for errors**
+- Test EVERY change before suggesting it
+- Verify syntax, imports, types, logic
+- Check for breaking changes
+- Run linters and type checkers mentally
+- If unsure → ASK, don't guess
+
+### Rule #3: SHOW, DON'T BREAK
+- When asked to "show" or "display" → provide COMPLETE, WORKING code
+- NEVER provide partial code
+- NEVER use "..." or "// rest of code"
+- ALWAYS show the full implementation
+- ALWAYS maintain existing functionality
+
+### Rule #4: FOLLOW EXISTING PATTERNS
+- Use the EXACT same code style as existing code
+- Follow the SAME naming conventions
+- Use the SAME file structure
+- Maintain the SAME architecture patterns
+- Don't introduce new patterns without explicit permission
+
+### Rule #5: VALIDATE BEFORE SUGGESTING
+**Before suggesting ANY change, verify:**
+- ✅ Does this match the user's requirement EXACTLY?
+- ✅ Will this code run without errors?
+- ✅ Are all imports correct?
+- ✅ Are all types correct?
+- ✅ Does this break anything?
+- ✅ Is this the minimal change needed?
+
+---
+
+## ⚠️ CRITICAL: PROJECT SCOPE DEFINITION
+
+**THIS IS A STUDENT MANAGEMENT SYSTEM - NOT A WORKSHEET GENERATOR!**
+
+❌ **This project is NOT:**
+- A worksheet creation website
+- A homework generator
+- An educational content creator
+- A teaching materials platform
+- A lesson planning tool
+- An exam/quiz builder
+
+✅ **This project IS:**
+- **Student Information Management System** (מערכת ניהול תלמידים)
+- Database of students, grades, groups
+- Attendance tracking system
+- Assessment/grades recording
+- Student profile management
+- Real-time monitoring and reports
+- Data import from external sources (math-tutor-app)
+
+**FOCUS**: Managing student records, not creating educational content!
+
+---
+
+## 🎯 Project Overview
+
+**Name**: Smart Student Management System (מערכת ניהול תלמידים חכמה)  
+**Type**: Full-stack web application for Hebrew-speaking educational institutions  
+**Purpose**: Comprehensive student management with real-time updates, charts, analytics, and data synchronization from external sources
+
+**Core Functions**:
+1. **Student Records Management** - CRUD operations for students
+2. **Attendance Tracking** - Who came to class, who's absent
+3. **Grades/Assessments** - Recording student performance
+4. **Groups & Classes Management** - Organizing students into grades/groups
+5. **Reports & Analytics** - Statistics and charts about students
+6. **Data Import** - Importing student data from math-tutor-app (Cloudflare D1)
+7. **Real-time Updates** - Live counters and notifications via WebSocket
+
+**NOT INCLUDED**: Creating worksheets, homework, lessons, educational content, teaching materials
+
+## 🏗️ Architecture
+
+### Technology Stack
+
+**Frontend:**
+- React 18.2.0 + TypeScript
+- Vite (build tool)
+- React Router DOM 6.15.0
+- State Management: Zustand 4.4.1
+- UI Framework: React Bootstrap 5.3.2 + Bootstrap Icons
+- Charts: ECharts 5.4.3 (via echarts-for-react)
+- Animations: Framer Motion 10.16.4
+- Forms: React Hook Form 7.45.4
+- HTTP Client: Axios 1.5.0
+- WebSocket: Socket.IO Client 4.6.1
+- Date utilities: date-fns 2.30.0
+
+**Backend:**
+- NestJS 10.0.0 + TypeScript
+- Database: PostgreSQL (via TypeORM 0.3.17)
+- ORM: TypeORM with pg driver 8.11.3
+- Authentication: JWT (@nestjs/jwt, Passport)
+- WebSocket: Socket.IO (@nestjs/websockets, @nestjs/platform-socket.io)
+- API Documentation: Swagger 7.1.0
+- File Upload: Multer 1.4.5
+- Excel Processing: XLSX 0.18.5
+- Validation: class-validator, class-transformer
+
+### Port Configuration
+- **Frontend**: http://localhost:8080
+- **Backend API**: http://localhost:3001
+- **Swagger Documentation**: http://localhost:3001/api
+- **Database**: PostgreSQL on port 5432
+
+## 📂 Project Structure
+
+```
+student-management-system/
+├── backend/                      # NestJS Backend
+│   ├── src/
+│   │   ├── app.module.ts        # Main application module
+│   │   ├── main.ts              # Entry point
+│   │   ├── assessments/         # Student assessments/grades module
+│   │   ├── attendance/          # Attendance tracking module
+│   │   ├── audit/               # Audit trail for all changes
+│   │   ├── auth/                # Authentication (password-less)
+│   │   │   ├── guards/          # Auth guards
+│   │   │   ├── strategies/      # Passport strategies (JWT, Local)
+│   │   │   └── dto/             # Data transfer objects
+│   │   ├── database/
+│   │   │   └── migrations/      # TypeORM migrations
+│   │   ├── etl/                 # Excel import/export module
+│   │   ├── files/               # File management & upload
+│   │   ├── grades/              # Grade/Class management (כיתות: ז', ח', ט')
+│   │   ├── groups/              # Group/Class section management (קבוצות)
+│   │   ├── realtime/            # WebSocket gateway for live updates
+│   │   ├── reports/             # Analytics & reporting
+│   │   ├── search/              # Smart search with Hebrew NLP
+│   │   ├── students/            # Student management
+│   │   └── users/               # User management
+│   ├── docker-compose.yml       # PostgreSQL container config
+│   ├── .env.example             # Environment variables template
+│   └── package.json
+├── frontend/                     # React Frontend
+│   ├── src/
+│   │   ├── App.tsx              # Main app component
+│   │   ├── main.tsx             # Entry point
+│   │   ├── pages/               # Page components
+│   │   │   ├── LoginPage.tsx   # Login (password-less)
+│   │   │   ├── GradePage.tsx   # Grade/Class view
+│   │   │   ├── GroupPage.tsx   # Group/Section view
+│   │   │   └── StudentPage.tsx # Student profile
+│   │   ├── components/          # Reusable UI components
+│   │   ├── services/            # API client & WebSocket
+│   │   └── store/               # Zustand state management
+│   ├── vite.config.ts           # Vite configuration
+│   ├── .env.example             # Environment variables template
+│   └── package.json
+├── scripts/                      # Automation scripts
+│   ├── sync-from-cloudflare.ps1 # PowerShell sync script
+│   └── sync-from-cloudflare.sh  # Bash sync script
+├── FIX_AND_START.ps1            # Quick start script
+├── README.md                     # Main documentation
+├── README_SYNC.md               # Data sync guide
+└── package.json                  # Root package config
+
+```
+
+## 📊 Data Model / Database Schema
+
+### Core Entities
+
+**Students** (תלמידים):
+- `id`: UUID (primary key)
+- `first_name`: string (שם פרטי)
+- `last_name`: string (שם משפחה)
+- `student_id`: string (unique, auto-generated: ST00001)
+- `grade_id`: UUID (foreign key to Grades)
+- `group_id`: UUID (foreign key to Groups)
+- `status`: enum ('active', 'inactive', 'graduated')
+- `profile_image_url`: string (optional)
+- `created_at`, `updated_at`: timestamps
+
+**Grades** (כיתות - ז', ח', ט'):
+- `id`: UUID (primary key)
+- `name`: string (e.g., "כיתה ז'", "כיתה ח'")
+- `student_count`: integer (calculated)
+- `created_at`, `updated_at`: timestamps
+
+**Groups** (קבוצות):
+- `id`: UUID (primary key)
+- `name`: string (group/section name)
+- `grade_id`: UUID (foreign key to Grades)
+- `teacher_id`: UUID (optional, foreign key to Users)
+- `student_count`: integer (calculated)
+- `description`: text (optional)
+- `created_at`, `updated_at`: timestamps
+
+**Users** (משתמשים - מורים/מנהלים):
+- `id`: UUID (primary key)
+- `name`: string
+- `email`: string (unique)
+- `role`: enum ('teacher', 'admin')
+- `created_at`, `updated_at`: timestamps
+
+**Assessments** (הערכות/ציונים):
+- `id`: UUID (primary key)
+- `student_id`: UUID (foreign key)
+- `group_id`: UUID (foreign key)
+- `metric`: string (assessment type)
+- `value`: decimal (1-5 scale or percentage)
+- `date`: date
+- `notes`: text (optional)
+- `created_at`, `updated_at`: timestamps
+
+**Attendance** (נוכחות):
+- `id`: UUID (primary key)
+- `student_id`: UUID (foreign key)
+- `date`: date
+- `status`: enum ('present', 'absent', 'late', 'excused')
+- `notes`: text (optional)
+- `created_at`, `updated_at`: timestamps
+
+**Files** (קבצים):
+- `id`: UUID (primary key)
+- `student_id`: UUID (foreign key)
+- `type`: string (e.g., 'document', 'image', 'assignment')
+- `url`: string (file path or signed URL)
+- `size`: integer (bytes)
+- `mime_type`: string
+- `uploaded_at`: timestamp
+
+**AuditTrail** (מעקב שינויים):
+- `id`: UUID (primary key)
+- `entity`: string (table name)
+- `entity_id`: UUID (record ID)
+- `field`: string (field name)
+- `old_value`: text
+- `new_value`: text
+- `user_id`: UUID (who made the change)
+- `timestamp`: timestamp
+
+## 🔐 Authentication & Authorization
+
+**Important**: The system uses **password-less authentication**
+- Users login with email only (no password required)
+- JWT tokens are issued for session management
+- Public access to most endpoints
+- Audit trail tracks all changes
+
+## 📡 API Endpoints
+
+### Authentication
+- `POST /auth/login` - Password-less login (email only)
+- `POST /auth/logout` - Logout
+- `GET /auth/me` - Get current user
+
+### Grades (כיתות)
+- `GET /grades` - List all grades
+- `GET /grades/:id` - Get specific grade
+- `POST /grades` - Create new grade
+- `PUT /grades/:id` - Update grade
+- `DELETE /grades/:id` - Delete grade
+
+### Groups (קבוצות)
+- `GET /groups` - List all groups
+- `GET /groups/:id` - Get specific group
+- `GET /groups/by-grade/:gradeId` - Get groups by grade
+- `POST /groups` - Create new group
+- `PUT /groups/:id` - Update group
+- `DELETE /groups/:id` - Delete group
+
+### Students (תלמידים)
+- `GET /students` - List all students (with pagination, filters)
+- `GET /students/:id` - Get student profile
+- `POST /students` - Create new student
+- `PUT /students/:id` - Update student
+- `DELETE /students/:id` - Delete student
+- `GET /students/:id/assessments` - Get student assessments
+- `GET /students/:id/attendance` - Get student attendance
+- `GET /students/:id/files` - Get student files
+
+### Assessments (הערכות)
+- `GET /assessments` - List assessments
+- `GET /assessments/:id` - Get specific assessment
+- `POST /assessments` - Create assessment
+- `PUT /assessments/:id` - Update assessment
+- `DELETE /assessments/:id` - Delete assessment
+
+### Attendance (נוכחות)
+- `GET /attendance` - List attendance records
+- `GET /attendance/:id` - Get specific record
+- `POST /attendance` - Create attendance record
+- `PUT /attendance/:id` - Update record
+- `DELETE /attendance/:id` - Delete record
+
+### Files (קבצים)
+- `GET /files` - List files
+- `GET /files/:id` - Get file info
+- `POST /files/upload` - Upload file
+- `DELETE /files/:id` - Delete file
+
+### Reports (דוחות)
+- `GET /reports/school` - School-level statistics
+- `GET /reports/grade/:id` - Grade-level statistics
+- `GET /reports/group/:id` - Group-level statistics
+- `GET /reports/student/:id` - Student-level statistics
+
+### Search (חיפוש חכם)
+- `GET /search?q=query` - Smart search with Hebrew NLP
+
+### ETL (ייבוא Excel)
+- `POST /etl/import/students` - Import students from Excel
+
+### Audit (מעקב שינויים)
+- `GET /audit` - Get audit trail
+- `GET /audit/entity/:type/:id` - Get changes for specific entity
+
+### WebSocket Events (Real-time)
+**Channels**: `grades`, `groups`, `students`, `reports`
+- Auto-updates for live counters
+- Chart data updates
+- Notification broadcasts
+
+## 🔄 External Data Import - math-tutor-app Integration
+
+### Source System: math-tutor-app
+**Repository**: https://github.com/yanivmizrachiy/math-tutor-app  
+**Database**: Cloudflare D1 (SQLite-compatible)  
+**Purpose**: Import existing student data from legacy system
+
+### Data Sources in math-tutor-app:
+1. **students** table - Student records with `full_name`, `phone`, `notes`
+2. **lessons** table - Lesson history
+3. **payments** table - Payment records
+4. **receipts** table - Receipt documents
+5. **settings** table - System configuration
+
+### Sync Scripts
+
+**Windows PowerShell**: `scripts/sync-from-cloudflare.ps1`
+```powershell
+# Full sync with backup
+.\scripts\sync-from-cloudflare.ps1
+
+# Dry run (test mode)
+.\scripts\sync-from-cloudflare.ps1 -DryRun
+
+# Custom path
+.\scripts\sync-from-cloudflare.ps1 -MathTutorPath "C:\path\to\math-tutor-app"
+
+# Skip backup
+.\scripts\sync-from-cloudflare.ps1 -SkipBackup
+```
+
+**Linux/Mac Bash**: `scripts/sync-from-cloudflare.sh`
+```bash
+# Export data
+./scripts/sync-from-cloudflare.sh ../math-tutor-app
+
+# Dry run
+./scripts/sync-from-cloudflare.sh ../math-tutor-app true
+```
+
+### Sync Process Flow:
+1. **Validate Prerequisites**
+   - Check Wrangler CLI installed (`npm install -g wrangler`)
+   - Verify Cloudflare authentication (`wrangler login`)
+   - Locate math-tutor-app repository
+
+2. **Export Data from Cloudflare D1**
+   - Connect to `math-tutor-db` database
+   - Export tables to JSON: `data-exports/*.json`
+   - Support both remote and local mode
+
+3. **Create PostgreSQL Backup**
+   - Dump current database: `backups/backup_YYYY-MM-DD_HH-mm-ss.sql`
+   - Use Docker: `docker exec student_management_postgres pg_dump`
+
+4. **Data Transformation**
+   - Parse `full_name` → split into `first_name` + `last_name`
+   - Sanitize input (remove dangerous characters: `;`, `\`)
+   - Escape SQL special characters
+   - Create default grades (כיתה ז', ח', ט') if not exist
+   - Create default group for each grade
+
+5. **Generate SQL Migration**
+   - Create file: `backend/migrations/YYYYMMDD_HHmmss_import_from_math_tutor.sql`
+   - Use PostgreSQL DO blocks for safe execution
+   - Transaction-based (rollback on error)
+
+6. **Execute Import**
+   - Validate PostgreSQL container running
+   - Execute SQL via Docker: `docker exec -i student_management_postgres psql`
+   - Verify success
+
+### Data Mapping:
+
+| math-tutor-app Field | → | student-management-system Field | Notes |
+|---------------------|---|--------------------------------|-------|
+| `students.full_name` | → | `students.first_name` + `students.last_name` | Split on whitespace |
+| `students.phone` | → | Currently exported but not imported | Requires schema extension |
+| `students.notes` | → | Currently exported but not imported | Requires schema extension |
+| `lessons.*` | → | Future: `assessments.*` | Not yet implemented |
+| `payments.*` | → | Future: custom payment module | Not yet implemented |
+
+### Generated Directories:
+```
+student-management-system/
+├── data-exports/              # JSON exports from Cloudflare
+│   ├── students.json
+│   ├── lessons.json
+│   ├── payments.json
+│   ├── receipts.json
+│   └── settings.json
+├── backups/                   # PostgreSQL backups
+│   └── backup_YYYY-MM-DD_HH-mm-ss.sql
+└── backend/migrations/        # Generated SQL migrations
+    └── YYYYMMDD_HHmmss_import_from_math_tutor.sql
+```
+
+### Security Measures:
+- ✅ Input sanitization (strip `;`, `\`, SQL injection prevention)
+- ✅ PostgreSQL DO blocks (proper variable scoping)
+- ✅ Transaction-based operations (automatic rollback on error)
+- ✅ Automatic backups before modifications
+- ✅ Original Cloudflare data never modified (read-only)
+- ✅ Dry-run mode for testing without changes
+
+## 🎨 UI/UX Features
+
+### Design System
+- **Color Scheme**: Dark purple background, white text, Hebrew interface
+- **Components**: 3D buttons, hover effects, parallax transitions
+- **Animations**: Smooth fade-ins, live counter updates
+- **Charts**: Interactive ECharts (pie, line, bar, histogram)
+
+### Pages
+
+**Login Page** (`/login`):
+- Password-less authentication
+- Three 3D grade buttons (ז', ח', ט')
+- Live student counters per grade
+
+**Grade Page** (`/grades`, `/grades?gradeId=<id>`):
+- List of groups with teacher names
+- Live student counters per group
+- Navigation to group details
+
+**Group Page** (`/group/<groupId>`):
+- Interactive table (dark-light theme)
+- Search, filter, sort functionality
+- Live student counter
+- Charts: attendance pie chart, grade distribution histogram
+
+**Student Page** (`/student/<studentId>`):
+- Full profile: name, grade, group, teacher
+- Profile image upload
+- Assessments/grades display
+- Attendance records
+- Notes section
+- File attachments
+- Audit trail of all changes
+- Charts: grade trends (line), attendance per day (bar)
+
+### Navigation
+- `/login` → Login page
+- `/grades` → Auto-select first grade
+- `/grades?gradeId=<id>` → Specific grade
+- `/group/<groupId>` → Group details
+- `/student/<studentId>` → Student profile
+
+## 🚀 Development Commands
+
+### Backend (from `backend/` directory):
+```bash
+npm install              # Install dependencies
+npm run start:dev        # Start dev server with watch mode
+npm run build            # Build for production
+npm run lint             # Run ESLint
+npm run test             # Run tests
+npm run test:watch       # Run tests in watch mode
+npm run test:cov         # Generate coverage report
+
+# Database checking scripts
+npm run check:db         # Check all database content
+npm run check:class      # Check students in class ח1
+npm run delete:demo      # Delete demo/test data
+```
+
+### Frontend (from `frontend/` directory):
+```bash
+npm install              # Install dependencies
+npm run dev              # Start Vite dev server
+npm run build            # Build for production
+npm run preview          # Preview production build
+npm run lint             # Run ESLint
+```
+
+### Docker (from `backend/` directory):
+```bash
+docker-compose up -d     # Start PostgreSQL container
+docker-compose down      # Stop PostgreSQL container
+docker-compose logs      # View container logs
+```
+
+### Quick Start (from root directory):
+```powershell
+# Windows - Start everything at once
+.\FIX_AND_START.ps1
+
+# Windows - Start with data sync from math-tutor-app
+.\FIX_AND_START.ps1 --sync
+
+# npm scripts
+npm run sync             # Run data sync
+npm run sync:dry         # Run data sync in dry-run mode
+npm run start:sync       # Start with sync
+```
+
+## 📊 Database Checking Scripts
+
+The system includes utility scripts to check and manage database content:
+
+### Check Database Content
+```bash
+cd backend
+npm run check:db        # or: npx ts-node check-database.ts
+```
+Shows: All grades, groups, students with counts and lists
+
+### Check Specific Class (e.g., ח1)
+```bash
+cd backend
+npm run check:class     # or: npx ts-node check-class-h1.ts
+```
+Shows: Students in class ח1 specifically with full details
+
+### Delete Demo/Test Data
+```bash
+cd backend
+npm run delete:demo     # or: npx ts-node delete-demo-data.ts
+```
+Removes: Demo/test students, grades, and groups
+
+### Direct SQL Queries
+```bash
+docker exec -it student_management_postgres psql -U postgres -d student_management
+```
+
+For more details, see [README_CHECK_STUDENTS.md](README_CHECK_STUDENTS.md)
+
+## 📋 Environment Variables
+
+### Backend (`.env`):
+```env
+# Database
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=postgres
+DB_PASSWORD=postgres
+DB_NAME=student_management
+
+# JWT
+JWT_SECRET=your-super-secret-jwt-key-change-in-production-min-32-chars
+
+# Server
+PORT=3001
+NODE_ENV=development
+
+# CORS
+FRONTEND_URL=http://localhost:8080
+```
+
+### Frontend (`.env`):
+```env
+VITE_API_URL=http://localhost:3001
+VITE_WS_URL=http://localhost:3001
+```
+
+## 🧪 Testing Strategy
+
+- **Unit Tests**: Jest for backend services
+- **E2E Tests**: Jest + Supertest for API endpoints
+- **Frontend Tests**: Not yet implemented (can use Vitest + React Testing Library)
+- **Integration Tests**: Test full workflows (login → grade → group → student)
+
+## 🔧 Code Style Guidelines
+
+### TypeScript
+- Use strict type checking
+- Prefer interfaces over types for object shapes
+- Use `async/await` over promises
+- Use descriptive variable names (Hebrew comments acceptable)
+
+### NestJS Backend
+- One module per feature (students, grades, groups, etc.)
+- Controllers handle HTTP requests only
+- Services contain business logic
+- Use DTOs for request/response validation
+- Use guards for authentication/authorization
+- Use interceptors for logging/transformation
+
+### React Frontend
+- Functional components with hooks
+- Zustand for global state management
+- React Hook Form for form handling
+- Axios for API calls
+- Socket.IO for real-time updates
+- ECharts for data visualization
+
+### File Naming
+- Backend: `entity.controller.ts`, `entity.service.ts`, `entity.module.ts`
+- Frontend: `ComponentName.tsx`, `useName.ts` (hooks)
+- Tests: `entity.spec.ts` (unit), `entity.e2e-spec.ts` (e2e)
+
+## 🐛 Common Issues & Solutions
+
+### PostgreSQL Connection Error
+```bash
+# Start PostgreSQL container
+cd backend
+docker-compose up -d
+
+# Check if running
+docker ps | grep postgres
+```
+
+### Port Already in Use
+```bash
+# Find process using port 3001 (backend)
+lsof -i :3001
+kill -9 <PID>
+
+# Find process using port 8080 (frontend)
+lsof -i :8080
+kill -9 <PID>
+```
+
+### WebSocket Connection Failed
+- Ensure backend is running on port 3001
+- Check CORS settings in `main.ts`
+- Verify `FRONTEND_URL` in backend `.env`
+
+### math-tutor-app Sync Issues
+```bash
+# Install Wrangler CLI
+npm install -g wrangler
+
+# Login to Cloudflare
+wrangler login
+
+# Check database exists
+wrangler d1 list
+
+# Test dry run first
+.\scripts\sync-from-cloudflare.ps1 -DryRun
+```
+
+## 📚 Key Concepts
+
+### Hebrew Language Support
+- All UI text in Hebrew
+- Right-to-left (RTL) layout (to be implemented if needed)
+- Hebrew search with NLP features
+- Hebrew database indexes for efficient search
+
+### Real-time Updates
+- WebSocket connection established on page load
+- Auto-updates for counters, charts, tables
+- Channels: `grades`, `groups`, `students`, `reports`
+- Emit events from backend after database changes
+
+### Audit Trail
+- All CUD operations (Create, Update, Delete) logged
+- Track: entity type, entity ID, field, old/new values, user, timestamp
+- Display on student profile page
+
+### File Management
+- Upload files via Multer
+- Store in `backend/uploads/` directory
+- Support signed URLs for secure access
+- Associate files with students
+
+### Smart Search
+- Hebrew NLP processing
+- Typo correction
+- Natural language queries
+- Search across: students, grades, groups
+
+### Excel Import/Export
+- Import students from Excel files
+- Validation and error reporting
+- Progress tracking
+- Downloadable templates
+
+## 🎯 Development Best Practices
+
+1. **Always run migrations** after pulling new code
+2. **Use TypeScript strictly** - no `any` types
+3. **Test API endpoints** with Swagger UI at `/api`
+4. **Validate with DTOs** - never trust client input
+5. **Log important operations** - especially data imports
+6. **Handle errors gracefully** - return meaningful messages
+7. **Use transactions** for multi-step database operations
+8. **Backup before imports** - always create backup before data sync
+9. **Document changes** - update README when adding features
+10. **Review audit trail** - check what changed and why
+
+## 🚧 Known Limitations & Future Enhancements
+
+### Current Version (v1.0):
+- ✅ Students import only (from math-tutor-app)
+- ⚠️ Phone and notes fields not imported (schema extension needed)
+- ⚠️ Lessons, payments, receipts not imported (future enhancement)
+- ⚠️ No RTL support in UI (can be added)
+- ⚠️ No email notifications (can be added)
+- ⚠️ No mobile app (web-only)
+
+### Planned Features (Future):
+- Import lessons as assessments
+- Import payment records
+- Import receipt documents
+- Add student phone field to schema
+- Add student notes field to schema
+- Email notifications for attendance/grades
+- Parent portal access
+- SMS notifications
+- Mobile responsive design improvements
+- Offline mode with service workers
+- Advanced reporting with PDF export
+- Calendar integration
+- Assignment/homework module
+
+## 📖 Additional Resources
+
+- **Main Documentation**: [README.md](README.md)
+- **Sync Guide**: [README_SYNC.md](README_SYNC.md)
+- **math-tutor-app Repository**: https://github.com/yanivmizrachiy/math-tutor-app
+- **This Repository**: https://github.com/yanivmizrachiy/student-management-system
+- **Swagger API Docs**: http://localhost:3001/api (when backend running)
+
+## 👨‍💻 Author & Maintainer
+
+**Yaniv Raz** (ינִיב רז)  
+**License**: MIT
+
+---
+
+## 🤖 Instructions for Cursor AI
+
+### ⚠️ MOST IMPORTANT - READ FIRST:
+
+**THIS IS A STUDENT MANAGEMENT SYSTEM, NOT A WORKSHEET/HOMEWORK CREATOR!**
+
+When the user asks for features, always interpret in the context of:
+- ✅ Managing student records (add, edit, view students)
+- ✅ Tracking attendance (present/absent/late)
+- ✅ Recording grades/assessments (test scores, evaluations)
+- ✅ Organizing classes and groups
+- ✅ Generating reports about students
+- ✅ Importing student data from external sources
+
+**NEVER** assume the user wants to:
+- ❌ Create worksheets or educational materials
+- ❌ Generate homework assignments
+- ❌ Build lesson plans
+- ❌ Create quizzes or exams
+- ❌ Design teaching content
+
+**Example Clarifications**:
+- "Add a student" = Create student record in database (NOT create a worksheet for a student)
+- "Create a report" = Generate statistics report about students (NOT create homework report)
+- "Import data" = Import student records from math-tutor-app (NOT import worksheet templates)
+- "Files" = Student-related files (grades, documents, photos) (NOT educational materials)
+
+### Core Development Guidelines:
+
+When working with this codebase:
+
+1. **Language**: Use Hebrew for UI text and comments. Use English for code.
+2. **Backend**: Follow NestJS best practices. Use TypeORM for database. Validate with DTOs.
+3. **Frontend**: Use React functional components. Prefer Zustand for state. Use React Hook Form for forms.
+4. **Database**: Always use migrations for schema changes. Never modify DB directly.
+5. **Testing**: Write tests for new features. Run existing tests before commits.
+6. **Data Import**: Be cautious with sync scripts. Always backup. Test with dry-run first.
+7. **Security**: Sanitize inputs. Use transactions. Log sensitive operations.
+8. **Real-time**: Emit WebSocket events after data changes for live updates.
+9. **Documentation**: Update README when adding features or changing architecture.
+10. **Consistency**: Follow existing patterns. Match code style of surrounding code.
+
+### ❌ What NOT to Suggest:
+
+**NEVER suggest or implement features for:**
+- Creating worksheets, homework, or educational materials
+- Generating math problems, questions, or exercises
+- Building lesson plans or teaching content
+- Creating quizzes, tests, or exams (only RECORDING grades is OK)
+- Educational content management
+- Worksheet templates or generators
+- Teaching resource libraries
+
+**Remember**: We manage STUDENTS, not CONTENT!
+
+### When Adding New Features:
+- Create module with controller, service, entities
+- Add DTOs for validation
+- Create database migration if needed
+- Add API endpoint documentation
+- Emit WebSocket event if real-time update needed
+- Add to Swagger documentation
+- Write tests (unit + e2e)
+- Update README
+
+### When Fixing Bugs:
+- Understand root cause first
+- Check audit trail for data issues
+- Test with realistic data
+- Consider edge cases
+- Add test to prevent regression
+
+### When Refactoring:
+- Run tests before and after
+- Keep changes small and focused
+- Update documentation
+- Don't break existing API contracts
+- Maintain backward compatibility
+
+**Remember**: This system handles educational data. Accuracy and data integrity are critical. Always test thoroughly!
+
+---
+
+## 🔒 ERROR PREVENTION CHECKLIST
+
+### Before EVERY code suggestion, verify:
+
+**✅ SYNTAX CHECK:**
+- [ ] All brackets/braces are balanced
+- [ ] All strings are properly closed
+- [ ] All imports are correct and exist
+- [ ] No typos in variable/function names
+- [ ] Semicolons where needed (TypeScript)
+
+**✅ TYPE CHECK:**
+- [ ] All types are correct
+- [ ] No `any` types unless absolutely necessary
+- [ ] Interfaces match actual data structures
+- [ ] Props are correctly typed in React components
+- [ ] Database entities match the schema
+
+**✅ LOGIC CHECK:**
+- [ ] Code does what the user asked
+- [ ] No infinite loops
+- [ ] All edge cases handled
+- [ ] Error handling is present
+- [ ] No memory leaks
+
+**✅ BREAKING CHANGES:**
+- [ ] Existing functionality still works
+- [ ] No removed functionality without permission
+- [ ] API contracts maintained
+- [ ] Database migrations are reversible
+- [ ] Tests still pass
+
+**✅ SECURITY:**
+- [ ] Input is sanitized
+- [ ] SQL injection prevented
+- [ ] XSS attacks prevented
+- [ ] Authentication checked where needed
+- [ ] Sensitive data not logged
+
+---
+
+## 📋 REQUIREMENT VALIDATION PROCESS
+
+### When user gives a requirement:
+
+**STEP 1: UNDERSTAND**
+```
+1. Read requirement carefully 3 times
+2. Identify WHAT they want (the feature/change)
+3. Identify WHY they want it (the goal)
+4. Identify WHERE it affects (which files/components)
+5. Identify CONSTRAINTS (what must NOT change)
+```
+
+**STEP 2: CLARIFY**
+```
+ASK if:
+- Any part is ambiguous
+- Multiple interpretations possible
+- Impact on existing features unclear
+- Requirements conflict with architecture
+- Requirements are too broad
+```
+
+**STEP 3: PLAN**
+```
+1. List files that need changes
+2. List minimal changes needed
+3. Identify potential breaking points
+4. Plan rollback strategy
+5. Identify test scenarios
+```
+
+**STEP 4: VALIDATE PLAN**
+```
+Ask yourself:
+- Does this EXACTLY match user's request?
+- Is this the MINIMAL change?
+- Will this work WITHOUT errors?
+- Are all dependencies handled?
+- Is existing functionality preserved?
+```
+
+**STEP 5: IMPLEMENT**
+```
+- Write complete, working code
+- No partial implementations
+- No "..." placeholders
+- All imports included
+- All types correct
+```
+
+**STEP 6: VERIFY**
+```
+Before showing to user:
+- Mentally run the code
+- Check for syntax errors
+- Verify logic flow
+- Confirm requirement met
+- Double-check nothing broken
+```
+
+---
+
+## 🚫 ABSOLUTE PROHIBITIONS
+
+### NEVER do these things:
+
+**1. NEVER assume:**
+- What the user wants
+- What features to add
+- What code style to use
+- What libraries to include
+
+**2. NEVER break:**
+- Existing functionality
+- Working tests
+- API contracts
+- Database integrity
+
+**3. NEVER ignore:**
+- User's explicit requirements
+- Existing code patterns
+- Type safety
+- Error handling
+
+**4. NEVER provide:**
+- Incomplete code with "..."
+- Code that won't compile
+- Code without imports
+- Code without types
+
+**5. NEVER skip:**
+- Testing your suggestions
+- Checking for errors
+- Validating requirements
+- Following the checklist
+
+---
+
+## ✅ QUALITY GATES
+
+### Every code suggestion MUST pass ALL these gates:
+
+**GATE 1: REQUIREMENT MATCH**
+- ✅ Does this do EXACTLY what user asked?
+- ✅ Nothing more, nothing less?
+
+**GATE 2: ZERO ERRORS**
+- ✅ Will this compile without errors?
+- ✅ Will this run without runtime errors?
+- ✅ Are all dependencies satisfied?
+
+**GATE 3: NO BREAKING CHANGES**
+- ✅ Does existing functionality still work?
+- ✅ Are existing tests still passing?
+- ✅ Is backward compatibility maintained?
+
+**GATE 4: CODE QUALITY**
+- ✅ Follows project conventions?
+- ✅ Properly typed?
+- ✅ Properly documented?
+- ✅ Secure and safe?
+
+**GATE 5: COMPLETENESS**
+- ✅ All code is complete (no "...")?
+- ✅ All imports included?
+- ✅ All types defined?
+- ✅ Ready to use immediately?
+
+**If ANY gate fails → DO NOT suggest the code. Fix it first or ask for clarification.**
+
+---
+
+## 🎯 WHEN USER SAYS "SHOW ME"
+
+When user asks to "show" or "display" the website/feature:
+
+**YOU MUST:**
+1. ✅ Provide COMPLETE, working code
+2. ✅ Include ALL imports
+3. ✅ Include ALL types/interfaces
+4. ✅ Include proper error handling
+5. ✅ Make it ready to copy-paste and run
+6. ✅ Ensure it matches requirements EXACTLY
+7. ✅ Verify it has ZERO errors
+
+**YOU MUST NOT:**
+1. ❌ Use "..." or "// rest of code"
+2. ❌ Skip any parts of the implementation
+3. ❌ Assume anything is "obvious"
+4. ❌ Leave TODOs or placeholders
+5. ❌ Provide code that won't work immediately
+
+---
+
+## 💯 SUCCESS CRITERIA
+
+**Your response is successful ONLY when:**
+
+✅ User's requirement is met **EXACTLY**  
+✅ Code works **WITHOUT ERRORS**  
+✅ Nothing is broken  
+✅ Code is complete and ready to use  
+✅ User can implement immediately  
+✅ All quality gates passed  
+✅ All checks completed  
+
+**If you're not 100% certain → ASK FIRST, don't guess!**
+
+---
+
+**REMEMBER: REQUIREMENTS FIRST, ZERO ERRORS, COMPLETE CODE, NO ASSUMPTIONS**
+

@@ -69,6 +69,27 @@
 - Docker Desktop (להרצת PostgreSQL)
 - npm או yarn
 
+---
+
+## 🔄 סנכרון נתונים מ-math-tutor-app
+
+אם יש לך נתונים ב-**math-tutor-app** (Cloudflare D1), תוכל לסנכרן אותם בקלות!
+
+### הפעלה עם סנכרון אוטומטי:
+```powershell
+.\FIX_AND_START.ps1 -Sync
+```
+
+זה יעשה הכל:
+1. ✅ ייצא תלמידים מ-Cloudflare D1
+2. ✅ יצור גיבוי אוטומטי של PostgreSQL
+3. ✅ יייבא את כל התלמידים
+4. ✅ יפעיל את המערכת
+
+**לפרטים מלאים:** ראה [README_SYNC.md](README_SYNC.md)
+
+---
+
 ### Backend
 
 ```bash

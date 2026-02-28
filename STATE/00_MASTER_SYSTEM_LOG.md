@@ -1,0 +1,1 @@
+# 🧠 MASTER SYSTEM LOG — student-management-system\n\n- Initialized by GOV align (safe, no-overwrite)\n- Time: 2026-03-01T00:33:12+02:00\n

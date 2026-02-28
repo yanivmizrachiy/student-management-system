@@ -1,0 +1,1 @@
+# 📌 CONTROL INDEX — student-management-system\n\n## 2026-03-01T00:33:12+02:00 — init\n

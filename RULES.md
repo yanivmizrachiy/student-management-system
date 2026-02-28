@@ -1,0 +1,1 @@
+# RULES — student-management-system\n\nכלל ברזל: אין דמו. כל שינוי מתועד.\n\n- Updated: 2026-03-01T00:33:12+02:00\n

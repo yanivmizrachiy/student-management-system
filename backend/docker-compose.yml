@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   postgres:
+    container_name: student_management_postgres
     image: postgres:15-alpine
     environment:
       POSTGRES_USER: postgres
